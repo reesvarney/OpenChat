@@ -28,6 +28,10 @@ Using OpenChat is quite simple. The following guide explains how to set it up lo
 ## Bugs
 If you encounter any issues with OpenChat, please raise an issue so that it can be fixed as quickly as possible.
 
+### Currently Identified Issues:
+ - Stability beyond 8/9 users
+ - Temperamental issues with signalling, especially regarding users currently connected to a channel
+
 ## Development/ Contribution
 Due to the current state of the application in terms of stability, changes will quickly be applied directly to the master branch. However, once stability improves and updates become more incremental, new features/ fixes will be added into their own branches with more extensive testing before being merged into the master branch.
 

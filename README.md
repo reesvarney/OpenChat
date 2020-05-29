@@ -31,6 +31,7 @@ If you encounter any issues with OpenChat, please raise an issue so that it can 
 ### Currently Identified Issues:
  - Stability beyond 8/9 users
  - Temperamental issues with signalling, especially regarding users currently connected to a channel
+ - Sometimes voice channels seem to 'break' meaning users are completely unable to join them
 
 ## Development/ Contribution
 Due to the current state of the application in terms of stability, changes will quickly be applied directly to the master branch. However, once stability improves and updates become more incremental, new features/ fixes will be added into their own branches with more extensive testing before being merged into the master branch.

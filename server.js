@@ -1,4 +1,5 @@
 const express = require('express');
+var colors = require('colors');
 var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
@@ -9,7 +10,7 @@ var serveStatic = require('serve-static')
 const { PeerServer } = require('peer');
 const puppeteer = require('puppeteer');
 var arguments = process.argv.slice(2);
-var mcu_id;
+var mcu_id = null;
 
 const peerServer = PeerServer({ port: 9000, path: '/rtc' });
 const { server_secret } = require("./mcu/js/secret.js");
@@ -44,27 +45,31 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
     //WHEN USER SENDS THEIR INFORMATION
     socket.on("userinfo", function(data){
       if(data.type == "client"){
-        console.log("User Connected || IP: " + socket.request.connection.remoteAddress + "|| SOCKET ID: " + socket.id + "||" );
+        console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.blue );
        
         //TEMP - need to carry out checks on information that has been submitted
         var uservalid = true;
-
-        if(uservalid){
-          currentUser.info = data;
-          socket.emit("changeState", 1);
-          socket.emit("serverInfo", server_info);
-          server_info.users[socket.id] = {
-            name: data.name,
-            channel: null
-          };
-          io.emit('usersChange', server_info.users);
+        if(mcu_id !== null){
+          if(uservalid){
+            currentUser.info = data;
+            socket.emit("changeState", 1);
+            socket.emit("serverInfo", server_info);
+            server_info.users[socket.id] = {
+              name: data.name,
+              channel: null
+            };
+            io.emit('usersChange', server_info.users);
+          } else {
+            socket.emit("ocerror", "user details are not valid");
+          }
         } else {
-          socket.emit("ocerror", "user details are not valid");
+          socket.emit("ocerror", "MCU has not connected yet")
         }
+
 
       } else if(data.type == "server"){
         if(data.secret == server_secret){
-          console.log("MCU Connected || IP: " + socket.request.connection.remoteAddress + "|| SOCKET ID: " + socket.id + "||" );
+          console.log("MCU CONNECTED");
           console.log("READY TO RECEIVE CALLS")
           mcu_id = socket.id;
         } else {
@@ -94,7 +99,7 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
       var channel = message.channel;
       var content = message.content;
       if((content.length <= 2000) && (server_info.channels[channel].channel_type == "text")){
-        console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`);
+        console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.yellow);
         db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( "${content}", "${sender}", "${channel}")`, function (err, result) {
           if (err) throw err;
         });
@@ -178,7 +183,6 @@ async function startMCU() {
   const page = await browser.newPage();
   await page.goto(`file:${path.join(__dirname, '/mcu/mcu.html')}`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
   await page.click('#button');
-  page.on('console', msg => console.log(msg.text));
 };
 
 startMCU();

@@ -12,7 +12,7 @@ Using OpenChat is quite simple. The following guide explains how to set it up lo
 1. Install the latest version of Node/ NPM
 2. Clone/ Download the repository
 3. Open the repository and run `npm i` to install prequisite packages
-4. (Temporary until administrative panel is added) edit `conf.json` to add channels and configure ports
+4. (Temporary until administrative panel is added) - edit `conf.json` to add channels and configure ports
 5. Navigate to `/mcu/js/secret.js` and change the secret to a random string of characters
 6. Run `npm start` in the console at the root of the repository
 7. Open `IP:PORT` in your browser (e.g. `localhost:8080/`)

@@ -11,6 +11,7 @@
   "author": "RV",
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.4.0",
     "express": "^4.17.1",
     "peer": "^0.5.3",
     "puppeteer": "^3.1.0",

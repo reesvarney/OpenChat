@@ -56,7 +56,11 @@ function connectToServer(){
       type: 'client',
       name: client.name
     });
-  })
+  });
+
+  socket.on('disconnect', function(){
+    window.location.reload();
+  });
 
   socket.on('canJoin', function(canJoin){
     if(canJoin == true){

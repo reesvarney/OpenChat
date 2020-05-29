@@ -27,6 +27,7 @@ function main() {
   const audioOut = document.querySelector('audio');
 
   function updateStreams(currentChannel){
+    console.log(connected_users);
     var channelUsers = [];
 
     for ( a = 0; a < Object.keys(connected_users).length; a++){
@@ -113,6 +114,4 @@ function main() {
     updateStreams(old_channel);
     socket.emit("callClosed", data.user);
   });
-
-
 };

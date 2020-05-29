@@ -169,7 +169,12 @@ if(arguments.includes("showmcu")){
 
 //TODO: ALLOW MCU TO BE SPLIT INTO MULTIPLE PROCESSES/ TABS
 async function startMCU() {
-  const browser = await puppeteer.launch({headless: isHeadless});
+  const browser = await puppeteer.launch(
+    {
+      headless: isHeadless,
+      args: ['--autoplay-policy=no-user-gesture-required']
+    }
+  );
   const page = await browser.newPage();
   await page.goto(`file:${path.join(__dirname, '/mcu/mcu.html')}`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
   await page.click('#button');

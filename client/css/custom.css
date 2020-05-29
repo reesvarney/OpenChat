@@ -1,0 +1,23 @@
+.server-icon{
+  border-radius: 50%;
+  display: inline-block;
+  background-color: white;
+  height: 50px;
+  width: 50px;
+  text-align:center;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+#modal-close{
+  height: 10px;
+  width: 10px;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  position: absolute;
+  margin-left: auto;
+  background-color: red;
+}

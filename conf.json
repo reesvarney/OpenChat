@@ -1,0 +1,26 @@
+{
+  "sig" : {
+    "port" : 8080
+  },
+  "server" : {
+    "name" : "Rees's Server",
+    "channels" : [
+      {
+      "channel_name" : "Text 1",
+      "channel_type" : "text"
+    },
+    {
+      "channel_name" : "Text 2",
+      "channel_type" : "text"
+    },
+    {
+      "channel_name" : "Voice 1",
+      "channel_type" : "voice"
+    },
+    {
+      "channel_name" : "Voice 2",
+      "channel_type" : "voice"
+    }
+    ]
+  }
+}

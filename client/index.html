@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<head>
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" href="./css/bulma.css" />
+  <link rel="stylesheet" href="./css/custom.css" />
+  <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
+  <script src="./js/jquery.js"></script>
+  <script src="./js/moment.js"></script>
+  <script src="./js/socket.io.js"></script>
+  <script src="./js/peer.js"></script>
+  <script src="./js/handlebars.js"></script>
+  <script src="./js/app.js"></script>
+  <meta charset="UTF-8">
+  <title>OpenChat</title>
+</head>
+
+<body style="height: 100vh; overflow-y: hidden;">
+  <div class="columns" style="height: 100vh;margin: 0;" >
+
+    <div style="width: 70px;height: 100vh; background-color: #8f8f8f; ">
+
+      <div id="servercolumn" style="height: 90vh;" >
+      </div>
+
+      <div style="text-align: center;">
+        <a id="addserver" style="margin: auto;display: inline-block; text-align: center;" class="server-icon"><i style="height: 100%;" class="fas fa-wifi fa-2x"></i></a>
+      </div>
+    </div>
+
+    <div class="column is-2"style="margin-left: 10px; background-color: #d5d9e0; margin:0; padding: 0;">
+      <div class="column" style="height: 90vh;">
+        <aside class="menu">
+
+          <h1 id="server_title">
+
+          </h1>
+
+          <p class="menu-label">
+            Voice
+          </p>
+
+          <ul class="menu-list" id="voice_channels">
+          </ul>
+
+          <p class="menu-label">
+            Text
+          </p>
+
+          <ul class="menu-list" id="text_channels">
+          </ul>
+
+        </aside>
+      </div>
+
+      <div class="column" style="background-color: #b8b8b8; height: 10vh;">
+        <div  style="width: 100%; height: 100%; position: relative; ">
+          <a id="mute-button"><i class="fas fa-microphone fa-lg"></i></a>
+          <a id="mute-audio-button"><i class="fas fa-volume-up fa-lg"></i></a>
+          <div id="call-controls" style="right:0;top:0;margin-left: auto;position: absolute;display: none;">
+            <a id="disconnect-button"><i class="fas fa-phone-slash fa-lg"></i></a>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <div class="column" style="margin:0; padding:0;">
+      <div class="column" style="height: 90vh;background-color: #f2f2f0;">
+
+        <div id="message_area" style="display: flex;justify-content: flex-end;flex-direction: column; height: 100%;">
+        </div>
+
+      </div>
+
+      <div class="column" style="height:10vh; background-color: #deddd9;">
+
+        <form id="messageForm">
+          <input class="input" type="text" id="messageInput" disabled placeholder="Send Message..." style="background-color: #f2f2f0;"></input>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <audio autoplay></audio>
+
+  <div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content" style="width: auto;">
+      <div class="box" style="height: 50vh; width: 30vw;">
+        <div style="width:100%">
+          <button id="modal-close" aria-label="close" class="delete is-medium"></button>
+        </div>
+        <h5 class="title is-5">Connect to server</h5>
+        <div class="field">
+          <label class="label">Alias</label>
+          <div class="control">
+            <input style="text-align: center;" class="input" id="name_input" type="text">
+          </div>
+        </div>
+        <label class="label">Server IP / host</label>
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <input style="text-align: center;" class="input" id="ip_input" type="text">
+          </div>
+        </div>
+        <div class="field">
+          <div class="control" style="text-align: center;">
+            <button class="button is-link" id="connectbutton">Connect</button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+</body>
+
+<template id="ChatMessage" type="text/x-handlebars-template">
+  <div class="box" style="justify-content: flex-end;">
+    <article class="media">
+      <div class="media-content">
+        <div class="content">
+          <p>
+            <strong>{{messageSender}}</strong>
+            <i class="has-text-grey" style="width: 100%; text-align: right;">{{messageDate}}</i>
+            <br>
+            {{messageContent}}
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</template>
+
+<template id="VoiceChannel" type="text/x-handlebars-template">
+  <li>
+    <a id="{{channelID}}" class="channel">
+      {{channelName}}
+    </a>
+    <ul id="{{channelID}}-users" class="user-list"></ul>
+  </li>
+</template>
+
+<template id="TextChannel" type="text/x-handlebars-template">
+  <li>
+    <a id="{{channelID}}" class="channel">
+      {{channelName}}
+    </a>
+  </li>
+</template>

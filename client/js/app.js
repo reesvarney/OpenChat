@@ -258,8 +258,4 @@ $( document ).ready(function() {
       $('#mute-audio-button svg').attr('data-icon', 'volume-mute');
     }
   });
-
-  
-
-
 });

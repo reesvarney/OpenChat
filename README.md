@@ -29,7 +29,7 @@ Using OpenChat is quite simple. The following guide explains how to set it up lo
 If you encounter any issues with OpenChat, please raise an issue so that it can be fixed as quickly as possible.
 
 ### Currently Identified Issues:
- - Stability beyond 8/9 users
+ - Instability beyond 8/9 users in a single channel
  - Temperamental issues with signalling, especially regarding users currently connected to a channel
  - Sometimes voice channels seem to 'break' meaning users are completely unable to join them
 

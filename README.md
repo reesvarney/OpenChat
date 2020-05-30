@@ -24,6 +24,7 @@ Using OpenChat is quite simple. The following guide explains how to set it up lo
  - [ ] Rewrite front-end styling to use custom css rather than depending on a framework
  - [ ] Use react to optimize front-end code
  - [ ] Add some kind of session tracking to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
+ - [ ] Combine signalling into single system with native WebRTC implementation
 
 ## Bugs
 If you encounter any issues with OpenChat, please raise an issue so that it can be fixed as quickly as possible.

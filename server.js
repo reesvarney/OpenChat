@@ -45,7 +45,7 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
     //WHEN USER SENDS THEIR INFORMATION
     socket.on("userinfo", function(data){
       if(data.type == "client"){
-        console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.blue );
+        console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.brightBlue );
        
         //TEMP - need to carry out checks on information that has been submitted
         var uservalid = true;
@@ -73,7 +73,7 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
           console.log("READY TO RECEIVE CALLS")
           mcu_id = socket.id;
         } else {
-          console.log('MCU WITH WRONG SECRET HAS TRIED TO CONNECT')
+          console.log('MCU WITH WRONG SECRET HAS TRIED TO CONNECT'.bgRed)
         }
       }
 
@@ -99,7 +99,7 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
       var channel = message.channel;
       var content = message.content;
       if((content.length <= 2000) && (server_info.channels[channel].channel_type == "text")){
-        console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.yellow);
+        console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
         db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( "${content}", "${sender}", "${channel}")`, function (err, result) {
           if (err) throw err;
         });
@@ -111,7 +111,7 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
     socket.on("joinChannel", function(channel){
       if(server_info['channels'][channel] != undefined){
         if(server_info['channels'][channel]['channel_type'] == "voice"){
-          console.log('User ' + socket.id + ' changing to channel ' + server_info['channels'][channel]['channel_name']);
+          console.log(`User ${socket.id} changing to channel ${server_info['channels'][channel]['channel_name']}`.cyan);
           io.to(mcu_id).emit('setChannel', {
             user: socket.id,
             channel: channel
@@ -132,12 +132,12 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
     socket.on('peerConnected', function(data){
       server_info.users[data.user].channel = data.channel;
       io.emit('usersChange', server_info.users);
-      console.log("User " + data.user + " has successfully joined channel " +  server_info['channels'][data.channel]['channel_name']);
+      console.log(`User ${data.user} has successfully joined channel ${server_info['channels'][data.channel]['channel_name']}`.green);
     });
 
     //WHEN USER REQUESTS TO LEAVE THEIR CURRENT CHANNEL
     socket.on("leaveChannel", function(){
-      console.log("User " + socket.id + " leaving channel " + server_info.users[socket.id].channel);
+      console.log(`User ${socket.id} leaving channel ${server_info.users[socket.id].channel}`.yellow);
       io.to(mcu_id).emit('closeCall', {
         user: socket.id
       });
@@ -149,12 +149,12 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
         server_info.users[user].channel = null;
         io.emit('usersChange', server_info.users);
       };
-      console.log("User " + user + " has been disconnected from the channel")
+      console.log(`User ${user} has been disconnected from the channel`.yellow)
     });
 
     //WHEN USER HAS DISCONNECTED FROM THE SOCKET
     socket.on("disconnect", function(){
-      console.log("User " + socket.id + " Disconnected");
+      console.log(`User ${socket.id} Disconnected`.brightRed);
       io.to(mcu_id).emit('closeCall', {
         user: socket.id
       });

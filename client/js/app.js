@@ -87,6 +87,7 @@ function connectToServer(){
 
   socket.on('serverInfo', function(server_info){
     console.log(server_info);
+    $("#server_title").text(server_info.name);
     $("#text_channels").empty();
     $("#voice_channels").empty();
     serverinfo = server_info;

@@ -26,7 +26,6 @@ require('./signalling.js')(io, conf);
 // MCU CLIENT //
 // Configure params for starting the MCU here
 
-var mcu_id = null;
 var mcu_params = {
   isHeadless: true,
   protocol: 'http',

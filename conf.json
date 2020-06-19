@@ -3,7 +3,7 @@
     "port" : 8080
   },
   "server" : {
-    "name" : "Rees's Server",
+    "name" : "OpenChat Server",
     "channels" : [
       {
       "channel_name" : "Text 1",

@@ -1,6 +1,8 @@
 var colors = require('colors');
 var sqlite3 = require('sqlite3').verbose();
 
+var mcu_id = null;
+
 const { server_secret } = require("./mcu/static/js/secret.js");
 
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
@@ -64,7 +66,7 @@ function startServer(io, conf) {
                 if(query.page == undefined){
                 query.page = 0;
                 }
-                db.all(`SELECT * FROM messages WHERE channel_id="${query.channel_id}" LIMIT ${(query.page * 50)} , 50`,[], function (err, result) {
+                db.all(`SELECT * FROM messages WHERE channel_id="${query.channel_id}" ORDER BY message_date DESC LIMIT ${(query.page * 50)} , 50`,[], function (err, result) {
                 if (err) throw err;
                 if(result.length == 0){
                     result = null;
@@ -78,13 +80,22 @@ function startServer(io, conf) {
                 var sender = server_info.users[socket.id].name;
                 var channel = message.channel;
                 var content = message.content;
-                if((content.length <= 2000) && (server_info.channels[channel].channel_type == "text")){
-                console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
-                db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( "${content}", "${sender}", "${channel}")`, function (err, result) {
-                    if (err) throw err;
-                });
-                io.emit("newMessage", channel)
-                };
+                if(channel in server_info.channels){
+                    if(content != ""){
+                        if((content.length <= 2000) && (server_info.channels[channel].channel_type == "text")){
+                            console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
+                            db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( "${content}", "${sender}", "${channel}")`, function (err, result) {
+                                if (err) throw err;
+                            });
+                            io.emit("newMessage", channel)
+                        };
+                    } else {
+                        socket.emit("ocerror", "Cannot send empty message")
+                    }
+
+                } else {
+                    socket.emit("ocerror", "Invalid Channel");
+                }
             });
         
             //WHEN USER TRIES TO JOIN A CHANNEL

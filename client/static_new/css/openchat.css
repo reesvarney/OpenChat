@@ -1,0 +1,320 @@
+html {
+    font-family: 'Public Sans', sans-serif;
+    height: 100vh;
+    height: -webkit-fill-available;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+/* SIDEBAR */
+nav {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 0px;
+    background: #f5f5f5;
+    box-shadow:  5px 5px 14px #e9e9e9, 
+                -5px -5px 14px #ffffff;
+}
+
+/* ALIGNMENT */
+.center-self {
+    text-align: center;
+}
+
+div.center-self {
+    justify-self: center;
+}
+
+/* CHANNELS */
+#channels {
+    border-radius: 11px;
+    background: #f5f5f5;
+    box-shadow:  6px 6px 11px #ebebeb, 
+                 -6px -6px 11px #ffffff;
+    padding: 10px;
+    padding-left: 40px;
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.channel-group>ul{
+    padding-left: 5px;
+}
+
+.channel-group>ul>li {
+    text-decoration: none;
+    list-style: none;
+    border-radius: 16px;
+    background: #f5f5f5;
+    box-shadow:  5px 5px 10px #e9e9e9, 
+                 -5px -5px 10px #ffffff; 
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+.channel-group>ul>li>a{
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    position: relative;
+}
+
+.channel-group>ul>li>a:hover{
+    cursor: pointer;
+}
+
+#channels .active {
+    box-shadow: 0px 0px 6px 1px rgba(22,66,199,0.52);
+}
+
+#channels .active>a {
+    color: rgba(22,66,199,0.52);
+}
+
+.user-list{
+    position: relative;
+    list-style: none;
+    height: auto;
+    padding: 1px;
+    padding-left: 10px;
+}
+
+.user-list li{
+    position: relative;
+    margin-top: 10px;
+    box-sizing: border-box;
+    padding-left: 20px;
+}
+
+.user-list li:last-of-type{
+    margin-bottom: 20px;
+}
+
+
+.user-list>li:first-of-type::before{
+    content:'';
+    width:100%;
+    height: 1px;
+    left:0;
+    top: -10px;
+    background: linear-gradient(to right, hsla(0, 0%, 0%, 0.2) 0%, hsla(0, 0%, 0%, 0.2) 33%, hsla(0, 0%, 0%, 0) 90%);
+    position: absolute;
+}
+
+/* CONTROLS */
+#control_area {
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.control-button {
+    border-radius: 50%;
+    background: #e6e6e6;
+    box-shadow:  3px 3px 5px #d6d6d6, 
+                 -3px -3px 5px #f6f6f6;
+    height: 0;
+    width: 0;
+    padding: 10px;
+    margin: 2px;
+}
+
+.control-button:hover {
+    cursor: pointer;
+}
+
+/* MESSAGE AREA */
+main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 0px;
+    background-color: #ededed;
+}
+
+#messages {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 20px;
+}
+
+.message-card {
+    border-radius: 16px;
+    background: #ededed;
+    box-shadow:  5px 5px 10px #dfdfdf, 
+                 -5px -5px 10px #fbfbfb;
+    padding: 5px;
+    padding-left: 40px;
+    padding-right: 40px;
+    margin-bottom: 20px;
+}
+/* MESSAGE INPUT */
+#message_input_area {
+    display: flex;
+    flex-direction: row;
+    border-radius: 0px;
+    background: #e8e8e8;
+    box-shadow:  0px -7px 14px #d8d8d8;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#message_box {
+    flex-grow: 1;
+    width:100%;
+    color: grey;
+    border-radius: 28px 0px 0px 28px;
+    background: #d9d9d9;
+    box-shadow: inset 5px 5px 5px #d0d0d0, 
+                inset -5px -5px 5px #e2e2e2;
+    border: none;
+    padding: 10px;
+    padding-left: 15px;
+    font-size: 1.3em;
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    overflow-y: auto;
+}
+
+#message_box:disabled {
+    filter: opacity(50%);
+}
+
+#message_box:focus {
+    outline: none;
+}
+
+#message_box::-webkit-scrollbar {
+    display: none;
+}
+
+#message_send {
+    border-radius: 0px 32px 32px 0px;
+    background: linear-gradient(145deg, #e0e0e0, #bcbcbc);
+    outline: none;
+    border: none;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+#message_send:focus {
+    outline: none;
+}
+
+#message_send:focus:hover {
+    background: #d1d1d1;
+    box-shadow: inset 5px 5px 7px #c2c2c2, 
+                inset -5px -5px 7px #e0e0e0;
+}
+
+/* OVERLAY */
+.overlay {
+    position: absolute;
+    height: -webkit-fill-available;
+    width: 100vw;
+    backdrop-filter: blur(5px);
+    visibility: hidden;
+    background: rgba(0,0,0, 0.2);
+}
+
+.overlay.active {
+    visibility: visible;
+}
+
+.modal {
+    border-radius: 98px;
+    background: #ededed;
+    box-shadow:  8px 8px 10px #bbbbbb, 
+                -8px -8px 10px #cccccc;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    min-height: 30%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.modal.active {
+    visibility: visible;
+}
+
+.modal h2 {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    color: grey;
+}
+
+/* LOGIN FORM */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    max-width: 20em;
+    margin-top: 40px;
+}
+
+.login-form *{
+    margin-bottom: 50px;
+}
+
+.login-form input{
+    color: grey;
+    border-radius: 38px;
+    background: #d9d9d9;
+    box-shadow: inset 8px 8px 16px #b8b8b8, 
+                inset -8px -8px 16px #fafafa;
+    border: none;
+    padding: 10px;
+    padding-left: 15px;
+    text-align: center;
+    font-size: 1.3em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-form input:focus{
+    outline: 0;  
+}
+
+.login-form button {
+    border-radius: 54px;
+    background: #ebebeb;
+    box-shadow:  5px 5px 10px #9b9b9b, 
+                 -5px -5px 10px #ffffff;
+    border: none;
+    padding: 10px;
+    color: grey;
+    font-size: 20px;
+}
+
+.login-form  button:focus{
+    outline: 0;  
+}
+
+.login-form  button:focus:hover{
+    border-radius: 54px;
+    background: #ebebeb;
+    box-shadow: inset 5px 5px 10px #9b9b9b, 
+                inset -5px -5px 10px #ffffff;
+    outline: 0;  
+}
+
+/* detect sub 270 wide displays */
+@media screen and ( max-width: 270px ) {
+    /* MAKE NAV 100% WIDTH, SWIPE BETWEEN NAV/ MESSAGES */
+}

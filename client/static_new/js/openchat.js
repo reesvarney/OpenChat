@@ -1,6 +1,3 @@
-//TEMP, REPLACE WITH SOME KIND OF DETECTION E.G. FOR ELECTRON APPS
-var hosted = true;
-
 var serverinfo;
 var destination = {};
 var client = {};
@@ -42,12 +39,10 @@ var stream;
 var peer;
 var call;
 var new_channel = null;
-
-destination.port = "8080"
-
+var hostname = window.location.hostname;
 function connectToServer(){
 
-  var socket = io.connect("http://" + destination.ip + ":" + destination.port);
+  var socket = io.connect(`http://${hostname}:8080`);
   $("#addserver").hide();
   
   // SOCKET LISTENERS
@@ -69,9 +64,9 @@ function connectToServer(){
 
       call.on('stream', function(remoteStream) {
         isConnected = true;
-        $("#call-controls").show();
-        $('#voice_channels a').removeClass("is-active");
-        $('#voice_channels #' + new_channel).addClass("is-active");
+        $("#disconnect_button").show();
+        $('#voice_channels li').removeClass("active");
+        $('#voice_channels #' + new_channel).parent().addClass("active");
         var audioOut = document.querySelector('audio');
         audioOut.srcObject = remoteStream;
         soundeffects.connect.play();
@@ -95,7 +90,7 @@ function connectToServer(){
     for(i = 0; i < server_info.channels.length; i++){
       addChannel(server_info.channels[i].channel_type, server_info.channels[i].channel_name, i)
     };
-    peer = new Peer(socket.id, {host: destination.ip, port: 9000, path: '/rtc'});
+    peer = new Peer(socket.id, {host: hostname, port: 9000, path: '/rtc'});
   });
 
   socket.on('usersChange', function(users){
@@ -124,7 +119,7 @@ function connectToServer(){
           "messageDate" : date.format('MMMM Do YYYY, h:mm a')
         };
         var result = template(data);
-        $('#message_area').append(result);
+        $('#messages').append(result);
       }
     }
   });
@@ -135,10 +130,10 @@ function connectToServer(){
       channel_id : channel_id,
       page : page
      });
-     $('#message_area').empty();
-     $('#text_channels a').removeClass("is-active");
-     $('#text_channels #' + channel_id).addClass("is-active");
-     $("#messageInput").prop('disabled', false);
+     $('#messages').empty();
+     $('#text_channels li').removeClass("active");
+     $('#text_channels #' + channel_id).parent().addClass("active");
+     $("#message_box").prop('disabled', false);
      currentText = channel_id;
   };
   
@@ -191,11 +186,11 @@ function connectToServer(){
 
   //DOM LISTENERS
   $( document ).ready(function() {
-    $("#disconnect-button").click(function(){
+    $("#disconnect_button").click(function(){
       leaveChannel();
-      $("#call-controls").hide();
+      $("#disconnect_button").hide();
       isConnected = false;
-      $('#voice_channels a').removeClass("is-active");
+      $('#voice_channels li').removeClass("active");
       soundeffects.disconnect.play();
     });
 
@@ -206,62 +201,56 @@ function connectToServer(){
     $("#text_channels").on('click', '* .channel', function() {
       getMessages($(this).attr("id"), 0);
     })
+
   });
 
-  $("#messageForm").submit(function(e) {
+  $("#message_box").keypress(function (evt) {
+    if(evt.keyCode == 13 && !evt.shiftKey) {
+      $("#message_input_area").submit();
+    }
+  });
+
+  $("#message_input_area").submit(function(e) {
     e.preventDefault();
-    var contents = $("#messageInput").val();
+    var contents = $("#message_box").val();
     socket.emit("sendMessage", {
       channel: currentText,
       content: contents
     });
-    $("#messageInput").val("");
+    $("#message_box").val("");
   });
 };
 
 $( document ).ready(function() {
-  if(hosted == true){
-    $("#ip_input").val(window.location.hostname);
-    $("#ip_input").prop("disabled", true );
-  }
-
-  $("#addserver").click(function() {
-    $(".modal").addClass("is-active");
+  $( "#connect_form" ).submit(function( event ) {
+    event.preventDefault();
+    client.name = $("#name_input").val();
+    connectToServer();
+    $("#connect_overlay").removeClass("active");
   });
 
-  $("#modal-close").click(function() {
-     $(".modal").removeClass("is-active");
-  });
-
-  $("#connectbutton").click(function() {
-     client.name = $("#name_input").val();
-     destination.ip = $("#ip_input").val();
-     connectToServer();
-     $(".modal").removeClass("is-active");
-  });
-
-  $("#mute-button").click(function(){
+  $("#mute_microphone").click(function(){
     if(isMuted){
       isMuted = false;
-      $('#mute-button svg').attr('data-icon', 'microphone');
+      $('#mute_microphone svg').attr('data-icon', 'microphone');
       stream.getAudioTracks()[0].enabled = true;
       soundeffects.unmute.play();
     } else {
       isMuted = true;
-      $('#mute-button svg').attr('data-icon', 'microphone-slash');
+      $('#mute_microphone svg').attr('data-icon', 'microphone-slash');
       stream.getAudioTracks()[0].enabled = false;
       soundeffects.mute.play();
     }
   });
 
-  $("#mute-audio-button").click(function(){
+  $("#mute_audio").click(function(){
     var audioOut = document.querySelector('audio');
     if(audioOut.muted == true){
       audioOut.muted = false;
-      $('#mute-audio-button svg').attr('data-icon', 'volume-up');
+      $('#mute_audio svg').attr('data-icon', 'volume-up');
     } else {
       audioOut.muted = true;
-      $('#mute-audio-button svg').attr('data-icon', 'volume-mute');
+      $('#mute_audio svg').attr('data-icon', 'volume-mute');
     }
   });
 });

@@ -186,6 +186,7 @@ main>h2::after {
     height: 100%;
     overflow-y: auto;
     padding-right: 20px;
+    margin: 0px;
 }
 
 .message-card {

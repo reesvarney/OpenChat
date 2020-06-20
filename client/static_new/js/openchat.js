@@ -103,6 +103,42 @@ function connectToServer(){
     }
   })
 
+  function getOGP(ogp_url, messageID){
+    $.ajax({
+      async: true,
+      type: 'GET',
+      url: "/ogp", 
+      data: { "url": `${ogp_url}` },
+      success: ( function( result ){
+        var ogSource = document.getElementById("OGPCard").innerHTML;
+        var ogTemplate = Handlebars.compile(ogSource);
+        if ("ogTitle" in result){
+          var ogpImageURL = "";
+          if ("ogImage" in result && "url" in result.ogImage) {
+            ogpImageURL = result.ogImage.url
+            if (result.ogImage.url.startsWith("/")){
+              ogpImageURL = (result.requestUrl || result.ogUrl) + result.ogImage.url;
+            }
+          }
+          var ogpSiteName = "";
+          if ("ogSiteName" in result){
+            ogpSiteName = `${result.ogSiteName} - `;
+          }
+          
+          var ogData = {
+            "ogpImageURL" : ogpImageURL,
+            "ogpURL" : result.ogUrl || result.requestUrl,
+            "ogpTitle" : result.ogTitle,
+            "ogpSiteName": ogpSiteName,
+            "ogpDesc" : result.ogDescription
+          };
+          $(`#${messageID} .ogp-area`).empty();
+          $(`#${messageID} .ogp-area`).append(ogTemplate(ogData));
+        }
+      })
+    });
+  }
+
   socket.on("messages", function(messages){
     if(messages == null){
       console.log("No more messages to display");
@@ -110,13 +146,15 @@ function connectToServer(){
       var source = document.getElementById("ChatMessage").innerHTML;
       var template = Handlebars.compile(source);
       for( i = 0; i < messages.length; i++){
+        var messageID = `message-${i}`
         var date = moment.utc(messages[i].message_date);
         var data = {
           "messageSender" : messages[i].sender_name,
           "messageContent" : messages[i].message_content,
           "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
-          "messageID" : `message-${i}`
+          "messageID" : messageID
         };
+
         var result = $($.parseHTML(anchorme({
           input: template(data),
           options : {
@@ -125,26 +163,14 @@ function connectToServer(){
             }
           }
         })));
+
         $('#messages').append(result);
         if ($(result).find(".found-link").length != 0){
           var ogp_url = $(result).find(".found-link")[0].href;
-          console.log(ogp_url)
-          $.get( "/ogp", { "url": `${ogp_url}` }).done( function( result ){
-            var ogSource = document.getElementById("OGPCard").innerHTML;
-            var ogTemplate = Handlebars.compile(ogSource);
-            var ogData = {
-              "ogpImageURL" : result.ogImage.url,
-              "ogpURL" : result.ogUrl,
-              "ogpTitle" : result.ogTitle,
-              "ogpSiteName": result.ogSiteName,
-              "ogpDesc" : result.ogDescription
-            };
-            $(`#message-${i - 1} .ogp-area`).empty();
-            $(`#message-${i - 1} .ogp-area`).append(ogTemplate(ogData));
-          });
-        }
-      }
-    }
+          getOGP(ogp_url, messageID)
+        };
+      };
+    };
   });
 
   socket.on("OGPData", function(ogp){

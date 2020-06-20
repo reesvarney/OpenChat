@@ -44,10 +44,13 @@ require('./mcu_launcher.js')(mcu_params);
 var clientController = require('./client/client.js');
 var adminController = require('./admin/admin.js');
 var mcuController = require('./mcu/mcu.js');
+var ogpController = require('./ogp/ogp.js');
 
 app.get('/', function(req, res){
   res.redirect('/client')
 });
+
 app.use("/client", clientController);
 app.use("/admin", adminController);
 app.use("/mcu", mcuController);
+app.use("/ogp", ogpController);

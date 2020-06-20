@@ -21,7 +21,7 @@ var constraints = {
     video: false
 };
 
-var soundfiles = ["connect", "disconnect", "mute", "unmute"];
+var soundfiles = ["connect", "disconnect", "mute", "unmute", "mute_mic", "unmute_mic"];
 var soundeffects = {};
 
 for(i = 0; i < soundfiles.length; i++){
@@ -96,7 +96,6 @@ function connectToServer(){
   socket.on('usersChange', function(users){
     $('.user-list').empty();
     serverinfo.users = users;
-    console.log(users);
     for(i = 0; i < Object.keys(users).length; i++){
       if(users[Object.keys(users)[i]].channel != null){
         $('#' + users[Object.keys(users)[i]].channel + "-users").append("<li><a>" + users[Object.keys(users)[i]].name + "</a></li>");
@@ -108,7 +107,6 @@ function connectToServer(){
     if(messages == null){
       console.log("No more messages to display");
     } else {
-      console.log(messages);
       var source = document.getElementById("ChatMessage").innerHTML;
       var template = Handlebars.compile(source);
       for( i = 0; i < messages.length; i++){
@@ -118,12 +116,29 @@ function connectToServer(){
           "messageContent" : messages[i].message_content,
           "messageDate" : date.format('MMMM Do YYYY, h:mm a')
         };
-        var result = template(data);
+        var result = $($.parseHTML(anchorme({
+          input: template(data),
+          options : {
+            attributes: {
+              class: "found-link"
+            }
+          }
+        })));
         $('#messages').append(result);
+        if ($(result).find(".found-link").length != 0){
+          var ogp_url = $(result).find(".found-link")[0].href;
+          console.log(ogp_url)
+          $.get( "/ogp", { "url": `${ogp_url}` }).done( function( data ){
+            console.log(data);
+          });
+        }
       }
     }
   });
 
+  socket.on("OGPData", function(ogp){
+    console.log('reesults:', ogp);
+  })
 
   function getMessages(channel_id, page){
     socket.emit("getMessages", {
@@ -133,7 +148,9 @@ function connectToServer(){
      $('#messages').empty();
      $('#text_channels li').removeClass("active");
      $('#text_channels #' + channel_id).parent().addClass("active");
-     $("#message_box").prop('disabled', false);
+     $("#message_input_area *").each( function( index ){
+      $(this).prop('disabled', false);
+     });
      currentText = channel_id;
   };
   
@@ -234,12 +251,12 @@ $( document ).ready(function() {
       isMuted = false;
       $('#mute_microphone svg').attr('data-icon', 'microphone');
       stream.getAudioTracks()[0].enabled = true;
-      soundeffects.unmute.play();
+      soundeffects.unmute_mic.play();
     } else {
       isMuted = true;
       $('#mute_microphone svg').attr('data-icon', 'microphone-slash');
       stream.getAudioTracks()[0].enabled = false;
-      soundeffects.mute.play();
+      soundeffects.mute_mic.play();
     }
   });
 
@@ -248,9 +265,17 @@ $( document ).ready(function() {
     if(audioOut.muted == true){
       audioOut.muted = false;
       $('#mute_audio svg').attr('data-icon', 'volume-up');
+      soundeffects.unmute.play();
+      isMuted = false;
+      $('#mute_microphone svg').attr('data-icon', 'microphone');
+      stream.getAudioTracks()[0].enabled = true;
     } else {
       audioOut.muted = true;
       $('#mute_audio svg').attr('data-icon', 'volume-mute');
+      soundeffects.mute.play();
+      isMuted = true;
+      $('#mute_microphone svg').attr('data-icon', 'microphone-slash');
+      stream.getAudioTracks()[0].enabled = false;
     }
   });
 });

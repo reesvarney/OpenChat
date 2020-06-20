@@ -19,6 +19,15 @@ nav {
     background: #f5f5f5;
     box-shadow:  5px 5px 14px #e9e9e9, 
                 -5px -5px 14px #ffffff;
+    min-width: 270px;
+}
+
+nav>h1 {
+    margin-top: 5px;
+    font-weight: 500;
+    font-family: 'Muli', sans-serif;
+    margin-bottom: 10px;
+    font-size: 24px;
 }
 
 /* ALIGNMENT */
@@ -37,10 +46,26 @@ div.center-self {
     box-shadow:  6px 6px 11px #ebebeb, 
                  -6px -6px 11px #ffffff;
     padding: 10px;
-    padding-left: 40px;
+    padding-left: 20px;
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+#channels>h2 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.channel-group {
+    padding-left: 20px;
+}
+
+.channel-group>h3 {
+    font-weight: 500;
+    font-family: 'Muli', sans-serif;
+    margin-bottom: 10px;
+    color: darkgrey;
 }
 
 .channel-group>ul{
@@ -54,8 +79,8 @@ div.center-self {
     background: #f5f5f5;
     box-shadow:  5px 5px 10px #e9e9e9, 
                  -5px -5px 10px #ffffff; 
-    margin-top: 10px;
     margin-right: 20px;
+    margin-bottom: 10px;
 }
 
 .channel-group>ul>li>a{
@@ -139,6 +164,20 @@ main {
     background-color: #ededed;
 }
 
+main>h2 {
+    padding-left: 20px;
+}
+
+main>h2::after {
+    content:'';
+    width:100%;
+    height: 1px;
+    left:0;
+    top: -10px;
+    background: linear-gradient(to right, hsla(0, 0%, 0%, 0.2) 0%, hsla(0, 0%, 0%, 0.2) 33%, hsla(0, 0%, 0%, 0) 90%);
+    position: absolute;
+}
+
 #messages {
     display: flex;
     flex-grow: 1;
@@ -190,10 +229,6 @@ main {
     overflow-y: auto;
 }
 
-#message_box:disabled {
-    filter: opacity(50%);
-}
-
 #message_box:focus {
     outline: none;
 }
@@ -204,7 +239,9 @@ main {
 
 #message_send {
     border-radius: 0px 32px 32px 0px;
-    background: linear-gradient(145deg, #e0e0e0, #bcbcbc);
+    background: #ebebeb;
+    box-shadow:  5px 5px 7px #dbdbdb, 
+                 -5px -5px 7px #fbfbfb;
     outline: none;
     border: none;
     padding-left: 10px;
@@ -213,6 +250,14 @@ main {
 
 #message_send:focus {
     outline: none;
+}
+
+#message_send:disabled:hover {
+    cursor: default;
+}
+
+#message_send:hover {
+    cursor: pointer;
 }
 
 #message_send:focus:hover {
@@ -274,10 +319,10 @@ main {
 
 .login-form input{
     color: grey;
-    border-radius: 38px;
-    background: #d9d9d9;
-    box-shadow: inset 8px 8px 16px #b8b8b8, 
-                inset -8px -8px 16px #fafafa;
+    border-radius: 32px;
+    background: #e6e6e6;
+    box-shadow: inset 6px 6px 12px #d8d8d8, 
+                inset -6px -6px 12px #f4f4f4;
     border: none;
     padding: 10px;
     padding-left: 15px;
@@ -292,7 +337,7 @@ main {
 }
 
 .login-form button {
-    border-radius: 54px;
+    border-radius: 50px;
     background: #ebebeb;
     box-shadow:  5px 5px 10px #9b9b9b, 
                  -5px -5px 10px #ffffff;
@@ -307,10 +352,8 @@ main {
 }
 
 .login-form  button:focus:hover{
-    border-radius: 54px;
-    background: #ebebeb;
-    box-shadow: inset 5px 5px 10px #9b9b9b, 
-                inset -5px -5px 10px #ffffff;
+    box-shadow: inset 8px 8px 16px #dbdbdb, 
+                inset -8px -8px 16px #fbfbfb;
     outline: 0;  
 }
 

@@ -84,7 +84,11 @@ function startServer(io, conf) {
                     if(content != ""){
                         if((content.length <= 2000) && (server_info.channels[channel].channel_type == "text")){
                             console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
-                            db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( "${content}", "${sender}", "${channel}")`, function (err, result) {
+                            db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( $content, "${sender}", "${channel}")`,
+                            {
+                                $content: message.content
+                            }
+                            , function (err, result) {
                                 if (err) throw err;
                             });
                             io.emit("newMessage", channel)

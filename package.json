@@ -13,6 +13,7 @@
   "dependencies": {
     "colors": "^1.4.0",
     "express": "^4.17.1",
+    "open-graph-scraper": "^4.1.1",
     "peer": "^0.5.3",
     "puppeteer": "^3.1.0",
     "socket.io": "^2.3.0",

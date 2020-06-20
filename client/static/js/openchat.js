@@ -289,11 +289,18 @@ $( document ).ready(function() {
   });
 
   $("#mute_microphone").click(function(){
+    var audioOut = document.querySelector('audio');
     if(isMuted){
       isMuted = false;
       $('#mute_microphone svg').attr('data-icon', 'microphone');
       stream.getAudioTracks()[0].enabled = true;
-      soundeffects.unmute_mic.play();
+      if(audioOut.muted == true){
+        audioOut.muted = false;
+        $('#mute_audio svg').attr('data-icon', 'volume-up');
+        soundeffects.unmute.play();
+      } else {
+        soundeffects.unmute_mic.play();
+      }
     } else {
       isMuted = true;
       $('#mute_microphone svg').attr('data-icon', 'microphone-slash');

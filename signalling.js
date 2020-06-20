@@ -17,7 +17,6 @@ function startServer(io, conf) {
         if (err) {
           console.error(err.message);
         } else {
-          console.log('Connected to the database.');
           db.run("CREATE TABLE IF NOT EXISTS messages (message_id INTEGER PRIMARY KEY AUTOINCREMENT, message_date DATETIME DEFAULT CURRENT_TIMESTAMP, channel_id TEXT, sender_name INTEGER, message_content TEXT)");
         }
         
@@ -60,20 +59,6 @@ function startServer(io, conf) {
                 }
         
             })
-        
-            //WHEN USER REQUESTS MESSAGES FOR A CHANNEL
-            socket.on("getMessages", function(query){
-                if(query.page == undefined){
-                query.page = 0;
-                }
-                db.all(`SELECT * FROM messages WHERE channel_id="${query.channel_id}" ORDER BY message_date DESC LIMIT ${(query.page * 50)} , 50`,[], function (err, result) {
-                if (err) throw err;
-                if(result.length == 0){
-                    result = null;
-                }
-                socket.emit("messages", result);
-                });
-            });
         
             //WHEN USER SENDS A MESSAGE
             socket.on("sendMessage", function(message){

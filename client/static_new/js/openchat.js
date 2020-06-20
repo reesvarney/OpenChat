@@ -107,7 +107,7 @@ function connectToServer(){
     $.ajax({
       async: true,
       type: 'GET',
-      url: "/ogp", 
+      url: "/messages/ogp", 
       data: { "url": `${ogp_url}` },
       success: ( function( result ){
         var ogSource = document.getElementById("OGPCard").innerHTML;
@@ -139,56 +139,61 @@ function connectToServer(){
     });
   }
 
-  socket.on("messages", function(messages){
-    if(messages == null){
-      //NO MORE MESSAGES TO DISPLAY
-    } else {
-      var source = document.getElementById("ChatMessage").innerHTML;
-      var template = Handlebars.compile(source);
-      for( i = 0; i < messages.length; i++){
-        var messageID = `message-${i}`
-        var date = moment.utc(messages[i].message_date);
-        var data = {
-          "messageSender" : messages[i].sender_name,
-          "messageContent" : messages[i].message_content,
-          "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
-          "messageID" : messageID
-        };
-
-        var result = $($.parseHTML(anchorme({
-          input: template(data),
-          options : {
-            attributes: {
-              class: "found-link"
-            }
-          }
-        })));
-
-        $('#messages').append(result);
-        if ($(result).find(".found-link").length != 0){
-          var ogp_url = $(result).find(".found-link")[0].href;
-          getOGP(ogp_url, messageID)
-        };
-      };
-    };
-  });
-
   socket.on("OGPData", function(ogp){
     console.log('reesults:', ogp);
   })
 
   function getMessages(channel_id, page){
-    socket.emit("getMessages", {
-      channel_id : channel_id,
-      page : page
-     });
-     $('#messages').empty();
-     $('#text_channels li').removeClass("active");
-     $('#text_channels #' + channel_id).parent().addClass("active");
-     $("#message_input_area *").each( function( index ){
-      $(this).prop('disabled', false);
-     });
-     currentText = channel_id;
+    // socket.emit("getMessages", {
+    //   channel_id : channel_id,
+    //   page : page
+    //  });
+    $.ajax({
+      async: true,
+      type: 'GET',
+      url: `/messages/channels/${channel_id}`, 
+      data: { "page": `${page}` },
+      success: ( function( messages ){
+        $('#messages').empty();
+        $('#text_channels li').removeClass("active");
+        $('#text_channels #' + channel_id).parent().addClass("active");
+        currentText = channel_id;
+        $("#message_input_area *").each( function( index ){
+          $(this).prop('disabled', false);
+         });
+        if(messages == null){
+          //NO MORE MESSAGES TO DISPLAY
+        } else {
+          var source = document.getElementById("ChatMessage").innerHTML;
+          var template = Handlebars.compile(source);
+          for( i = 0; i < messages.length; i++){
+            var messageID = `message-${i}`
+            var date = moment.utc(messages[i].message_date);
+            var data = {
+              "messageSender" : messages[i].sender_name,
+              "messageContent" : messages[i].message_content,
+              "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
+              "messageID" : messageID
+            };
+    
+            var result = $($.parseHTML(anchorme({
+              input: template(data),
+              options : {
+                attributes: {
+                  class: "found-link"
+                }
+              }
+            })));
+    
+            $('#messages').append(result);
+            if ($(result).find(".found-link").length != 0){
+              var ogp_url = $(result).find(".found-link")[0].href;
+              getOGP(ogp_url, messageID)
+            };
+          };
+        };
+      })
+    });
   };
   
   socket.on("newMessage", function(channel){

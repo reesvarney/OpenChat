@@ -198,6 +198,26 @@ main>h2::after {
     padding-right: 40px;
     margin-bottom: 20px;
 }
+
+.ogp-card {
+    display: flex;
+    flex-direction: row;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: inset 7px 7px 14px #f5f5f5, 
+                inset -7px -7px 14px #ffffff;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+.ogp-card img {
+    max-height: 50px;
+    margin-right: 30px;
+}
+
+.ogp-card p {
+    margin: 0px;
+}
 /* MESSAGE INPUT */
 #message_input_area {
     display: flex;

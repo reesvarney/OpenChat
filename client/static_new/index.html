@@ -78,12 +78,26 @@
     <audio autoplay></audio>
 
     <template id="ChatMessage" type="text/x-handlebars-template">
-        <div class="message-card">
+        <div id="{{messageID}}" class="message-card">
           <p>
             <strong>{{messageSender}}</strong>
             <i>{{messageDate}}</i>
             <br>
             {{messageContent}}
+          </p>
+          <div class="ogp-area">
+
+          </div>
+        </div>
+      </template>
+
+      <template id="OGPCard" type="text/x-handlebars-template">
+        <div class="ogp-card">
+          <img src="{{ogpImageURL}}">
+          <p>
+            <a href="{{ogpURL}}"><strong>{{ogpSiteName}} - </strong>{{ogpTitle}}</a>
+            <br>
+            {{ogpDesc}}
           </p>
         </div>
       </template>

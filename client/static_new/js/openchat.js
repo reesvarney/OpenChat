@@ -114,7 +114,8 @@ function connectToServer(){
         var data = {
           "messageSender" : messages[i].sender_name,
           "messageContent" : messages[i].message_content,
-          "messageDate" : date.format('MMMM Do YYYY, h:mm a')
+          "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
+          "messageID" : `message-${i}`
         };
         var result = $($.parseHTML(anchorme({
           input: template(data),
@@ -128,8 +129,18 @@ function connectToServer(){
         if ($(result).find(".found-link").length != 0){
           var ogp_url = $(result).find(".found-link")[0].href;
           console.log(ogp_url)
-          $.get( "/ogp", { "url": `${ogp_url}` }).done( function( data ){
-            console.log(data);
+          $.get( "/ogp", { "url": `${ogp_url}` }).done( function( result ){
+            var ogSource = document.getElementById("OGPCard").innerHTML;
+            var ogTemplate = Handlebars.compile(ogSource);
+            var ogData = {
+              "ogpImageURL" : result.ogImage.url,
+              "ogpURL" : result.ogUrl,
+              "ogpTitle" : result.ogTitle,
+              "ogpSiteName": result.ogSiteName,
+              "ogpDesc" : result.ogDescription
+            };
+            $(`#message-${i - 1} .ogp-area`).empty();
+            $(`#message-${i - 1} .ogp-area`).append(ogTemplate(ogData));
           });
         }
       }

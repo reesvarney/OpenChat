@@ -3,7 +3,7 @@ var sqlite3 = require('sqlite3').verbose();
 
 var mcu_id = null;
 
-const { server_secret } = require("./mcu/static/js/secret.js");
+const { server_secret } = require("../mcu/static/js/secret.js");
 
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
 function startServer(db, io, conf) {

@@ -1,6 +1,6 @@
 {
   "sig" : {
-    "port" : 8080
+    "port" : 443
   },
   "server" : {
     "name" : "OpenChat Server",

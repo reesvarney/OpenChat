@@ -9,7 +9,7 @@ async function startMCU(params) {
         }
     );
     const page = await browser.newPage();
-    await page.goto(`${params.protocol}://localhost:${params.port}/mcu`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
+    await page.goto(`${params.protocol}://localhost/mcu`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
     await page.click('#button');
 };
 

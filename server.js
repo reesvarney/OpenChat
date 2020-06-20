@@ -55,7 +55,7 @@ const peerServer = PeerServer({
 //SIGNALLING
 
 var io = require('socket.io')(server);
-require('./signalling.js')(db, io, conf);
+require('./signalling/signalling.js')(db, io, conf);
 
 
 // MCU CLIENT //
@@ -63,14 +63,14 @@ require('./signalling.js')(db, io, conf);
 
 var mcu_params = {
   isHeadless: true,
-  protocol: 'https',
-  port: 8080
+  protocol: 'https'
 };
+
 if(arguments.includes("showmcu")){
   mcu_params.isHeadless = false;
 };
 
-require('./mcu_launcher.js')(mcu_params);
+require('./mcu/mcu_launcher.js')(mcu_params);
 
 
 // ROUTING //

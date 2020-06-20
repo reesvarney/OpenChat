@@ -42,7 +42,7 @@ var new_channel = null;
 var hostname = window.location.hostname;
 function connectToServer(){
 
-  var socket = io.connect(`https://${hostname}:8080`);
+  var socket = io.connect(`https://${hostname}:443`);
   $("#addserver").hide();
   
   // SOCKET LISTENERS

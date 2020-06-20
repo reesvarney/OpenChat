@@ -141,7 +141,7 @@ function connectToServer(){
 
   socket.on("messages", function(messages){
     if(messages == null){
-      console.log("No more messages to display");
+      //NO MORE MESSAGES TO DISPLAY
     } else {
       var source = document.getElementById("ChatMessage").innerHTML;
       var template = Handlebars.compile(source);

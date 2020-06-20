@@ -1,15 +1,13 @@
 var arguments = process.argv.slice(2);
-const express = require('express');
-var app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+const fs = require('fs')
 const conf = require("./conf.json");
-var sqlite3 = require('sqlite3').verbose();
 
 console.log("WELCOME TO OPENCHAT")
 
 
 //DB
+
+var sqlite3 = require('sqlite3').verbose();
 
 var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
@@ -22,17 +20,41 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
 
 //HTTP
 
-http.listen(conf.sig.port, function(){
-  console.log("HTTP Server Running")
+var https = require('https');
+const express = require('express');
+var app = express();
+
+var key  = fs.readFileSync('ssl/server.key', 'utf8');
+var cert = fs.readFileSync('ssl/server.cert', 'utf8');
+
+var options = {
+  key: key,
+  cert: cert
+};
+
+var server = https.createServer(options, app);
+
+server.listen(conf.sig.port, function(){
+  console.log("HTTPS Server Running")
 });
 
 
 //PEER SERVER
 
 const { PeerServer } = require('peer');
-const peerServer = PeerServer({ port: 9000, path: '/rtc' });
+const peerServer = PeerServer({ 
+  port: 9000, 
+  path: '/rtc',
+  ssl: {
+    key: key,
+    cert: cert
+  }
+});
+
 
 //SIGNALLING
+
+var io = require('socket.io')(server);
 require('./signalling.js')(db, io, conf);
 
 
@@ -41,7 +63,7 @@ require('./signalling.js')(db, io, conf);
 
 var mcu_params = {
   isHeadless: true,
-  protocol: 'http',
+  protocol: 'https',
   port: 8080
 };
 if(arguments.includes("showmcu")){

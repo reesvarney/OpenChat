@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server",
-    "showmcu": "node server showmcu"
+    "showmcu": "node server showmcu",
+    "createSSL": "openssl req -nodes -new -x509 -keyout ./ssl/server.key -out ./ssl/server.cert"
   },
   "author": "RV",
   "license": "GPL-3.0",

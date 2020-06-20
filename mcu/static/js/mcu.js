@@ -1,5 +1,5 @@
 function main() {
-  var socket = io("http://localhost:8080");
+  var socket = io("https://localhost:8080");
   var ee = new EventEmitter();
   var connected_users = {};
 

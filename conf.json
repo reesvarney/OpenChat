@@ -22,5 +22,6 @@
       "channel_type" : "voice"
     }
     ]
-  }
+  },
+  "secure" : true
 }

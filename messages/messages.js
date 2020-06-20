@@ -3,7 +3,7 @@ var express = require('express');
 var router = express.Router();
 var sqlite3 = require('sqlite3').verbose();
 
-var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+module.exports = function(db){
     router.get('/channels/:channel', function(req, res){
         if(req.query.page == undefined){
             req.query.page = 0;
@@ -27,6 +27,6 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
             res.send(results);
         });
     });
-});
 
-module.exports = router;
+    return router;
+};

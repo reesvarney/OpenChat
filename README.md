@@ -18,8 +18,9 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
     - Run `npm run createSSL` in the OpenChat root directory
     Otherwise:
     - Place the server key/ certificate into the `ssl/` directory, naming them `server.key` and `server.cert` respectively
-6. Run `npm start` in the console at the root of the repository
-7. Open `IP:PORT` in your browser (e.g. `localhost:8080/`)
+7. Port forward `8080` and `9000` in your router software ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
+8. Run `npm start` in the console at the root of the repository
+9. Open `IP:PORT` in your browser (e.g. `localhost:8080/`)
 
 ## Plans for the future:
  - [ ] Add admin panel to allow server settings to be adjusted without having to manually edit files

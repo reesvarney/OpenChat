@@ -10,7 +10,7 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 1. Install the latest version of Node/ NPM
 2. Clone/ Download the repository
 3. Open the repository and run `npm i` to install prequisite packages
-4. (Temporary until administrative panel is added) - edit `conf.json` to add channels and configure ports
+4. (Temporary until administrative panel is added) - edit `conf.json` to add channels. Currently port set at 443, DO NOT CHANGE, as the client assumes this port, this should be fixed in the future to propagate down.
 5. Navigate to `/mcu/static/js/secret.js` and change the secret to a random string of characters, these will be used to verify between the mcu and the server
 6. Setup SSL Keys
     #### If you do not already have SSL keys: 
@@ -20,7 +20,7 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
     - Place the server key/ certificate into the `ssl/` directory, naming them `server.key` and `server.cert` respectively
 7. Port forward `8080` and `9000` in your router software ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
 8. Run `npm start` in the console at the root of the repository
-9. Open `IP:PORT` in your browser (e.g. `localhost:8080/`)
+9. Open the IP in your browser, should load without needing a port b
 
 ## Plans for the future:
  - [ ] Add admin panel to allow server settings to be adjusted without having to manually edit files

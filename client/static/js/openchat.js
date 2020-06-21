@@ -189,7 +189,7 @@ function connectToServer(){
     $("#voice_channels").empty();
     serverinfo = server_info;
     for(i = 0; i < server_info.channels.length; i++){
-      addChannel(server_info.channels[i].channel_type, server_info.channels[i].channel_name, i)
+      addChannel(server_info.channels[i].channel_type, server_info.channels[i].channel_name, server_info.channels[i].uuid)
     };
     peer = new Peer(socket.id, {host: "localhost", port: server_info.peerPort, path: '/rtc'});
   });

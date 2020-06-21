@@ -10,19 +10,23 @@
     "channels" : [
       {
       "channel_name" : "Text 1",
-      "channel_type" : "text"
+      "channel_type" : "text",
+      "uuid" : "3f927897-fea5-4415-9780-db506629231e"
     },
     {
       "channel_name" : "Text 2",
-      "channel_type" : "text"
+      "channel_type" : "text",
+      "uuid" : "fbdbbad6-ad0a-4995-9299-5c02f0e59747"
     },
     {
       "channel_name" : "Voice 1",
-      "channel_type" : "voice"
+      "channel_type" : "voice",
+      "uuid" : "edf30a62-d767-451b-ab67-07c31f6b2135"
     },
     {
       "channel_name" : "Voice 2",
-      "channel_type" : "voice"
+      "channel_type" : "voice",
+      "uuid" : "0fc7247d-9b97-411f-9072-71abfad3ad6c"
     }
     ]
   },

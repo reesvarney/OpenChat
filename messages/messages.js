@@ -28,13 +28,13 @@ module.exports = function(db){
     });
 
     router.get('/ogp', function(req, res){
-        if( url in ogpCache){
-            res.send(ogpCache[url])
+        if( req.query.url in ogpCache){
+            res.send(ogpCache[req.query.url])
         } else {
             ogs({ url: req.query.url }, (error, results, response) => {
                 res.send(results);
+                ogpCache[req.query.url] = results;
             });
-            ogpCache[url] = results;
         };
     });
 

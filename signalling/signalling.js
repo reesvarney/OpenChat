@@ -60,13 +60,16 @@ function startServer(db, io, conf) {
             var sender = server_info.users[socket.id].name;
             var channel = message.channel;
             var content = message.content;
-            if(channel in server_info.channels){
+            var channel_search = server_info["channels"].find(({ uuid } )=> uuid == channel);
+            if( channel_search != undefined && channel_search.channel_type == "text"){
                 if(content != ""){
-                    if((content.length <= 2000) && (server_info.channels[channel].channel_type == "text")){
+                    if(content.length <= 2000){
                         console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
-                        db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( $content, "${sender}", "${channel}")`,
+                        db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( $content, $sender, $channel)`,
                         {
-                            $content: message.content
+                            "$content": message.content,
+                            "$sender": sender,
+                            "$channel": channel
                         }
                         , function (err, result) {
                             if (err) throw err;

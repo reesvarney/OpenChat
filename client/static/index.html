@@ -13,6 +13,7 @@
         <meta property="og:site_name" itemprop="name" content="OpenChat" />
         <meta property="og:description" itemprop="description" content="Open Source Communication" />
 
+        <link rel="stylesheet" href="./css/all.min.css" />
         <link rel="stylesheet" href="./css/normalize.css" />
         <link rel="stylesheet" href="./css/openchat.css" />
 
@@ -24,7 +25,6 @@
         <script src="./js/anchorme.js"></script>
         <script src="./js/openchat.js"></script>
 
-        <script defer src="https://use.fontawesome.com/releases/v5.9.0/js/all.js"></script>
         <link type="font/opentype" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100..900&display=swap" rel="stylesheet">
         <link type="font/opentype" href="https://fonts.googleapis.com/css2?family=Muli:wght@100..900&display=swap" rel="stylesheet">
     </head>
@@ -82,7 +82,7 @@
         </main>
     </body>
 
-    <audio autoplay></audio>
+    <audio id="call_out" autoplay></audio>
 
     <template id="ChatMessage" type="text/x-handlebars-template">
         <div id="{{messageID}}" class="message-card">
@@ -102,7 +102,7 @@
         <div class="ogp-card">
           <img src="{{ogpImageURL}}">
           <p>
-            <a href="{{ogpURL}}"><strong>{{ogpSiteName}}</strong>{{ogpTitle}}</a>
+            <a target="_blank" href="{{ogpURL}}"><strong>{{ogpSiteName}}</strong>{{ogpTitle}}</a>
             <br>
             {{ogpDesc}}
           </p>

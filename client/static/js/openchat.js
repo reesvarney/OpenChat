@@ -1,36 +1,45 @@
-var serverinfo;
-var destination = {};
-var client = {};
-var isConnected = false;
-var isMuted = false;
-navigator.getUserMedia = (
-  navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia ||
-  navigator.msGetUserMedia
-);
-
-var currentText;
-var constraints = {
+var serverinfo,
+  destination = {},
+  client = {},
+  new_channel = null,
+  isConnected = false,
+  audioOut = $('#call_out'),
+  isMuted = false,
+  peer,
+  call,
+  currentText,
+  soundeffects = {},
+  soundfiles = [
+    "mute",
+    "unmute",
+    "connect",
+    "mute_mic",
+    "unmute_mic",
+    "disconnect"
+  ],
+  constraints = {
     audio: {
         sampleRate: 64000,
         volume: 1.0,
-        noiseSuppression: true,
+        noiseSuppression: false,
         echoCancellation: false,
         autoGainControl: true
     },
     video: false
-};
-
-var soundfiles = ["connect", "disconnect", "mute", "unmute", "mute_mic", "unmute_mic"];
-var soundeffects = {};
+  },
+  stream;
 
 for(i = 0; i < soundfiles.length; i++){
   soundeffects[soundfiles[i]] = new Audio(`./audio/${soundfiles[i]}.mp3`);
   soundeffects[soundfiles[i]].loop = false;
 };
 
-var stream;
+navigator.getUserMedia = (
+  navigator.getUserMedia ||
+  navigator.webkitGetUserMedia ||
+  navigator.mozGetUserMedia ||
+  navigator.msGetUserMedia
+);
 
 navigator.getUserMedia(constraints, function(localstream) {
   stream = localstream;
@@ -75,10 +84,6 @@ function getOGP(ogp_url, messageID){
 };
 
 function getMessages(channel_id, page){
-  // socket.emit("getMessages", {
-  //   channel_id : channel_id,
-  //   page : page
-  //  });
   $.ajax({
     async: true,
     type: 'GET',
@@ -112,7 +117,8 @@ function getMessages(channel_id, page){
             input: template(data),
             options : {
               attributes: {
-                class: "found-link"
+                class: "found-link",
+                target: "_blank"
               }
             }
           })));
@@ -152,10 +158,6 @@ function addChannel(type, name, id){
     console.log("ERROR: Unrecognised Channel Type")
   }
 }
-
-var peer;
-var call;
-var new_channel = null;
 
 function connectToServer(){
   var socket = io.connect();
@@ -278,52 +280,71 @@ function connectToServer(){
   });
 };
 
-$( document ).ready(function() {
-  $( "#connect_form" ).submit(function( event ) {
-    event.preventDefault();
-    client.name = $("#name_input").val();
-    connectToServer();
-    $("#connect_overlay").removeClass("active");
-  });
+function muteAudio(toggleStatus){
+  if(toggleStatus){
+    audioOut.muted = true;
+    $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
 
-  $("#mute_microphone").click(function(){
-    var audioOut = document.querySelector('audio');
-    if(isMuted){
+    //IF MIC NOT MUTE
+    if(stream.getAudioTracks()[0].enabled){
+      muteMic(true);
       isMuted = false;
-      $('#mute_microphone svg').attr('data-icon', 'microphone');
-      stream.getAudioTracks()[0].enabled = true;
-      if(audioOut.muted == true){
-        audioOut.muted = false;
-        $('#mute_audio svg').attr('data-icon', 'volume-up');
-        soundeffects.unmute.play();
-      } else {
-        soundeffects.unmute_mic.play();
-      }
+    }
+    soundeffects.mute.play();
+  } else {
+    audioOut.muted = false;
+    $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
+    soundeffects.unmute.play();
+
+    //IF MIC PREVIOUS NOT MUTE
+    if(!isMuted){
+      muteMic(false);
+    }
+  }
+}
+
+function muteMic(toggleStatus){
+  if(toggleStatus){
+    $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
+    stream.getAudioTracks()[0].enabled = false;
+  } else {
+    $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
+    stream.getAudioTracks()[0].enabled = true;
+
+    // IF AUDIO MUTE
+    if(audioOut.muted){
+      muteAudio(false);
     } else {
+      soundeffects.unmute_mic.play();
+    }
+  }
+};
+
+$( document ).ready(function() {
+  $("#mute_microphone").click(function(){
+    if(!stream.getAudioTracks()[0].enabled){
+      muteMic(false);
+      isMuted = false;
+    } else {
+      muteMic(true);
       isMuted = true;
-      $('#mute_microphone svg').attr('data-icon', 'microphone-slash');
-      stream.getAudioTracks()[0].enabled = false;
       soundeffects.mute_mic.play();
     }
   });
 
   $("#mute_audio").click(function(){
-    var audioOut = document.querySelector('audio');
     if(audioOut.muted == true){
-      audioOut.muted = false;
-      $('#mute_audio svg').attr('data-icon', 'volume-up');
-      soundeffects.unmute.play();
-      isMuted = false;
-      $('#mute_microphone svg').attr('data-icon', 'microphone');
-      stream.getAudioTracks()[0].enabled = true;
+      muteAudio(false);
     } else {
-      audioOut.muted = true;
-      $('#mute_audio svg').attr('data-icon', 'volume-mute');
-      soundeffects.mute.play();
-      isMuted = true;
-      $('#mute_microphone svg').attr('data-icon', 'microphone-slash');
-      stream.getAudioTracks()[0].enabled = false;
+      muteAudio(true);
     }
+  });
+
+  $( "#connect_form" ).submit(function( event ) {
+    event.preventDefault();
+    client.name = $("#name_input").val();
+    connectToServer();
+    $("#connect_overlay").removeClass("active");
   });
 
   $("#nav-toggle").click(function(){

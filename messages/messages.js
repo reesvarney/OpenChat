@@ -5,6 +5,7 @@ var sqlite3 = require('sqlite3').verbose();
 
 module.exports = function(db){
     var messages = [];
+    var ogpCache = {};
 
     //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
     router.get('/channels/:channel', function(req, res){
@@ -27,9 +28,14 @@ module.exports = function(db){
     });
 
     router.get('/ogp', function(req, res){
-        ogs({ url: req.query.url }, (error, results, response) => {
-            res.send(results);
-        });
+        if( url in ogpCache){
+            res.send(ogpCache[url])
+        } else {
+            ogs({ url: req.query.url }, (error, results, response) => {
+                res.send(results);
+            });
+            ogpCache[url] = results;
+        };
     });
 
     return router;

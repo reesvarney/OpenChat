@@ -15,8 +15,9 @@ var constraints = {
     audio: {
         sampleRate: 64000,
         volume: 1.0,
-        noiseSuppression: false,
-        echoCancellation: false
+        noiseSuppression: true,
+        echoCancellation: false,
+        autoGainControl: true
     },
     video: false
 };
@@ -29,17 +30,20 @@ for(i = 0; i < soundfiles.length; i++){
   soundeffects[soundfiles[i]].loop = false;
 };
 
+var stream;
+
 navigator.getUserMedia(constraints, function(localstream) {
   stream = localstream;
 }, function(err) {
   console.log('Failed to get local stream', err);
 });
 
-var stream;
+
 var peer;
 var call;
 var new_channel = null;
 var hostname = window.location.hostname;
+
 function connectToServer(){
 
   var socket = io.connect(`https://${hostname}:443`);
@@ -153,6 +157,7 @@ function connectToServer(){
       type: 'GET',
       url: `/messages/channels/${channel_id}`, 
       data: { "page": `${page}` },
+      timeout: 10000,
       success: ( function( messages ){
         $('#messages').empty();
         $('#text_channels li').removeClass("active");
@@ -327,4 +332,12 @@ $( document ).ready(function() {
       stream.getAudioTracks()[0].enabled = false;
     }
   });
+
+  $("#nav-toggle").click(function(){
+    $("nav").show();
+  })
+
+  $("#nav-close").click(function(){
+    $("nav").hide();
+  })
 });

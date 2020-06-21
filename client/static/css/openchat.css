@@ -1,6 +1,7 @@
 html {
     font-family: 'Public Sans', sans-serif;
     height: 100vh;
+    width: 100vw;
     height: -webkit-fill-available;
 }
 
@@ -382,7 +383,89 @@ main>h2::after {
     outline: 0;  
 }
 
-/* detect sub 270 wide displays */
-@media screen and ( max-width: 270px ) {
+
+
+/* detect sub 700 wide displays */
+#nav-toggle, #nav-close {
+    display: none;
+}
+
+@media screen and ( max-width: 700px ) {
     /* MAKE NAV 100% WIDTH, SWIPE BETWEEN NAV/ MESSAGES */
+    nav {
+        overflow-x: auto;
+        position: fixed;
+        z-index: 99;
+        display: none;
+        width : 100vw;
+        height : 100vh;
+    }
+
+    main {
+        min-width: 100vw;
+    }
+
+    main>h2{
+        display: inline-block;
+    }
+
+    .modal {
+        width: 80vw;
+    }
+
+    .login-form {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #messages {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .message-card {
+        padding: 10px;
+        word-wrap: break-word;
+    }
+
+    .ogp-card {
+        flex-direction: column;
+        padding: 5px;
+    }
+
+    #channels {
+        min-height: 20vh;
+        height: auto;
+    }
+
+    #nav-toggle{
+        display: inline-block;
+    }
+
+    #nav-close {
+        display: block;
+        position: absolute;
+        top: 20px;
+        right: 40px;
+    }
+}
+
+@media screen and ( min-width: 700px ) {
+    nav {
+        overflow-x: auto;
+        position: relative;
+        display: flex;
+        width : auto;
+        height : auto;
+    }
+}
+
+@media screen and ( max-width: 275px ) {
+    /* Too small, reject/ change orientation */
+
+}
+
+@media screen and ( max-height: 465px ) {
+    /* Too small, reject/ change orientation */
+
 }

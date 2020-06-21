@@ -43,7 +43,7 @@ server.listen(conf.sig.port, function(){
 
 const { PeerServer } = require('peer');
 const peerServer = PeerServer({ 
-  port: 9000, 
+  port: conf.peer.port, 
   path: '/rtc',
   ssl: {
     key: key,
@@ -62,8 +62,7 @@ require('./signalling/signalling.js')(db, io, conf);
 // Configure params for starting the MCU here
 
 var mcu_params = {
-  isHeadless: true,
-  protocol: 'https'
+  isHeadless: true
 };
 
 if(arguments.includes("showmcu")){

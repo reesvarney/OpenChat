@@ -2,6 +2,9 @@
   "sig" : {
     "port" : 443
   },
+  "peer": {
+    "port" : 9000
+  },
   "server" : {
     "name" : "OpenChat Server",
     "channels" : [

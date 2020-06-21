@@ -38,15 +38,127 @@ navigator.getUserMedia(constraints, function(localstream) {
   console.log('Failed to get local stream', err);
 });
 
+function getOGP(ogp_url, messageID){
+  $.ajax({
+    async: true,
+    type: 'GET',
+    url: "/messages/ogp", 
+    data: { "url": `${ogp_url}` },
+    success: ( function( result ){
+      var ogSource = document.getElementById("OGPCard").innerHTML;
+      var ogTemplate = Handlebars.compile(ogSource);
+      if ("ogTitle" in result){
+        var ogpImageURL = "";
+        if ("ogImage" in result && "url" in result.ogImage) {
+          ogpImageURL = result.ogImage.url
+          if (result.ogImage.url.startsWith("/")){
+            ogpImageURL = (result.requestUrl || result.ogUrl) + result.ogImage.url;
+          }
+        }
+        var ogpSiteName = "";
+        if ("ogSiteName" in result){
+          ogpSiteName = `${result.ogSiteName} - `;
+        }
+        
+        var ogData = {
+          "ogpImageURL" : ogpImageURL,
+          "ogpURL" : result.ogUrl || result.requestUrl,
+          "ogpTitle" : result.ogTitle,
+          "ogpSiteName": ogpSiteName,
+          "ogpDesc" : result.ogDescription
+        };
+        $(`#${messageID} .ogp-area`).empty();
+        $(`#${messageID} .ogp-area`).append(ogTemplate(ogData));
+      }
+    })
+  });
+};
+
+function getMessages(channel_id, page){
+  // socket.emit("getMessages", {
+  //   channel_id : channel_id,
+  //   page : page
+  //  });
+  $.ajax({
+    async: true,
+    type: 'GET',
+    url: `/messages/channels/${channel_id}`, 
+    data: { "page": `${page}` },
+    timeout: 10000,
+    success: ( function( messages ){
+      $('#messages').empty();
+      $('#text_channels li').removeClass("active");
+      $('#text_channels #' + channel_id).parent().addClass("active");
+      currentText = channel_id;
+      $("#message_input_area *").each( function( index ){
+        $(this).prop('disabled', false);
+       });
+      if(messages == null){
+        //NO MORE MESSAGES TO DISPLAY
+      } else {
+        var source = document.getElementById("ChatMessage").innerHTML;
+        var template = Handlebars.compile(source);
+        for( i = 0; i < messages.length; i++){
+          var messageID = `message-${i}`
+          var date = moment.utc(messages[i].message_date);
+          var data = {
+            "messageSender" : messages[i].sender_name,
+            "messageContent" : messages[i].message_content,
+            "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
+            "messageID" : messageID
+          };
+  
+          var result = $($.parseHTML(anchorme({
+            input: template(data),
+            options : {
+              attributes: {
+                class: "found-link"
+              }
+            }
+          })));
+  
+          $('#messages').append(result);
+          if ($(result).find(".found-link").length != 0){
+            var ogp_url = $(result).find(".found-link")[0].href;
+            getOGP(ogp_url, messageID)
+          };
+        };
+      };
+    })
+  });
+};
+
+//displays channels to user
+function addChannel(type, name, id){
+  if(type == "text"){
+    var source = document.getElementById("TextChannel").innerHTML;
+    var template = Handlebars.compile(source);
+    var data = {
+      "channelName" : name,
+      "channelID" : id
+    };
+    var result = template(data);
+    $('#text_channels').append(result);
+  } else if(type == "voice"){
+    var source = document.getElementById("VoiceChannel").innerHTML;
+    var template = Handlebars.compile(source);
+    var data = {
+      "channelName" : name,
+      "channelID" : id
+    };
+    var result = template(data);
+    $('#voice_channels').append(result);
+  } else {
+    console.log("ERROR: Unrecognised Channel Type")
+  }
+}
 
 var peer;
 var call;
 var new_channel = null;
-var hostname = window.location.hostname;
 
 function connectToServer(){
-
-  var socket = io.connect(`https://${hostname}:443`);
+  var socket = io.connect();
   $("#addserver").hide();
   
   // SOCKET LISTENERS
@@ -56,29 +168,12 @@ function connectToServer(){
       type: 'client',
       name: client.name
     });
+    console.log(socket)
   });
 
   socket.on('disconnect', function(){
     window.location.reload();
   });
-
-  socket.on('canJoin', function(canJoin){
-    if(canJoin == true){
-      call = peer.call('server', stream);
-
-      call.on('stream', function(remoteStream) {
-        isConnected = true;
-        $("#disconnect_button").show();
-        $('#voice_channels li').removeClass("active");
-        $('#voice_channels #' + new_channel).parent().addClass("active");
-        var audioOut = document.querySelector('audio');
-        audioOut.srcObject = remoteStream;
-        soundeffects.connect.play();
-      });
-    } else {
-      console.log("NEGOTIATION ERROR");
-    }
-  })
 
   //openchat related errors
   socket.on("ocerror", function(data){
@@ -94,8 +189,25 @@ function connectToServer(){
     for(i = 0; i < server_info.channels.length; i++){
       addChannel(server_info.channels[i].channel_type, server_info.channels[i].channel_name, i)
     };
-    peer = new Peer(socket.id, {host: hostname, port: 9000, path: '/rtc'});
+    peer = new Peer(socket.id, {host: "localhost", port: server_info.peerPort, path: '/rtc'});
   });
+
+  socket.on('canJoin', function(canJoin){
+    if(canJoin == true){
+      call = peer.call('server', stream);
+      call.on('stream', function(remoteStream) {
+        isConnected = true;
+        $("#disconnect_button").show();
+        $('#voice_channels li').removeClass("active");
+        $('#voice_channels #' + new_channel).parent().addClass("active");
+        var audioOut = document.querySelector('audio');
+        audioOut.srcObject = remoteStream;
+        soundeffects.connect.play();
+      });
+    } else {
+      console.log("NEGOTIATION ERROR");
+    }
+  })
 
   socket.on('usersChange', function(users){
     $('.user-list').empty();
@@ -106,131 +218,12 @@ function connectToServer(){
       }
     }
   })
-
-  function getOGP(ogp_url, messageID){
-    $.ajax({
-      async: true,
-      type: 'GET',
-      url: "/messages/ogp", 
-      data: { "url": `${ogp_url}` },
-      success: ( function( result ){
-        var ogSource = document.getElementById("OGPCard").innerHTML;
-        var ogTemplate = Handlebars.compile(ogSource);
-        if ("ogTitle" in result){
-          var ogpImageURL = "";
-          if ("ogImage" in result && "url" in result.ogImage) {
-            ogpImageURL = result.ogImage.url
-            if (result.ogImage.url.startsWith("/")){
-              ogpImageURL = (result.requestUrl || result.ogUrl) + result.ogImage.url;
-            }
-          }
-          var ogpSiteName = "";
-          if ("ogSiteName" in result){
-            ogpSiteName = `${result.ogSiteName} - `;
-          }
-          
-          var ogData = {
-            "ogpImageURL" : ogpImageURL,
-            "ogpURL" : result.ogUrl || result.requestUrl,
-            "ogpTitle" : result.ogTitle,
-            "ogpSiteName": ogpSiteName,
-            "ogpDesc" : result.ogDescription
-          };
-          $(`#${messageID} .ogp-area`).empty();
-          $(`#${messageID} .ogp-area`).append(ogTemplate(ogData));
-        }
-      })
-    });
-  }
-
-  socket.on("OGPData", function(ogp){
-    console.log('reesults:', ogp);
-  })
-
-  function getMessages(channel_id, page){
-    // socket.emit("getMessages", {
-    //   channel_id : channel_id,
-    //   page : page
-    //  });
-    $.ajax({
-      async: true,
-      type: 'GET',
-      url: `/messages/channels/${channel_id}`, 
-      data: { "page": `${page}` },
-      timeout: 10000,
-      success: ( function( messages ){
-        $('#messages').empty();
-        $('#text_channels li').removeClass("active");
-        $('#text_channels #' + channel_id).parent().addClass("active");
-        currentText = channel_id;
-        $("#message_input_area *").each( function( index ){
-          $(this).prop('disabled', false);
-         });
-        if(messages == null){
-          //NO MORE MESSAGES TO DISPLAY
-        } else {
-          var source = document.getElementById("ChatMessage").innerHTML;
-          var template = Handlebars.compile(source);
-          for( i = 0; i < messages.length; i++){
-            var messageID = `message-${i}`
-            var date = moment.utc(messages[i].message_date);
-            var data = {
-              "messageSender" : messages[i].sender_name,
-              "messageContent" : messages[i].message_content,
-              "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
-              "messageID" : messageID
-            };
-    
-            var result = $($.parseHTML(anchorme({
-              input: template(data),
-              options : {
-                attributes: {
-                  class: "found-link"
-                }
-              }
-            })));
-    
-            $('#messages').append(result);
-            if ($(result).find(".found-link").length != 0){
-              var ogp_url = $(result).find(".found-link")[0].href;
-              getOGP(ogp_url, messageID)
-            };
-          };
-        };
-      })
-    });
-  };
   
   socket.on("newMessage", function(channel){
     if(channel == currentText){
       getMessages(channel, 0);
     }
   })
-
-  //displays channels to user
-  function addChannel(type, name, id){
-    if(type == "text"){
-      var source = document.getElementById("TextChannel").innerHTML;
-      var template = Handlebars.compile(source);
-      var data = {
-        "channelName" : name,
-        "channelID" : id
-      };
-      var result = template(data);
-      $('#text_channels').append(result);
-    } else if(type == "voice"){
-      var source = document.getElementById("VoiceChannel").innerHTML;
-      var template = Handlebars.compile(source);
-      var data = {
-        "channelName" : name,
-        "channelID" : id
-      };
-      var result = template(data);
-      $('#voice_channels').append(result);
-    } else {
-      console.log("ERROR: Unrecognised Channel Type")
-    }
-  }
 
   //start channel joining process
   function joinChannel(channel_id){

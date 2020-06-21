@@ -24,11 +24,7 @@ function main() {
     });
   });
 
-  var peer = new Peer("server", {
-    host: "localhost",
-    port: 9000,
-    path: "/rtc",
-  });
+  var peer;
 
   const audioOut = document.querySelector("audio");
 
@@ -84,28 +80,37 @@ function main() {
         }
       }
     }
-  }
+  };
+  
+  socket.on("serverInfo", function(data) {
+    peer = new Peer("server", {
+      host: "localhost",
+      port: data.peerPort,
+      path: "/rtc",
+    });
 
-  peer.on("call", function (call) {
-    var peerChannel = connected_users[call.peer]["channelID"];
-    connected_users[call.peer].call = call;
-    call.answer(new MediaStream([emptyAudio]));
-
-    call.on("stream", function (remoteStream) {
-      updateStreams(peerChannel);
-      socket.emit("peerConnected", {
-        user: call.peer,
-        channel: connected_users[call.peer]["channelID"],
+    peer.on("call", function (call) {
+      var peerChannel = connected_users[call.peer]["channelID"];
+      connected_users[call.peer].call = call;
+      call.answer(new MediaStream([emptyAudio]));
+  
+      call.on("stream", function (remoteStream) {
+        updateStreams(peerChannel);
+        socket.emit("peerConnected", {
+          user: call.peer,
+          channel: connected_users[call.peer]["channelID"],
+        });
+      });
+  
+      call.on("error", function () {
+        var old_channel = connected_users[call.peer]["channelID"];
+        delete connected_users[call.peer];
+        updateStreams(old_channel);
+        socket.emit("callClosed", call.peer);
       });
     });
 
-    call.on("error", function () {
-      var old_channel = connected_users[call.peer]["channelID"];
-      delete connected_users[call.peer];
-      updateStreams(old_channel);
-      socket.emit("callClosed", call.peer);
-    });
-  });
+  })
 
   socket.on("setChannel", function (data) {
     if (data.user in connected_users) {

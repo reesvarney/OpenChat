@@ -55,7 +55,7 @@ const peerServer = PeerServer({
 //SIGNALLING
 
 var io = require('socket.io')(server);
-require('./signalling/signalling.js')(db, io, conf);
+require('./controllers/signalling/signalling.js')(db, io, conf);
 
 
 // MCU CLIENT //
@@ -69,16 +69,16 @@ if(arguments.includes("showmcu")){
   mcu_params.isHeadless = false;
 };
 
-require('./mcu/mcu_launcher.js')(mcu_params);
+require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 
 
 // ROUTING //
 // Store routes here
 
-var clientController = require('./client/client.js');
-var adminController = require('./admin/admin.js');
-var mcuController = require('./mcu/mcu.js');
-var messageController = require('./messages/messages.js')(db);
+var clientController = require('./controllers/client/client.js');
+var adminController = require('./controllers/admin/admin.js');
+var mcuController = require('./controllers/mcu/mcu.js');
+var messageController = require('./controllers/messages/messages.js')(db);
 
 app.get('/', function(req, res){
   res.redirect('/client')

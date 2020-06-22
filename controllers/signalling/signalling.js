@@ -87,17 +87,16 @@ function startServer(db, io, conf) {
     
         //WHEN USER TRIES TO JOIN A CHANNEL
         socket.on("joinChannel", function(channel){
-            if(server_info['channels'][channel] != undefined){
-            if(server_info['channels'][channel]['channel_type'] == "voice"){
-                console.log(`User ${socket.id} changing to channel ${server_info['channels'][channel]['channel_name']}`.cyan);
+            var channel_search = server_info["channels"].find(({ uuid } )=> uuid == channel);
+            if(channel_search != undefined && channel_search.channel_type == "voice"){
+                console.log(`User ${socket.id} changing to channel ${channel_search.channel_name}`.cyan);
                 io.to(mcu_id).emit('setChannel', {
                 user: socket.id,
                 channel: channel
                 });
                 server_info.users[socket.id].channel = channel;
-            }
             } else {
-            socket.emit("ocerror", "Channel is not valid");
+                socket.emit("ocerror", "Channel is not valid");
             };
         });
     
@@ -110,7 +109,7 @@ function startServer(db, io, conf) {
         socket.on('peerConnected', function(data){
             server_info.users[data.user].channel = data.channel;
             io.emit('usersChange', server_info.users);
-            console.log(`User ${data.user} has successfully joined channel ${server_info['channels'][data.channel]['channel_name']}`.green);
+            console.log(`User ${data.user} has successfully joined channel ${server_info.users[data.user].channel}`.green);
         });
     
         //WHEN USER REQUESTS TO LEAVE THEIR CURRENT CHANNEL

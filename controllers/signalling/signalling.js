@@ -3,8 +3,6 @@ var sqlite3 = require('sqlite3').verbose();
 
 var mcu_id = null;
 
-const { server_secret } = require("../../views/mcu/static/js/secret.js");
-
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
 function startServer(db, io, conf) {
     var server_info = {
@@ -13,6 +11,8 @@ function startServer(db, io, conf) {
         peerPort: conf.peer.port,
         channels: conf.server.channels
     };
+
+    const server_secret = conf.mcu_secret;
         
     io.on("connection", function(socket){
         var currentUser = {};

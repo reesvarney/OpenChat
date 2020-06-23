@@ -79,7 +79,7 @@ require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 
 var clientController = require('./controllers/client/client.js')(conf);
 var adminController = require('./controllers/admin/admin.js');
-var mcuController = require('./controllers/mcu/mcu.js');
+var mcuController = require('./controllers/mcu/mcu.js')(conf.mcu_secret);
 var messageController = require('./controllers/messages/messages.js')(db);
 
 app.get('/', function(req, res){

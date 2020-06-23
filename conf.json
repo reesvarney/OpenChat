@@ -30,5 +30,6 @@
     }
     ]
   },
-  "secure" : true
+  "secure" : true,
+  "mcu_secret" : "SECRET STRING HERE"
 }

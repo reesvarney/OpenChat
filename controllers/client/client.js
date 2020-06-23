@@ -1,7 +1,12 @@
-var path = require('path');
 var express = require('express');
 var router = express.Router();
 
-router.use("/", express.static('./views/client',{index:"index.html",extensions:['html']}));
+module.exports = function(conf){
+    router.use(express.static('./views/client/static'));
 
-module.exports = router;
+    router.get('/', function(req, res) {
+        res.render('client/index', {conf: conf});
+    });
+    
+    return router;
+}

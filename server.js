@@ -23,6 +23,8 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
 var https = require('https');
 const express = require('express');
 var app = express();
+app.set('view engine', 'ejs');
+app.disable('view cache');
 
 var key  = fs.readFileSync('ssl/server.key', 'utf8');
 var cert = fs.readFileSync('ssl/server.cert', 'utf8');
@@ -75,7 +77,7 @@ require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 // ROUTING //
 // Store routes here
 
-var clientController = require('./controllers/client/client.js');
+var clientController = require('./controllers/client/client.js')(conf);
 var adminController = require('./controllers/admin/admin.js');
 var mcuController = require('./controllers/mcu/mcu.js');
 var messageController = require('./controllers/messages/messages.js')(db);

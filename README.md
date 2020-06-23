@@ -23,10 +23,9 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 9. Open the IP in your browser, should load without needing a port b
 
 ## Plans for the future:
- - [ ] Add admin panel to allow server settings to be adjusted without having to manually edit files
- - [ ] Use react to optimize front-end code
- - [ ] Add some kind of session tracking to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
- - [ ] Combine signalling into single system with native WebRTC implementation
+ - Add admin panel to allow server settings to be adjusted without having to manually edit files
+ - Add some kind of session tracking to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
+ - Combine signalling into single system with native WebRTC implementation
 
 ## Bugs
 If you encounter any issues with OpenChat, please raise an issue so that it can be fixed as quickly as possible.

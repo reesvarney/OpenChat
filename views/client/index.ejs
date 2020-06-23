@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/client_head') %>
+
+<body>
+  <div class="overlay active" id="connect_overlay">
+    <div class="modal" id="connect_modal">
+      <h2 class="center-self">Enter a display name</h2>
+      <form class="login-form" id="connect_form">
+        <input type="text" id="name_input">
+        <button>Connect</button>
+      </form>
+    </div>
+  </div>
+
+  <nav>
+    <h1 id="server_title"></h1>
+    <a id="nav-close"><i class="fas fa-times"></i></a>
+    <div id="channels">
+      <h2>Channels</h2>
+
+      <div class="channel-group">
+        <h3>Voice</h3>
+        <ul id="voice_channels">
+
+        </ul>
+      </div>
+
+      <div class="channel-group">
+        <h3>Text</h3>
+        <ul id="text_channels">
+
+        </ul>
+      </div>
+    </div>
+
+    <div id="control_area">
+      <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
+      <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>
+      <a id="disconnect_button" class="control-button" style="display: none;"><i
+          class="fas fa-phone-slash fa-lg"></i></a>
+    </div>
+
+  </nav>
+
+  <main>
+
+    <h2><a id="nav-toggle"><i class="fas fa-bars"></i></a> Messages</h2>
+    <ol id="messages">
+
+    </ol>
+    <form id="message_input_area">
+      <textarea rows="1" id="message_box" disabled></textarea>
+      <button id="message_send" disabled>Send</button>
+    </form>
+  </main>
+</body>
+
+<audio id="call_out" autoplay></audio>
+
+<template id="ChatMessage" type="text/x-handlebars-template">
+  <div id="{{messageID}}" class="message-card">
+    <p>
+      <strong>{{messageSender}}</strong>
+      <i>{{messageDate}}</i>
+      <br>
+      {{messageContent}}
+    </p>
+    <div class="ogp-area">
+
+    </div>
+  </div>
+</template>
+
+<template id="OGPCard" type="text/x-handlebars-template">
+  <div class="ogp-card">
+    <img src="{{ogpImageURL}}">
+    <p>
+      <a target="_blank" href="{{ogpURL}}"><strong>{{ogpSiteName}}</strong>{{ogpTitle}}</a>
+      <br>
+      {{ogpDesc}}
+    </p>
+  </div>
+</template>
+
+<template id="VoiceChannel" type="text/x-handlebars-template">
+  <li>
+    <a id="{{channelID}}" class="channel">
+      {{channelName}}
+    </a>
+    <ul id="{{channelID}}-users" class="user-list"></ul>
+  </li>
+</template>
+
+<template id="TextChannel" type="text/x-handlebars-template">
+  <li>
+    <a id="{{channelID}}" class="channel">
+      {{channelName}}
+    </a>
+  </li>
+</template>
+
+</html>

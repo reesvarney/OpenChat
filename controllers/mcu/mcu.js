@@ -8,6 +8,6 @@ router.use((req, res, next) => {
     } else {
         res.status(400).send('MCU needs to be ran locally');
     }
-}, express.static('./views/mcu' ,{index:"mcu.html",extensions:['html']}));
+}, express.static('./views/mcu/static' ,{index:"mcu.html",extensions:['html']}));
 
 module.exports = router;

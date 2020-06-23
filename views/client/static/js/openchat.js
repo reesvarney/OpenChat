@@ -134,31 +134,6 @@ function getMessages(channel_id, page){
   });
 };
 
-//displays channels to user
-function addChannel(type, name, id){
-  if(type == "text"){
-    var source = document.getElementById("TextChannel").innerHTML;
-    var template = Handlebars.compile(source);
-    var data = {
-      "channelName" : name,
-      "channelID" : id
-    };
-    var result = template(data);
-    $('#text_channels').append(result);
-  } else if(type == "voice"){
-    var source = document.getElementById("VoiceChannel").innerHTML;
-    var template = Handlebars.compile(source);
-    var data = {
-      "channelName" : name,
-      "channelID" : id
-    };
-    var result = template(data);
-    $('#voice_channels').append(result);
-  } else {
-    console.log("ERROR: Unrecognised Channel Type")
-  }
-}
-
 function connectToServer(){
   var socket = io.connect();
   $("#addserver").hide();
@@ -183,14 +158,7 @@ function connectToServer(){
   })
 
   socket.on('serverInfo', function(server_info){
-    console.log(server_info);
-    $("#server_title").text(server_info.name);
-    $("#text_channels").empty();
-    $("#voice_channels").empty();
     serverinfo = server_info;
-    for(i = 0; i < server_info.channels.length; i++){
-      addChannel(server_info.channels[i].channel_type, server_info.channels[i].channel_name, server_info.channels[i].uuid)
-    };
     peer = new Peer(socket.id, {host: "localhost", port: server_info.peerPort, path: '/rtc'});
   });
 

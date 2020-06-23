@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/client_head') %>
+<%- include('_head') %>
 
 <body>
   <div class="overlay active" id="connect_overlay">
@@ -14,7 +14,7 @@
   </div>
 
   <nav>
-    <h1 id="server_title"></h1>
+    <h1 id="server_title"><%= conf.server.name %></h1>
     <a id="nav-close"><i class="fas fa-times"></i></a>
     <div id="channels">
       <h2>Channels</h2>
@@ -22,14 +22,18 @@
       <div class="channel-group">
         <h3>Voice</h3>
         <ul id="voice_channels">
-
+        <% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){%>
+          <%- include('_channel', {data: e}); %>
+        <% }); %>
         </ul>
       </div>
 
       <div class="channel-group">
         <h3>Text</h3>
         <ul id="text_channels">
-
+          <% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){%>
+            <%- include('_channel', {data: e}); %>
+          <% }); %>
         </ul>
       </div>
     </div>
@@ -81,23 +85,6 @@
       {{ogpDesc}}
     </p>
   </div>
-</template>
-
-<template id="VoiceChannel" type="text/x-handlebars-template">
-  <li>
-    <a id="{{channelID}}" class="channel">
-      {{channelName}}
-    </a>
-    <ul id="{{channelID}}-users" class="user-list"></ul>
-  </li>
-</template>
-
-<template id="TextChannel" type="text/x-handlebars-template">
-  <li>
-    <a id="{{channelID}}" class="channel">
-      {{channelName}}
-    </a>
-  </li>
 </template>
 
 </html>

@@ -7,6 +7,8 @@ This project is currently in its infancy and is functional, however can have iss
 At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows many users to connect without having to establish a connection between each and every peer. It currently utilises a headless browser (using puppeteer) which acts as a proxy-client to receive multiple WebRTC streams and create a single output for each user. Extensive testing for performance and stability has not yet been carried out but the system seems to handle several users quite well without requiring too much power from the CPU (although may be RAM intensive with the natural drawback from using a chromium based headless browser).
 
 ## Usage
+Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
+
 1. Install the latest version of Node/ NPM
 2. Clone/ Download the repository
 3. Open the repository and run `npm i` to install prequisite packages
@@ -17,12 +19,12 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
     - Run `npm run createSSL` in the OpenChat root directory
     #### Otherwise: 
     - Place the server key/ certificate into the `ssl/` directory, naming them `server.key` and `server.cert` respectively
-6. Port forward the ports set in `conf.json` in your router software ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
+6. Port forward the port set in `conf.json` in your router software ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
 7. Run `npm start` in the console at the root of the repository
-8. Open the IP in your browser, should load without needing a port b
+8. Open the IP in your browser, should load without needing a port if you are using the default https (443)
 
 ## Plans for the future:
- - Add admin panel to allow server settings to be adjusted without having to manually edit files
+ - IN PROGRESS: Add admin panel to allow server settings to be adjusted without having to manually edit files
  - Add some kind of session tracking to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
  - Combine signalling into single system with native WebRTC implementation
 

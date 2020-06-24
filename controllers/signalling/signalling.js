@@ -12,7 +12,7 @@ function startServer(db, io, conf) {
         channels: conf.server.channels
     };
 
-    const server_secret = conf.mcu_secret;
+    const server_secret = conf.secret;
         
     io.on("connection", function(socket){
         var currentUser = {};

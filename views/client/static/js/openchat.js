@@ -145,7 +145,6 @@ function connectToServer(){
       type: 'client',
       name: client.name
     });
-    console.log(socket)
   });
 
   socket.on('disconnect', function(){

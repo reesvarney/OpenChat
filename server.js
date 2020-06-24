@@ -13,7 +13,8 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
   if (err) {
     console.error(err.message);
   } else {
-    db.run("CREATE TABLE IF NOT EXISTS messages (message_id INTEGER PRIMARY KEY AUTOINCREMENT, message_date DATETIME DEFAULT CURRENT_TIMESTAMP, channel_id TEXT, sender_name INTEGER, message_content TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS messages (message_id INTEGER PRIMARY KEY AUTOINCREMENT, message_date DATETIME DEFAULT CURRENT_TIMESTAMP, channel_id TEXT, sender_name TEXT, message_content TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, salt TEXT)");
   }
   console.log("DATABASE CONNECTED")
 });
@@ -78,8 +79,8 @@ require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 // Store routes here
 
 var clientController = require('./controllers/client/client.js')(conf);
-var adminController = require('./controllers/admin/admin.js');
-var mcuController = require('./controllers/mcu/mcu.js')(conf.mcu_secret);
+var adminController = require('./controllers/admin/admin.js')(db, conf);
+var mcuController = require('./controllers/mcu/mcu.js')(conf.secret);
 var messageController = require('./controllers/messages/messages.js')(db);
 
 app.get('/', function(req, res){

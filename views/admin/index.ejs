@@ -1,1 +1,26 @@
-<p>Auth Successful</p>
+<h1>OpenChat Admin Panel</h1>
+
+<h2>Server Name</h2>
+<input value="<%= conf.server.name %>"></input>
+
+<h2>Ports:</h2>
+<p> PeerJS Signalling: <input value="<%= conf.peer.port %>"></input></p>
+<p> HTTPS/ Socket.IO Signalling: <input value="<%= conf.sig.port %>"></input></p>
+
+<h2>Channels</h2>
+<h3>Text</h3>
+<% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){%>
+    <%- include('_channel', {data: e}); %>
+<% }); %>
+<button>Add Channel</button>
+
+<h3>Voice</h3>
+<% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){%>
+    <%- include('_channel', {data: e}); %>
+<% }); %>
+<button>Add Channel</button>
+
+<h2>Security</h2>
+<p>Secret: <input value="<%= conf.secret %>"></input></p>
+
+<button>Save</button>

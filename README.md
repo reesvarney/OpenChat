@@ -10,7 +10,7 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 1. Install the latest version of Node/ NPM
 2. Clone/ Download the repository
 3. Open the repository and run `npm i` to install prequisite packages
-4. (Temporary until administrative panel is added) - edit `conf.json` to add channels or change ports. Change the `mcu_secret` to a set of secret/ random characters so that the mcu can be authenticated.
+4. (Temporary until administrative panel is added) - edit `conf.json` to add channels or change ports. Change the `secret` to a set of secret/ random characters which will be used for authentication sessions and MCU verification.
 5. Setup SSL Keys
     #### If you do not already have SSL keys: 
     - Install [openssl](https://wiki.openssl.org/index.php/Binaries)

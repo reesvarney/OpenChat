@@ -30,6 +30,5 @@
     }
     ]
   },
-  "secure" : true,
   "secret" : "SECRET STRING HERE"
 }

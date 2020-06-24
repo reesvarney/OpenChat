@@ -1,0 +1,13 @@
+<% if (data.channel_type == "voice"){ %>
+    <li>
+        <a id="<%= data.uuid %>" class="channel">
+            <input value="<%= data.channel_name %>"></input>
+        </a>
+    </li>
+<% }else if(data.channel_type == "text"){ %>
+    <li>
+        <a id="<%= data.uuid %>" class="channel">
+            <input value="<%= data.channel_name %>"></input>
+        </a>
+    </li>
+<% }; %>

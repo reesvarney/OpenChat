@@ -158,7 +158,8 @@ function connectToServer(){
 
   socket.on('serverInfo', function(server_info){
     serverinfo = server_info;
-    peer = new Peer(socket.id, {host: "localhost", port: server_info.peerPort, path: '/rtc'});
+    console.log(serverinfo)
+    peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
   });
 
   socket.on('canJoin', function(canJoin){

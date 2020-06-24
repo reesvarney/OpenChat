@@ -1,7 +1,7 @@
 var arguments = process.argv.slice(2);
 const fs = require('fs')
 const conf = require("./conf.json");
-
+conf.port =  process.env.PORT || conf.port; 
 console.log("WELCOME TO OPENCHAT")
 
 
@@ -37,23 +37,22 @@ var options = {
 
 var server = https.createServer(options, app);
 
-server.listen(conf.sig.port, function(){
+server.listen(conf.port, function(){
   console.log("HTTPS Server Running")
 });
 
 
 //PEER SERVER
 
-const { PeerServer } = require('peer');
-const peerServer = PeerServer({ 
-  port: conf.peer.port, 
-  path: '/rtc',
+const { ExpressPeerServer } = require('peer');
+const peerServer = ExpressPeerServer(server, {
   ssl: {
     key: key,
     cert: cert
   }
 });
 
+app.use('/rtc', peerServer);
 
 //SIGNALLING
 

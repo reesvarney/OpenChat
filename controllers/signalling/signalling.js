@@ -8,7 +8,7 @@ function startServer(db, io, conf) {
     var server_info = {
         name: conf.server.name,
         users: {},
-        peerPort: conf.peer.port,
+        peerPort: conf.port,
         channels: conf.server.channels
     };
 
@@ -47,7 +47,7 @@ function startServer(db, io, conf) {
                 console.log("MCU CONNECTED");
                 console.log("READY TO RECEIVE CALLS")
                 mcu_id = socket.id;
-                socket.emit("serverInfo", {"peerPort": conf.peer.port})
+                socket.emit("serverInfo", {"peerPort": conf.port})
             } else {
                 console.log('MCU WITH WRONG SECRET HAS TRIED TO CONNECT'.bgRed)
             }

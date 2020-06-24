@@ -13,7 +13,7 @@ module.exports = function (db, conf) {
     router.use("/", express.static('./views/admin/static'));
     router.use(passport.initialize());
     router.use(cookieParser);
-    router.use(bodyParser.urlencoded({ extended: false }))
+    router.use(bodyParser.urlencoded({ extended: false }));
     router.use(passport.session());
 
     function checkAuth(req, res, next){

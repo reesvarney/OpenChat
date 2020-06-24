@@ -85,8 +85,8 @@ function main() {
   socket.on("serverInfo", function(data) {
     peer = new Peer("server", {
       host: "localhost",
-      port: data.peerPort,
-      path: "/rtc",
+      path: '/rtc',
+      port: data.peerPort
     });
 
     peer.on("call", function (call) {

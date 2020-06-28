@@ -50,9 +50,16 @@
   <main>
 
     <h2><a id="nav-toggle"><i class="fas fa-bars"></i></a> Messages</h2>
-    <ol id="messages">
-
-    </ol>
+    <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll;">
+      <div id="load_messages" style="width: 100%; text-align: center; margin-top: auto; display: none;">
+        <a href="#">Load More</a>
+      </div>
+      <div>
+        <ol id="messages">
+        
+        </ol>
+      </div>
+    </div>
     <form id="message_input_area">
       <textarea rows="1" id="message_box" disabled></textarea>
       <button id="message_send" disabled>Send</button>

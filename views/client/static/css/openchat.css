@@ -163,6 +163,8 @@ main {
     flex-grow: 1;
     padding: 0px;
     background-color: #ededed;
+    max-height: 100vh;
+    overflow: hidden;
 }
 
 main>h2 {
@@ -184,13 +186,12 @@ main>h2::after {
 
 #messages {
     display: flex;
-    flex-grow: 1;
     flex-direction: column-reverse;
     justify-content: flex-start;
-    height: 100%;
-    overflow-y: auto;
     padding-right: 20px;
+    padding-top: 20px;
     margin: 0px;
+    box-sizing: content-box;
 }
 
 .message-card {

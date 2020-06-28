@@ -8,6 +8,8 @@ var serverinfo,
   peer,
   call,
   currentText,
+  currentPage,
+  lastMessage,
   soundeffects = {},
   soundfiles = [
     "mute",
@@ -91,20 +93,23 @@ function getMessages(channel_id, page){
     data: { "page": `${page}` },
     timeout: 10000,
     success: ( function( messages ){
-      $('#messages').empty();
-      $('#text_channels li').removeClass("active");
-      $('#text_channels #' + channel_id).parent().addClass("active");
-      currentText = channel_id;
-      $("#message_input_area *").each( function( index ){
-        $(this).prop('disabled', false);
-       });
-      if(messages == null){
-        //NO MORE MESSAGES TO DISPLAY
+      var tempLastMessage;
+      if(page == 0){
+        $('.message-card').remove();
+      }
+      if(messages.length == 50){
+        $("#load_messages").show();
       } else {
+        $("#load_messages").hide();
+      }
+      if(messages.length == 0){
+      } else {
+        console.log(messages)
         var source = document.getElementById("ChatMessage").innerHTML;
         var template = Handlebars.compile(source);
         for( i = 0; i < messages.length; i++){
-          var messageID = `message-${i}`
+          var currentMessage = i + (page * 50);
+          var messageID = `message-${currentMessage}`
           var date = moment.utc(messages[i].message_date);
           var data = {
             "messageSender" : messages[i].sender_name,
@@ -128,8 +133,11 @@ function getMessages(channel_id, page){
             var ogp_url = $(result).find(".found-link")[0].href;
             getOGP(ogp_url, messageID)
           };
+          tempLastMessage = currentMessage;
         };
       };
+      window.location.href = `#message-${lastMessage}`
+      lastMessage = tempLastMessage;
     })
   });
 };
@@ -221,18 +229,34 @@ function connectToServer(){
       soundeffects.disconnect.play();
     });
 
+    $("#load_messages a").click(function(){
+      currentPage += 1
+      getMessages(currentText, currentPage)
+    });
+
+
     $("#voice_channels").on('click', '* .channel', function() {
       joinChannel($(this).attr("id"));
     })
 
     $("#text_channels").on('click', '* .channel', function() {
-      getMessages($(this).attr("id"), 0);
+      var channel_id = $(this).attr("id");
+      $('#text_channels li').removeClass("active");
+      $('#text_channels #' + channel_id).parent().addClass("active");
+      lastMessage = 0;
+      currentPage = 0;
+      currentText = channel_id;
+      $("#message_input_area *").each( function( index ){
+        $(this).prop('disabled', false);
+      });
+      getMessages(channel_id, 0);
     })
 
   });
 
   $("#message_box").keypress(function (evt) {
     if(evt.keyCode == 13 && !evt.shiftKey) {
+      evt.preventDefault();
       $("#message_input_area").submit();
     }
   });

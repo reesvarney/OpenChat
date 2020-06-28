@@ -264,6 +264,7 @@ function connectToServer(){
   $("#message_input_area").submit(function(e) {
     e.preventDefault();
     var contents = $("#message_box").val();
+    lastMessage = 0;
     socket.emit("sendMessage", {
       channel: currentText,
       content: contents

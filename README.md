@@ -9,24 +9,32 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 ## Usage
 Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
 
-1. Install the latest version of Node/ NPM
+### Basic
+1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys)
 2. Clone/ Download the repository
-3. Open the repository and run `npm i` to install prequisite packages
-4. (Temporary until administrative panel is added) - edit `conf.json` to add channels or change ports. Change the `secret` to a set of secret/ random characters which will be used for authentication sessions and MCU verification.
-5. Setup SSL Keys
-    #### If you do not already have SSL keys: 
-    - Install [openssl](https://wiki.openssl.org/index.php/Binaries)
-    - Run `npm run createSSL` in the OpenChat root directory
-    #### Otherwise: 
-    - Place the server key/ certificate into the `ssl/` directory, naming them `server.key` and `server.cert` respectively
-6. Port forward the port set in `conf.json` in your router software ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
-7. Run `npm start` in the console at the root of the repository
-8. Open the IP in your browser, should load without needing a port if you are using the default https (443)
+3. Open the repository in a terminal and execute `npm run ` to use the guided setup/ configuration. This will install prequisite packages, install self-signed ssl keys, add an admin account and set the server's secret string.
+4. (For non-local access) Port forward the port `443` in your router software ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
+5. Run `npm start` in the console at the root of the repository
+6. Open `localhost/admin` in your browser (replace with your IP if accessing from another device) and log in with the previously configured admin credentials. Here you will be able to change the server name and manage the different channels (clients will need to refresh to see these changes).
+7. To access the client go to your IP which should automatically be forwarded to `/client`.
+
+If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
+
+### Further configuration
+ - To add more admin accounts, run `npm run addAdmin` in the root of the repository.
+
+ - If you'd like to use a different port, open `conf.json` and change the port value.
 
 ## Plans for the future:
  - IN PROGRESS: Add admin panel to allow server settings to be adjusted without having to manually edit files
- - Add some kind of session tracking to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
+ - Add ability to upload and view files/ media.
+ - Markdown support
+ - Add some kind of session tracking or authentication to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
  - Combine signalling into single system with native WebRTC implementation
+ - Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would also provide the benefit of providing a less disjointed product as there would be less need for individual versions/forks. It may feature things such as:
+   - Bots
+   - Front-end appearance modification
+   - Completely additional functionality
 
 ## Bugs
 If you encounter any issues with OpenChat, please raise an issue so that it can be fixed as quickly as possible.

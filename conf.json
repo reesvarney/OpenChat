@@ -1,29 +1,29 @@
-{ 
-  "port" : 443,
-  "server" : {
-    "name" : "OpenChat Server",
-    "channels" : [
+{
+  "port": 443,
+  "server": {
+    "name": "OpenChat Server",
+    "channels": [
       {
-      "channel_name" : "Text 1",
-      "channel_type" : "text",
-      "uuid" : "3f927897-fea5-4415-9780-db506629231e"
-    },
-    {
-      "channel_name" : "Text 2",
-      "channel_type" : "text",
-      "uuid" : "fbdbbad6-ad0a-4995-9299-5c02f0e59747"
-    },
-    {
-      "channel_name" : "Voice 1",
-      "channel_type" : "voice",
-      "uuid" : "edf30a62-d767-451b-ab67-07c31f6b2135"
-    },
-    {
-      "channel_name" : "Voice 2",
-      "channel_type" : "voice",
-      "uuid" : "0fc7247d-9b97-411f-9072-71abfad3ad6c"
-    }
+        "channel_name": "Text 1",
+        "channel_type": "text",
+        "uuid": "aedfe89b-64ef-492d-83b8-8827221dde37"
+      },
+      {
+        "channel_name": "Voice 1",
+        "channel_type": "voice",
+        "uuid": "cb5d090e-a961-4bbc-8fed-bf03859ae0ea"
+      },
+      {
+        "channel_name": "Text 2",
+        "channel_type": "text",
+        "uuid": "51067468-0b35-4250-8178-a2d2bed71892"
+      },
+      {
+        "channel_name": "Voice 2",
+        "channel_type": "voice",
+        "uuid": "55a08475-acb1-4ec8-84cc-14076803b3bd"
+      }
     ]
   },
-  "secret" : "SECRET STRING HERE"
+  "secret": "SECRET STRING HERE"
 }

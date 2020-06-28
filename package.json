@@ -1,5 +1,5 @@
 {
-  "name": "openchat-server",
+  "name": "openchat",
   "version": "1.0.0",
   "description": "Open Source Communication Platform",
   "main": "server.js",
@@ -8,8 +8,13 @@
     "start": "node server",
     "showmcu": "node server showmcu",
     "createSSL": "openssl req -nodes -new -x509 -keyout ./ssl/server.key -out ./ssl/server.cert",
-    "addadmin": "node ./scripts/create_user",
-    "liveDev": "nodemon server"
+    "addAdmin": "node ./scripts/create_user",
+    "liveDev": "nodemon --ignore 'views/' server",
+    "setSecret": "node ./scripts/set_secret",
+    "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret"
+  },
+  "nodemonConfig": {
+    "ignore": ["views/*", "conf.json"]
   },
   "author": "RV",
   "license": "GPL-3.0",

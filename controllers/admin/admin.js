@@ -5,9 +5,9 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser')();
 var initializePassport = require('./passport-init.js');
+const { v4: uuidv4 } = require('uuid');
 
-module.exports = function (db, conf) {
-
+module.exports = function (db, conf, fs) {
     router.use(session({ secret: conf.secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
     initializePassport(passport, db);
     router.use("/", express.static('./views/admin/static'));
@@ -16,12 +16,21 @@ module.exports = function (db, conf) {
     router.use(bodyParser.urlencoded({ extended: false }));
     router.use(passport.session());
 
+    function updateConf(res){
+        fs.writeFile("./conf.json", JSON.stringify(conf, null, 2), function(err) {
+            if(err) {
+                res.sendStatus(500);
+            }
+            res.redirect(302, "/admin");
+        }); 
+    }
+
     function checkAuth(req, res, next){
         if (req.isAuthenticated()){
             return next();
         };
 
-        res.redirect('admin/login')
+        res.redirect('/admin/login')
     }
 
     function checkNotAuth(req, res, next){
@@ -47,6 +56,63 @@ module.exports = function (db, conf) {
     function(req,res){
         res.redirect("/admin");
     });
+
+    router.get('/logout', checkAuth, function(req, res){
+        req.logout();
+        res.redirect('/admin/login');
+    });
+
+    router.get("/channel/template", checkAuth, function(req,res){
+        res.render("admin/_channel", { 
+        data : {
+            channel_type: req.query.type,
+            channel_name: "",
+            new: true
+        }
+        });
+    });
+
+    router.delete("/channel/:uuid", checkAuth, function(req, res) {
+        var index = conf.server.channels.findIndex(({ uuid } )=> uuid == req.params.uuid);
+        var type = conf.server.channels[index].channel_type;
+        conf.server.channels.splice(index, 1);
+        updateConf(res);
+        if(type == "text"){
+            db.run(`DELETE FROM messages WHERE channel_id=?`, req.params.uuid, function(err) {
+                if (err) {
+                  return console.error(err.message);
+                }
+                console.log(`Message(s) deleted ${this.changes}`);
+            });
+        }
+    });
+
+    router.post("/channel/:uuid/update", checkAuth, function(req,res){
+        var name = req.body.name;
+        var index = conf.server.channels.findIndex(({ uuid } )=> uuid == req.params.uuid);
+        conf.server.channels[index].channel_name = name;
+        updateConf(res);
+    });
+
+    router.post("/channel/new", checkAuth, function(req,res){
+        var uuid = uuidv4();
+        var name = req.body.name;
+        var type = req.body.type;
+        var channel_data = {
+            "channel_name" : name,
+            "channel_type" : type,
+            "uuid" : uuid
+        };
+        conf.server.channels.push(channel_data);
+        updateConf(res);
+    });
+
+    router.post("/server/update", checkAuth, function(req,res){
+        var data = req.body;
+        var name = req.body.name;
+        conf.server.name = req.body.name;
+        updateConf(res);
+    })
 
     return router;
 };

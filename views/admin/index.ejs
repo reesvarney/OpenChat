@@ -1,26 +1,54 @@
-<h1>OpenChat Admin Panel</h1>
+<%- include('_head') %>
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+        OpenChat Admin
+    </a>
+    <a type="button" class="btn btn-danger" href="/admin/logout">Sign Out</a>
+</nav>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h2>Config</h2>
+                <div class="container" style="margin-bottom: 40px;">
+                    <form action="server/update" method="post">
+                        <div class="form-group">
+                            <label for="serverName">Server Name</label>
+                            <input id="serverName" class="form-control" name="name" value="<%= conf.server.name %>"></input>
+                        </div>
+                        <button class="btn btn-success">Save</button>
+                    </form>
+                </div>
+    
+                <h2>Channels</h2>
+                <div class="container" style="margin-bottom: 40px;">
+                    <h5>Text</h5>
+                    <div id="text_channels">
+                        <div class="form-group">
+                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){ %>
+                            <% var data = Object.create(e); %>
+                            <% data.new = false; %>
+                            <%- include('_channel', {data: data}); %>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <button onclick="addChannel('text')" class="btn btn-primary add-channel">Add Channel</button>
+                </div>
 
-<h2>Server Name</h2>
-<input value="<%= conf.server.name %>"></input>
-
-<h2>Ports:</h2>
-<p> PeerJS Signalling: <input value="<%= conf.peer.port %>"></input></p>
-<p> HTTPS/ Socket.IO Signalling: <input value="<%= conf.sig.port %>"></input></p>
-
-<h2>Channels</h2>
-<h3>Text</h3>
-<% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){%>
-    <%- include('_channel', {data: e}); %>
-<% }); %>
-<button>Add Channel</button>
-
-<h3>Voice</h3>
-<% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){%>
-    <%- include('_channel', {data: e}); %>
-<% }); %>
-<button>Add Channel</button>
-
-<h2>Security</h2>
-<p>Secret: <input value="<%= conf.secret %>"></input></p>
-
-<button>Save</button>
+                <div class="container">
+                    <h5>Voice</h5>
+                    <div id="voice_channels">
+                        <div class="form-group form-inline">
+                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){ %>
+                            <% var data = Object.create(e); %>
+                            <% data.new = false;%>
+                            <%- include('_channel', {data: data}); %>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <button onclick="addChannel('voice')" class="btn btn-primary add-channel">Add Channel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

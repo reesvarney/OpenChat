@@ -28,7 +28,6 @@ If you already have a SSL key and certificate, you can place them in the `/ssl` 
  - If you'd like to use a different port, open `conf.json` and change the port value.
 
 ## Plans for the future:
- - IN PROGRESS: Add admin panel to allow server settings to be adjusted without having to manually edit files
  - Add ability to upload and view files/ media.
  - Markdown support
  - Add some kind of session tracking or authentication to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity

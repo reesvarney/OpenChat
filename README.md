@@ -11,7 +11,7 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 ## Usage
 Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
 
-### Basic
+### Local
 1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys)
 2. Clone/ Download the repository
 3. Open the repository in a terminal and execute `npm run ` to use the guided setup/ configuration. This will install prequisite packages, install self-signed ssl keys, add an admin account and set the server's secret string.
@@ -21,6 +21,14 @@ Support for deployment methods such as heroku will be added in the future, howev
 7. To access the client go to your IP which should automatically be forwarded to `/client`.
 
 If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
+
+### Using Docker
+These instructions should work (although they have not been tested), however for an easier install you may want to use [Portainer](https://www.portainer.io/), to create/manage your containers after building.
+
+1. Clone/Download the repository
+2. Go to the directory that you installed it and run `docker build -t [tag] .`
+3. Then once it has been built run `docker run [tag] --detach -p [port to expose on]:443 --name [container name] [tag]`
+4. Then run `docker exec -it [container name]` and enter `npm run setup` to run the setup script. (This can be done from the console page in portainer).
 
 ### Further configuration
  - To add more admin accounts, run `npm run addAdmin` in the root of the repository.

@@ -4,7 +4,7 @@ async function startMCU(params) {
     const browser = await puppeteer.launch(
         {
         headless: params.isHeadless,
-        args: ['--autoplay-policy=no-user-gesture-required'],
+        args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'],
         ignoreHTTPSErrors: true
         }
     );

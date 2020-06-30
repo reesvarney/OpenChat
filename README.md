@@ -28,7 +28,7 @@ These instructions should work (although they have not been tested), however for
 1. Clone/Download the repository
 2. Go to the directory that you installed it and run `docker build -t [tag] .`
 3. Then once it has been built run `docker run [tag] --detach -p [port to expose on]:443 --name [container name] [tag]`
-4. Then run `docker exec -it [container name]` and enter `npm run setup` to run the setup script. (This can be done from the console page in portainer).
+4. Then run `docker exec -it [container name]  /bin/bash` and enter `npm run setup` to run the setup script. (This can be done from the console page in portainer).
 
 ### Further configuration
  - To add more admin accounts, run `npm run addAdmin` in the root of the repository.

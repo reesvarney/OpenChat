@@ -199,6 +199,8 @@ function connectToServer(){
   
   socket.on("newMessage", function(channel){
     if(channel == currentText){
+      lastMessage = 0;
+      
       getMessages(channel, 0);
     }
   })

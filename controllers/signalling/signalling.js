@@ -23,7 +23,6 @@ function startServer(db, io, conf) {
             if(data.type == "client"){
             console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.brightBlue );
             
-            //TEMP - need to carry out checks on information that has been submitted
             if(data.name.length < 32){
                 uservalid = true;
             } else {

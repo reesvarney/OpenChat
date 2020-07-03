@@ -192,7 +192,7 @@ function connectToServer(){
     serverinfo.users = users;
     for(i = 0; i < Object.keys(users).length; i++){
       if(users[Object.keys(users)[i]].channel != null){
-        $('#' + users[Object.keys(users)[i]].channel + "-users").append("<li><a>" + users[Object.keys(users)[i]].name + "</a></li>");
+        $("<li><a></a></li>").text(users[Object.keys(users)[i]].name).appendTo('#' + users[Object.keys(users)[i]].channel + "-users");
       }
     }
   })
@@ -200,7 +200,7 @@ function connectToServer(){
   socket.on("newMessage", function(channel){
     if(channel == currentText){
       lastMessage = 0;
-      
+
       getMessages(channel, 0);
     }
   })

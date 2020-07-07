@@ -79,8 +79,14 @@ function startServer(db, io, conf) {
                         }
                         , function (err, result) {
                             if (err) throw err;
+                            io.emit("newMessage", {
+                                message_content: message.content,
+                                sender_name: sender,
+                                channel_id: channel,
+                                message_id: this.lastID
+                            });
                         });
-                        io.emit("newMessage", channel)
+
                     };
                 } else {
                     socket.emit("ocerror", "Cannot send empty message")

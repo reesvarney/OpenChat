@@ -25,9 +25,12 @@
                     <h5>Text</h5>
                     <div id="text_channels">
                         <div class="form-group">
-                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){ %>
-                            <% var data = Object.create(e); %>
-                            <% data.new = false; %>
+                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e, i){ %>
+                            <% 
+                                var data = Object.create(e);
+                                data.new = false; 
+                                data.index = i; 
+                            %>
                             <%- include('_channel', {data: data}); %>
                             <% }); %>
                         </div>
@@ -39,9 +42,12 @@
                     <h5>Voice</h5>
                     <div id="voice_channels">
                         <div class="form-group form-inline">
-                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){ %>
-                            <% var data = Object.create(e); %>
-                            <% data.new = false;%>
+                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e, i){ %>
+                            <% 
+                                var data = Object.create(e);
+                                data.new = false; 
+                                data.index = i; 
+                            %>
                             <%- include('_channel', {data: data}); %>
                             <% }); %>
                         </div>

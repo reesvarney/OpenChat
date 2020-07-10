@@ -7,6 +7,10 @@ var cookieParser = require('cookie-parser')();
 var initializePassport = require('./passport-init.js');
 const { v4: uuidv4 } = require('uuid');
 
+Array.prototype.move = function (from, to) {
+    this.splice(to, 0, this.splice(from, 1)[0]);
+};
+
 module.exports = function (db, conf, fs) {
     router.use(session({ secret: conf.secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
     initializePassport(passport, db);
@@ -85,22 +89,27 @@ module.exports = function (db, conf, fs) {
                 console.log(`Message(s) deleted ${this.changes}`);
             });
         }
+        res.redirect(302, "/admin");
     });
 
     router.post("/channel/:uuid/update", checkAuth, function(req,res){
         var name = req.body.name;
+        var description = req.body.description;
         var index = conf.server.channels.findIndex(({ uuid } )=> uuid == req.params.uuid);
         conf.server.channels[index].channel_name = name;
+        conf.server.channels[index].channel_description = description;
         updateConf(res);
     });
 
     router.post("/channel/new", checkAuth, function(req,res){
         var uuid = uuidv4();
         var name = req.body.name;
+        var description = req.body.description;
         var type = req.body.type;
         var channel_data = {
             "channel_name" : name,
             "channel_type" : type,
+            "channel_description" : description,
             "uuid" : uuid
         };
         conf.server.channels.push(channel_data);
@@ -108,8 +117,6 @@ module.exports = function (db, conf, fs) {
     });
 
     router.post("/server/update", checkAuth, function(req,res){
-        var data = req.body;
-        var name = req.body.name;
         conf.server.name = req.body.name;
         updateConf(res);
     })

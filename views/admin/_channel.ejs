@@ -5,6 +5,7 @@
                 <a class="channel">
                 <input id="uuid-in" class="form-control" type="text" placeholder="" readonly>
                 <input id="name-in" class="form-control" name="name" value="<%= data.channel_name %>"></input>
+                <input id="desc-in" class="form-control" name="description" value="<%= data.channel_description %>"></input>
                 <input name="type" type="hidden" value="<%= data.channel_type %>">
                 <button class="btn btn-success" type="submit">Save</button>
                 <button class="btn btn-danger" type="button" onclick="cancelChannel('<%= data.uuid %>')">Cancel</button>
@@ -15,6 +16,7 @@
                 <a class="channel">
                     <input id="uuid-in" class="form-control" type="text" placeholder="" readonly>
                     <input id="name-in" class="form-control" name="name" value="<%= data.channel_name %>"></input>
+                    <input id="desc-in" class="form-control" name="description" value="<%= data.channel_description %>"></input>
                     <input name="type" type="hidden" value="<%= data.channel_type %>">
                     <button class="btn btn-success" type="submit">Save</button>
                     <button class="btn btn-danger" type="button" onclick="cancelChannel('<%= data.uuid %>')">Cancel</button>
@@ -29,6 +31,7 @@
                 <a id="<%= data.uuid %>" class="channel">
                     <input id="uuid-in" class="form-control" type="text" placeholder="<%= data.uuid %>" readonly>
                     <input  id="name-in" class="form-control" name="name" value="<%= data.channel_name %>"></input>
+                    <input id="desc-in" class="form-control" name="description" value="<%= data.channel_description %>"></input>
                     <button class="btn btn-success update-btn" type="submit">Update</button>
                     <button class="btn btn-danger delete-btn" type="button" onclick="deleteChannel('<%= data.uuid %>')">Delete</button>
                 </a>
@@ -38,6 +41,7 @@
                 <a id="<%= data.uuid %>" class="channel">
                     <input id="uuid-in"  class="form-control" type="text" placeholder="<%= data.uuid %>" readonly>
                     <input  id="name-in" class="form-control" name="name" value="<%= data.channel_name %>"></input>
+                    <input id="desc-in" class="form-control" name="description" value="<%= data.channel_description %>"></input>
                     <button class="btn btn-success update-btn" type="submit">Update</button>
                     <button class="btn btn-danger delete-btn" type="button" onclick="deleteChannel('<%= data.uuid %>')">Delete</button>
                 </a>

@@ -4,19 +4,21 @@
     "name": "OpenChat Server",
     "channels": [
       {
-        "channel_name": "Text 1",
-        "channel_type": "text",
-        "uuid": "aedfe89b-64ef-492d-83b8-8827221dde37"
-      },
-      {
         "channel_name": "Voice 1",
         "channel_type": "voice",
         "uuid": "cb5d090e-a961-4bbc-8fed-bf03859ae0ea"
       },
       {
+        "channel_name": "Text 1",
+        "channel_type": "text",
+        "uuid": "78f7d884-3164-4123-a9b9-1f2215ca50cd",
+        "channel_description": "Desc"
+      },
+      {
         "channel_name": "Text 2",
         "channel_type": "text",
-        "uuid": "51067468-0b35-4250-8178-a2d2bed71892"
+        "uuid": "51067468-0b35-4250-8178-a2d2bed71892",
+        "channel_description": "Desc"
       },
       {
         "channel_name": "Voice 2",

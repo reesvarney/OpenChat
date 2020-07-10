@@ -265,6 +265,7 @@ function connectToServer(){
     $("#message_input_area *").each( function( index ){
       $(this).prop('disabled', false);
     });
+    $("#channel_name").text($(this).text())
     getMessages(channel_id, 0);
   })
 

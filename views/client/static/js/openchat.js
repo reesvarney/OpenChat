@@ -212,9 +212,10 @@ function connectToServer(){
     if(message.channel_id == currentText){
       addMessage(message, true);
       if(scrollController.doesScroll(200)){
-        scrollController.goToBottom();
+        scrollController.goToBottom(true);
       } else {
         //new message alert popup
+        $("#new_message").toggleClass("hidden");
       }
     }
   })
@@ -234,43 +235,38 @@ function connectToServer(){
     socket.emit('leaveChannel');
   };
 
+  scrollController = new smartScroll($('#message_scroll'));
 
-  //DOM LISTENERS
-  $( document ).ready(function() {
-    scrollController = new smartScroll($('#message_scroll'));
-
-    $("#disconnect_button").click(function(){
-      leaveChannel();
-      $("#disconnect_button").hide();
-      isConnected = false;
-      $('#voice_channels li').removeClass("active");
-      soundeffects.disconnect.play();
-    });
-
-    $("#load_messages a").click(function(){
-      currentPage += 1
-      getMessages(currentText, currentPage)
-    });
-
-
-    $("#voice_channels").on('click', '* .channel', function() {
-      joinChannel($(this).attr("id"));
-    })
-
-    $("#text_channels").on('click', '* .channel', function() {
-      var channel_id = $(this).attr("id");
-      $('#text_channels li').removeClass("active");
-      $('#text_channels #' + channel_id).parent().addClass("active");
-      lastMessage = 0;
-      currentPage = 0;
-      currentText = channel_id;
-      $("#message_input_area *").each( function( index ){
-        $(this).prop('disabled', false);
-      });
-      getMessages(channel_id, 0);
-    })
-
+  $("#disconnect_button").click(function(){
+    leaveChannel();
+    $("#disconnect_button").hide();
+    isConnected = false;
+    $('#voice_channels li').removeClass("active");
+    soundeffects.disconnect.play();
   });
+
+  $("#load_messages a").click(function(){
+    currentPage += 1
+    getMessages(currentText, currentPage)
+  });
+
+
+  $("#voice_channels").on('click', '* .channel', function() {
+    joinChannel($(this).attr("id"));
+  })
+
+  $("#text_channels").on('click', '* .channel', function() {
+    var channel_id = $(this).attr("id");
+    $('#text_channels li').removeClass("active");
+    $('#text_channels #' + channel_id).parent().addClass("active");
+    lastMessage = 0;
+    currentPage = 0;
+    currentText = channel_id;
+    $("#message_input_area *").each( function( index ){
+      $(this).prop('disabled', false);
+    });
+    getMessages(channel_id, 0);
+  })
 
   $("#message_box").keypress(function (evt) {
     if(evt.keyCode == 13 && !evt.shiftKey) {
@@ -288,9 +284,35 @@ function connectToServer(){
       content: contents
     });
     $("#message_box").val("");
-    scrollController.goToBottom();
+    scrollController.goToBottom(true);
   });
 };
+
+$( document ).ready(function() {
+  $( "#connect_form" ).submit(function( event ) {
+    event.preventDefault();
+    client.name = $("#name_input").val();
+    connectToServer();
+    $("#connect_overlay").removeClass("active");
+  });
+
+  $("#nav-toggle").click(function(){
+    $("nav").show();
+  })
+
+  $("#nav-close").click(function(){
+    $("nav").hide();
+  })
+
+  $("#new_msg_btn").click(function(){
+    scrollController.goToBottom(true);
+    $("#new_message").toggleClass('hidden');
+  })
+
+  $("#new_msg_close").click(function(){
+    $("#new_message").toggleClass('hidden');
+  })
+});
 
 function muteAudio(toggleStatus){
   if(toggleStatus){
@@ -313,7 +335,7 @@ function muteAudio(toggleStatus){
       muteMic(false);
     }
   }
-}
+};
 
 function muteMic(toggleStatus){
   if(toggleStatus){
@@ -351,19 +373,4 @@ $( document ).ready(function() {
       muteAudio(true);
     }
   });
-
-  $( "#connect_form" ).submit(function( event ) {
-    event.preventDefault();
-    client.name = $("#name_input").val();
-    connectToServer();
-    $("#connect_overlay").removeClass("active");
-  });
-
-  $("#nav-toggle").click(function(){
-    $("nav").show();
-  })
-
-  $("#nav-close").click(function(){
-    $("nav").hide();
-  })
 });

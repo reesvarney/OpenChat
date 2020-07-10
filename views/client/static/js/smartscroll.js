@@ -18,7 +18,16 @@ class smartScroll{
         this.element.scrollTop(scrollTop);
     }
 
-    goToBottom(){
-        this.element.scrollTop(this.element[0].scrollHeight);
+    goToBottom(smooth){
+        var scrollTop = this.element[0].scrollHeight;
+        if(smooth){
+            this.element.animate({
+                scrollTop: scrollTop
+            }, 500);
+        } else {
+            this.element.scrollTop(scrollTop);
+        }
     }
+
+
 }

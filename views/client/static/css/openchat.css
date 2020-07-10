@@ -156,6 +156,29 @@ div.center-self {
     cursor: pointer;
 }
 
+/* NOTIFICATION */
+.notification {
+    position: absolute;
+    bottom: 0%;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #a6a6a6;
+    border-radius: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-weight: 550;
+    margin-bottom: 100px;
+}
+
+.hidden {
+    display: none;
+}
+
 /* MESSAGE AREA */
 main {
     display: flex;
@@ -165,6 +188,7 @@ main {
     background-color: #ededed;
     max-height: 100vh;
     overflow: hidden;
+    position: relative;
 }
 
 main>h2 {
@@ -182,6 +206,10 @@ main>h2::after {
     background: linear-gradient(to right, hsla(0, 0%, 0%, 0.1) 0%, hsla(0, 0%, 0%, 0.1) 33%, hsla(0, 0%, 0%, 0) 90%);
     box-shadow:  0px 7px 14px rgba(0,0,0,0.2);
     position: absolute;
+}
+
+#message_scroll {
+    position: relative;
 }
 
 #messages {
@@ -203,6 +231,7 @@ main>h2::after {
     padding-left: 40px;
     padding-right: 40px;
     margin-bottom: 20px;
+    word-wrap: break-word;
 }
 
 .ogp-card {
@@ -224,6 +253,7 @@ main>h2::after {
 .ogp-card p {
     margin: 0px;
 }
+
 /* MESSAGE INPUT */
 #message_input_area {
     display: flex;
@@ -426,7 +456,6 @@ main>h2::after {
 
     .message-card {
         padding: 10px;
-        word-wrap: break-word;
     }
 
     .ogp-card {

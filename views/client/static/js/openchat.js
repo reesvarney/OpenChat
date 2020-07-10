@@ -1,5 +1,4 @@
 var serverinfo,
-  destination = {},
   client = {},
   new_channel = null,
   isConnected = false,
@@ -19,6 +18,7 @@ var serverinfo,
     "unmute_mic",
     "disconnect"
   ],
+  scrollController,
   constraints = {
     audio: {
         sampleRate: 64000,
@@ -78,12 +78,48 @@ function getOGP(ogp_url, messageID){
           "ogpSiteName": ogpSiteName,
           "ogpDesc" : result.ogDescription
         };
-        $(`#${messageID} .ogp-area`).empty();
-        $(`#${messageID} .ogp-area`).append(ogTemplate(ogData));
+        $(`#message-${messageID} .ogp-area`).empty();
+        $(`#message-${messageID} .ogp-area`).append(ogTemplate(ogData));
       }
     })
   });
 };
+
+function addMessage(message, isNew){
+  var source = document.getElementById("ChatMessage").innerHTML;
+  var template = Handlebars.compile(source);
+  var messageID = message.message_id;
+  var date = moment.utc(message.message_date);
+  var data = {
+    "messageSender" : message.sender_name,
+    "messageContent" : message.message_content,
+    "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
+    "messageID" : `message-${messageID}`
+  };
+
+  var result = $($.parseHTML(anchorme({
+    input: template(data),
+    options : {
+      attributes: {
+        class: "found-link",
+        target: "_blank"
+      }
+    }
+  })));
+
+  if (!isNew){
+    $('#messages').append(result);
+  } else {
+    $('#messages').prepend(result);
+  }
+
+  if ($(result).find(".found-link").length != 0){
+    var ogp_url = $(result).find(".found-link")[0].href;
+    getOGP(ogp_url, messageID)
+  };
+
+  return messageID;
+}
 
 function getMessages(channel_id, page){
   $.ajax({
@@ -93,58 +129,33 @@ function getMessages(channel_id, page){
     data: { "page": `${page}` },
     timeout: 10000,
     success: ( function( messages ){
-      var tempLastMessage;
       if(page == 0){
         $('.message-card').remove();
       }
+
       if(messages.length == 50){
         $("#load_messages").show();
       } else {
         $("#load_messages").hide();
       }
+
       if(messages.length == 0){
       } else {
-        console.log(messages)
-        var source = document.getElementById("ChatMessage").innerHTML;
-        var template = Handlebars.compile(source);
         for( i = 0; i < messages.length; i++){
-          var currentMessage = i + (page * 50);
-          var messageID = `message-${currentMessage}`
-          var date = moment.utc(messages[i].message_date);
-          var data = {
-            "messageSender" : messages[i].sender_name,
-            "messageContent" : messages[i].message_content,
-            "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
-            "messageID" : messageID
+          tempLastMessage = addMessage(messages[i], false);
+          if(i == 0 && page == 0) {
+            lastMessage = tempLastMessage;
           };
-  
-          var result = $($.parseHTML(anchorme({
-            input: template(data),
-            options : {
-              attributes: {
-                class: "found-link",
-                target: "_blank"
-              }
-            }
-          })));
-  
-          $('#messages').append(result);
-          if ($(result).find(".found-link").length != 0){
-            var ogp_url = $(result).find(".found-link")[0].href;
-            getOGP(ogp_url, messageID)
-          };
-          tempLastMessage = currentMessage;
         };
+        scrollController.goToChild($(`#message-${lastMessage}`));
+        lastMessage = tempLastMessage;
       };
-      window.location.href = `#message-${lastMessage}`
-      lastMessage = tempLastMessage;
     })
   });
 };
 
 function connectToServer(){
   var socket = io.connect();
-  $("#addserver").hide();
   
   // SOCKET LISTENERS
   socket.on('connect', function() {
@@ -192,14 +203,20 @@ function connectToServer(){
     serverinfo.users = users;
     for(i = 0; i < Object.keys(users).length; i++){
       if(users[Object.keys(users)[i]].channel != null){
-        $('#' + users[Object.keys(users)[i]].channel + "-users").append("<li><a>" + users[Object.keys(users)[i]].name + "</a></li>");
+        $("<li><a></a></li>").text(users[Object.keys(users)[i]].name).appendTo('#' + users[Object.keys(users)[i]].channel + "-users");
       }
     }
   })
   
-  socket.on("newMessage", function(channel){
-    if(channel == currentText){
-      getMessages(channel, 0);
+  socket.on("newMessage", function(message){
+    if(message.channel_id == currentText){
+      addMessage(message, true);
+      if(scrollController.doesScroll(200)){
+        scrollController.goToBottom(true);
+      } else {
+        //new message alert popup
+        $("#new_message").toggleClass("hidden");
+      }
     }
   })
 
@@ -218,41 +235,38 @@ function connectToServer(){
     socket.emit('leaveChannel');
   };
 
+  scrollController = new smartScroll($('#message_scroll'));
 
-  //DOM LISTENERS
-  $( document ).ready(function() {
-    $("#disconnect_button").click(function(){
-      leaveChannel();
-      $("#disconnect_button").hide();
-      isConnected = false;
-      $('#voice_channels li').removeClass("active");
-      soundeffects.disconnect.play();
-    });
-
-    $("#load_messages a").click(function(){
-      currentPage += 1
-      getMessages(currentText, currentPage)
-    });
-
-
-    $("#voice_channels").on('click', '* .channel', function() {
-      joinChannel($(this).attr("id"));
-    })
-
-    $("#text_channels").on('click', '* .channel', function() {
-      var channel_id = $(this).attr("id");
-      $('#text_channels li').removeClass("active");
-      $('#text_channels #' + channel_id).parent().addClass("active");
-      lastMessage = 0;
-      currentPage = 0;
-      currentText = channel_id;
-      $("#message_input_area *").each( function( index ){
-        $(this).prop('disabled', false);
-      });
-      getMessages(channel_id, 0);
-    })
-
+  $("#disconnect_button").click(function(){
+    leaveChannel();
+    $("#disconnect_button").hide();
+    isConnected = false;
+    $('#voice_channels li').removeClass("active");
+    soundeffects.disconnect.play();
   });
+
+  $("#load_messages a").click(function(){
+    currentPage += 1
+    getMessages(currentText, currentPage)
+  });
+
+
+  $("#voice_channels").on('click', '* .channel', function() {
+    joinChannel($(this).attr("id"));
+  })
+
+  $("#text_channels").on('click', '* .channel', function() {
+    var channel_id = $(this).attr("id");
+    $('#text_channels li').removeClass("active");
+    $('#text_channels #' + channel_id).parent().addClass("active");
+    lastMessage = 0;
+    currentPage = 0;
+    currentText = channel_id;
+    $("#message_input_area *").each( function( index ){
+      $(this).prop('disabled', false);
+    });
+    getMessages(channel_id, 0);
+  })
 
   $("#message_box").keypress(function (evt) {
     if(evt.keyCode == 13 && !evt.shiftKey) {
@@ -270,8 +284,35 @@ function connectToServer(){
       content: contents
     });
     $("#message_box").val("");
+    scrollController.goToBottom(true);
   });
 };
+
+$( document ).ready(function() {
+  $( "#connect_form" ).submit(function( event ) {
+    event.preventDefault();
+    client.name = $("#name_input").val();
+    connectToServer();
+    $("#connect_overlay").removeClass("active");
+  });
+
+  $("#nav-toggle").click(function(){
+    $("nav").show();
+  })
+
+  $("#nav-close").click(function(){
+    $("nav").hide();
+  })
+
+  $("#new_msg_btn").click(function(){
+    scrollController.goToBottom(true);
+    $("#new_message").toggleClass('hidden');
+  })
+
+  $("#new_msg_close").click(function(){
+    $("#new_message").toggleClass('hidden');
+  })
+});
 
 function muteAudio(toggleStatus){
   if(toggleStatus){
@@ -294,7 +335,7 @@ function muteAudio(toggleStatus){
       muteMic(false);
     }
   }
-}
+};
 
 function muteMic(toggleStatus){
   if(toggleStatus){
@@ -332,19 +373,4 @@ $( document ).ready(function() {
       muteAudio(true);
     }
   });
-
-  $( "#connect_form" ).submit(function( event ) {
-    event.preventDefault();
-    client.name = $("#name_input").val();
-    connectToServer();
-    $("#connect_overlay").removeClass("active");
-  });
-
-  $("#nav-toggle").click(function(){
-    $("nav").show();
-  })
-
-  $("#nav-close").click(function(){
-    $("nav").hide();
-  })
 });

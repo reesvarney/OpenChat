@@ -16,14 +16,20 @@ function startServer(db, io, conf) {
         
     io.on("connection", function(socket){
         var currentUser = {};
+        var uservalid;
     
         //WHEN USER SENDS THEIR INFORMATION
         socket.on("userinfo", function(data){
             if(data.type == "client"){
             console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.brightBlue );
             
-            //TEMP - need to carry out checks on information that has been submitted
-            var uservalid = true;
+            if(data.name.length < 32){
+                uservalid = true;
+            } else {
+                socket.emit("ocerror", "Name too long");
+                socket.disconnect(true);
+            }
+
             if(mcu_id !== null){
                 if(uservalid){
                 currentUser.info = data;
@@ -73,8 +79,14 @@ function startServer(db, io, conf) {
                         }
                         , function (err, result) {
                             if (err) throw err;
+                            io.emit("newMessage", {
+                                message_content: message.content,
+                                sender_name: sender,
+                                channel_id: channel,
+                                message_id: this.lastID
+                            });
                         });
-                        io.emit("newMessage", channel)
+
                     };
                 } else {
                     socket.emit("ocerror", "Cannot send empty message")

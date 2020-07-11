@@ -14,7 +14,10 @@
     "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret"
   },
   "nodemonConfig": {
-    "ignore": ["views/*", "conf.json"]
+    "ignore": [
+      "views/*",
+      "conf.json"
+    ]
   },
   "author": "RV",
   "license": "GPL-3.0",

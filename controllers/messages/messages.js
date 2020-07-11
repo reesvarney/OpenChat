@@ -2,6 +2,8 @@ const ogs = require('open-graph-scraper');
 var express = require('express');
 var router = express.Router();
 var sqlite3 = require('sqlite3').verbose();
+//var anchorme = require("anchorme").default;
+//var moment = require('moment');
 
 module.exports = function(db){
     var messages = [];
@@ -13,16 +15,29 @@ module.exports = function(db){
             req.query.page = 0;
         };
 
-        db.all(`SELECT * FROM messages WHERE channel_id=$channel_id ORDER BY message_date DESC LIMIT $query_start , 50`,
-        {
-            $channel_id: req.params.channel,
-            $query_start: req.query.page * 50
-        },
+        var sql;
+        var queryData;
+
+        if (req.query.id != undefined){
+            sql = "SELECT * FROM messages WHERE message_id=$message_id LIMIT 1";
+            queryData = {
+                $message_id: req.query.id
+            }
+        } else {
+            sql = "SELECT * FROM messages WHERE channel_id=$channel_id ORDER BY message_date DESC LIMIT $query_start , 50";
+            queryData = {
+                $channel_id: req.params.channel,
+                $query_start: req.query.page * 50
+            }
+        };
+
+        db.all(sql, queryData,
         function (err, result) {
             if (err) throw err;
             if(result.length == 0){
                 result = null;
             }
+            //res.render("messages/container", {data: result})
             res.send(result);
         });
     });

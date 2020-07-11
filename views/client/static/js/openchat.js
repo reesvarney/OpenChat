@@ -121,33 +121,42 @@ function addMessage(message, isNew){
   return messageID;
 }
 
-function getMessages(channel_id, page){
+function getMessages(channel_id, params){
   $.ajax({
     async: true,
     type: 'GET',
     url: `/messages/channels/${channel_id}`, 
-    data: { "page": `${page}` },
+    data: params,
     timeout: 10000,
     success: ( function( messages ){
-      if(page == 0){
+      if("page" in params && params.page == 0){
         $('.message-card').remove();
       }
 
       if(messages.length == 50){
         $("#load_messages").show();
-      } else {
+      } else if("page" in params){
         $("#load_messages").hide();
       }
 
       if(messages.length == 0){
+        //no messages, notify user
       } else {
         for( i = 0; i < messages.length; i++){
-          tempLastMessage = addMessage(messages[i], false);
-          if(i == 0 && page == 0) {
+          var isNew;
+          if("id" in params){
+            isNew = true;
+          } else {
+            isNew = false;
+          }
+          tempLastMessage = addMessage(messages[i], isNew);
+          if(i == 0 && "page" in params && params.page == 0) {
             lastMessage = tempLastMessage;
           };
         };
-        scrollController.goToChild($(`#message-${lastMessage}`));
+        if("page" in params){
+          scrollController.goToChild($(`#message-${lastMessage}`));
+        }
         lastMessage = tempLastMessage;
       };
     })
@@ -208,16 +217,8 @@ function connectToServer(){
     }
   })
   
-  socket.on("newMessage", function(message){
-    if(message.channel_id == currentText){
-      addMessage(message, true);
-      if(scrollController.doesScroll(200)){
-        scrollController.goToBottom(true);
-      } else {
-        //new message alert popup
-        $("#new_message").toggleClass("hidden");
-      }
-    }
+  socket.on("newMessage", function(data){
+    getMessages(data.channel_id, {"id": data.message_id});
   })
 
   //start channel joining process
@@ -247,7 +248,7 @@ function connectToServer(){
 
   $("#load_messages a").click(function(){
     currentPage += 1
-    getMessages(currentText, currentPage)
+    getMessages(currentText, {"page": currentPage})
   });
 
 
@@ -269,7 +270,7 @@ function connectToServer(){
     console.log(channelData);
     $("#channel_name").text(channelData.channel_name)
     $("#channel_description").text(channelData.channel_description)
-    getMessages(channel_id, 0);
+    getMessages(channel_id, {"page" : 0});
   })
 
   $("#message_box").keypress(function (evt) {

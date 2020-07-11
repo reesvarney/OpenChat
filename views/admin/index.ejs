@@ -25,9 +25,23 @@
                     <h5>Text</h5>
                     <div id="text_channels">
                         <div class="form-group">
-                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){ %>
-                            <% var data = Object.create(e); %>
-                            <% data.new = false; %>
+                            <form class="form-inline headings-form">
+                                <div>
+                                    <a>
+                                        <input class="form-control" placeholder="Position" readonly></input>
+                                        <input class="form-control" placeholder="UUID" readonly></input>
+                                        <input class="form-control" placeholder="Name" readonly></input>
+                                        <input class="form-control" placeholder="Description" readonly></input>
+                                    </a>
+                                </div>
+                            </form>
+                            <% conf.server.channels.text.forEach(function(e, i){ %>
+                            <% 
+                                var data = Object.create(e);
+                                data.new = false; 
+                                data.index = i; 
+                                data.channel_type = "text";
+                            %>
                             <%- include('_channel', {data: data}); %>
                             <% }); %>
                         </div>
@@ -38,10 +52,23 @@
                 <div class="container">
                     <h5>Voice</h5>
                     <div id="voice_channels">
-                        <div class="form-group form-inline">
-                            <% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){ %>
-                            <% var data = Object.create(e); %>
-                            <% data.new = false;%>
+                        <div class="form-group">
+                            <form class="form-inline headings-form">
+                                <div>
+                                    <a>
+                                        <input class="form-control" placeholder="Position" readonly></input>
+                                        <input class="form-control" placeholder="UUID" readonly></input>
+                                        <input class="form-control" placeholder="Name" readonly></input>
+                                    </a>
+                                </div>
+                            </form>
+                            <% conf.server.channels.voice.forEach(function(e, i){ %>
+                            <% 
+                                var data = Object.create(e);
+                                data.new = false; 
+                                data.index = i;
+                                data.channel_type = "voice";
+                            %>
                             <%- include('_channel', {data: data}); %>
                             <% }); %>
                         </div>

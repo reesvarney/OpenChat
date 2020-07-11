@@ -11,6 +11,11 @@ body {
     height: 100%;
 }
 
+ol {
+    padding: 0;
+    margin: 0;
+}
+
 /* SIDEBAR */
 nav {
     display: flex;
@@ -224,10 +229,11 @@ main {
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-start;
-    padding-right: 20px;
-    padding-top: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin: 0px;
     box-sizing: content-box;
+    min-height: 100%;
 }
 
 .message-card {

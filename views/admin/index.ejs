@@ -25,6 +25,16 @@
                     <h5>Text</h5>
                     <div id="text_channels">
                         <div class="form-group">
+                            <form class="form-inline headings-form">
+                                <div>
+                                    <a>
+                                        <input class="form-control" placeholder="Position" readonly></input>
+                                        <input class="form-control" placeholder="UUID" readonly></input>
+                                        <input class="form-control" placeholder="Name" readonly></input>
+                                        <input class="form-control" placeholder="Description" readonly></input>
+                                    </a>
+                                </div>
+                            </form>
                             <% conf.server.channels.text.forEach(function(e, i){ %>
                             <% 
                                 var data = Object.create(e);
@@ -42,7 +52,16 @@
                 <div class="container">
                     <h5>Voice</h5>
                     <div id="voice_channels">
-                        <div class="form-group form-inline">
+                        <div class="form-group">
+                            <form class="form-inline headings-form">
+                                <div>
+                                    <a>
+                                        <input class="form-control" placeholder="Position" readonly></input>
+                                        <input class="form-control" placeholder="UUID" readonly></input>
+                                        <input class="form-control" placeholder="Name" readonly></input>
+                                    </a>
+                                </div>
+                            </form>
                             <% conf.server.channels.voice.forEach(function(e, i){ %>
                             <% 
                                 var data = Object.create(e);

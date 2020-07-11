@@ -66,8 +66,8 @@ function startServer(db, io, conf) {
             var sender = server_info.users[socket.id].name;
             var channel = message.channel;
             var content = message.content;
-            var channel_search = server_info["channels"].find(({ uuid } )=> uuid == channel);
-            if( channel_search != undefined && channel_search.channel_type == "text"){
+            var channel_search = server_info.channels.text.find(({ uuid } )=> uuid == channel);
+            if( channel_search != undefined){
                 if(content != ""){
                     if(content.length <= 2000){
                         console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
@@ -99,8 +99,8 @@ function startServer(db, io, conf) {
     
         //WHEN USER TRIES TO JOIN A CHANNEL
         socket.on("joinChannel", function(channel){
-            var channel_search = server_info["channels"].find(({ uuid } )=> uuid == channel);
-            if(channel_search != undefined && channel_search.channel_type == "voice"){
+            var channel_search = server_info.channels.voice.find(({ uuid } )=> uuid == channel);
+            if(channel_search != undefined){
                 console.log(`User ${socket.id} changing to channel ${channel_search.channel_name}`.cyan);
                 io.to(mcu_id).emit('setChannel', {
                 user: socket.id,

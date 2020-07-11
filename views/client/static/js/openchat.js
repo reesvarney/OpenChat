@@ -265,7 +265,7 @@ function connectToServer(){
     $("#message_input_area *").each( function( index ){
       $(this).prop('disabled', false);
     });
-    var channelData = serverinfo.channels.find(({ uuid } )=> uuid == channel_id);
+    var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
     console.log(channelData);
     $("#channel_name").text(channelData.channel_name)
     $("#channel_description").text(channelData.channel_description)

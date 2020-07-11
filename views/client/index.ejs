@@ -22,7 +22,7 @@
       <div class="channel-group">
         <h3>Voice</h3>
         <ul id="voice_channels">
-        <% conf.server.channels.filter(({ channel_type } )=> channel_type == "voice").forEach(function(e){%>
+        <% conf.server.channels.voice.forEach(function(e){%>
           <%- include('_channel', {data: e}); %>
         <% }); %>
         </ul>
@@ -31,7 +31,7 @@
       <div class="channel-group">
         <h3>Text</h3>
         <ul id="text_channels">
-          <% conf.server.channels.filter(({ channel_type } )=> channel_type == "text").forEach(function(e){%>
+          <% conf.server.channels.text.forEach(function(e){%>
             <%- include('_channel', {data: e}); %>
           <% }); %>
         </ul>

@@ -11,6 +11,19 @@ Array.prototype.move = function (from, to) {
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
+function findChannel(ch_uuid){
+    var data = {};
+    var types = Object.keys(conf.server.channels);
+    for(i = 0; i < types.length; i++){
+        var results = conf.server.channels[types[i]].find(({ uuid } )=> uuid == ch_uuid);
+        if( results != undefined){
+            data.index = conf.server.channels[types[i]].findIndex(({ uuid } )=> uuid == ch_uuid);
+            data.type = types[i];
+        }
+    }
+    return data
+}
+
 module.exports = function (db, conf, fs) {
     router.use(session({ secret: conf.secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
     initializePassport(passport, db);
@@ -95,9 +108,9 @@ module.exports = function (db, conf, fs) {
     router.post("/channel/:uuid/update", checkAuth, function(req,res){
         var name = req.body.name;
         var description = req.body.description;
-        var index = conf.server.channels.findIndex(({ uuid } )=> uuid == req.params.uuid);
-        conf.server.channels[index].channel_name = name;
-        conf.server.channels[index].channel_description = description;
+        var channel = findChannel(req.params.uuid);
+        conf.server.channels[channel.type][channel.index].channel_name = name;
+        conf.server.channels[channel.type][channel.index].channel_description = description;
         updateConf(res);
     });
 
@@ -108,11 +121,12 @@ module.exports = function (db, conf, fs) {
         var type = req.body.type;
         var channel_data = {
             "channel_name" : name,
-            "channel_type" : type,
-            "channel_description" : description,
             "uuid" : uuid
         };
-        conf.server.channels.push(channel_data);
+        if (description.length > 0){
+            channel_data.channel_description = description;
+        }
+        conf.server.channels[type].push(channel_data);
         updateConf(res);
     });
 

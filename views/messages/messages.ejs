@@ -8,17 +8,15 @@ var message = data[i];
         <br>
         <%- message.message_content %>
     </p>
-    <% if("ogp" in message){
-        var ogp = message.ogp;
-        %>
-    <div class="ogp-card">
-        <img src="<%= ogp.imageSRC %>">
-        <p>
-            <a target="_blank" href="<%= ogp.url %>"><strong><%= ogp.siteName %></strong><%= ogp.title %></a>
-            <br>
-            <%= ogp.desc %>
-        </p>
-    </div>
+    
+    <% if("ogp" in message){ %>
+        <% var ogp = message.ogp; %>
+        <%- include('_ogp', {ogp: ogp}) %>
+    <% } %>
+
+    <% if("yt" in message){ %>
+        <% var url = message.yt; %>
+        <%- include('_yt_embed', {url: url}) %>
     <% } %>
 </div>
 <% } %>

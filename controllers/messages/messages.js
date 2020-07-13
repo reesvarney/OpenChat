@@ -17,6 +17,7 @@ function sanitize(str){
 module.exports = function(db){
     var ogpCache = {};
     var messageCache = {};
+    var ytCache = {};
 
     //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
     router.get('/channels/:channel', function(req, res){
@@ -68,46 +69,65 @@ module.exports = function(db){
                         currentResult.message_date = moment.utc(currentResult.message_date).format('MMMM Do YYYY, h:mm a');
 
                         if(links.length != 0){
-                            var firstLink = links[0].string;
-                            if(firstLink in ogpCache){
-                                currentResult["ogp"] = ogpCache[firstLink];
-                                result[i] = currentResult;
-                                messageCache[currentResult.message_id] = currentResult;
-                                resolve(i)
-                            } else {
-                                ogs({ url: firstLink }, (error, ogpResult, response) => {
-                                    if ("ogTitle" in ogpResult){
-                                        var ogpData = {}
-        
-                                        ogpData.imageSRC = "";
-                                        if ("ogImage" in ogpResult && "url" in ogpResult.ogImage) {
-                                            ogpData.imageSRC = ogpResult.ogImage.url
-                                        if (ogpResult.ogImage.url.startsWith("/")){
-                                            ogpData.imageSRC = (ogpResult.requestUrl || ogpResult.ogUrl) + ogpResult.ogImage.url;
-                                        }
-                                        }
-        
-                                        ogpData.siteName = "";
-                                        if ("ogSiteName" in ogpResult){
-                                            ogpData.siteName = `${ogpResult.ogSiteName} - `;
-                                        }
-                                        
-                                        ogpData.url = ogpResult.ogUrl || ogpResult.requestUrl;
-                                        ogpData.title = ogpResult.ogTitle;
-                                        ogpData.desc = ogpResult.ogDescription
-        
-                                        ogpCache[firstLink] = ogpData;
-                                        currentResult["ogp"] = ogpData;
-                                        result[i] = currentResult;
-                                        messageCache[currentResult.message_id] = currentResult;
-                                        resolve(i)
-                                    };
-                                });
+                            var linkHandled = false;
+
+                            var ytRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/gim;
+                            for(x = 0; x < links.length; x++){
+                                if(ytRegex.test(links[x].string)){
+                                    currentResult["yt"] = links[x].string.replace("watch", "embed").replace("?v=", "/");
+                                    result[i] = currentResult;
+                                    messageCache[currentResult.message_id] = currentResult;
+                                    resolve(i)
+                                    linkHandled = true;
+                                
+                                }
                             };
+                            
+                            if(!linkHandled){
+                                var firstLink = links[0].string;
+                                if(firstLink in ogpCache){
+                                    currentResult["ogp"] = ogpCache[firstLink];
+                                    result[i] = currentResult;
+                                    messageCache[currentResult.message_id] = currentResult;
+                                    resolve(i)
+                                    linkHandled = true;
+                                } else {
+                                    ogs({ url: firstLink }, (error, ogpResult, response) => {
+                                        if ("ogTitle" in ogpResult){
+                                            var ogpData = {}
+            
+                                            ogpData.imageSRC = "";
+                                            if ("ogImage" in ogpResult && "url" in ogpResult.ogImage) {
+                                                ogpData.imageSRC = ogpResult.ogImage.url
+                                            if (ogpResult.ogImage.url.startsWith("/")){
+                                                ogpData.imageSRC = (ogpResult.requestUrl || ogpResult.ogUrl) + ogpResult.ogImage.url;
+                                            }
+                                            }
+            
+                                            ogpData.siteName = "";
+                                            if ("ogSiteName" in ogpResult){
+                                                ogpData.siteName = `${ogpResult.ogSiteName} - `;
+                                            }
+                                            
+                                            ogpData.url = ogpResult.ogUrl || ogpResult.requestUrl;
+                                            ogpData.title = ogpResult.ogTitle;
+                                            ogpData.desc = ogpResult.ogDescription
+            
+                                            ogpCache[firstLink] = ogpData;
+                                            currentResult["ogp"] = ogpData;
+                                            result[i] = currentResult;
+                                            messageCache[currentResult.message_id] = currentResult;
+                                            resolve(i)
+                                            linkHandled = true;
+                                        };
+                                    });
+                                };
+                            }
                         } else {
                             result[i] = currentResult;
                             messageCache[currentResult.message_id] = currentResult;
                             resolve(i)
+                            linkHandled = true;
                         };
                     });
                 }

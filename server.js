@@ -23,9 +23,12 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
 
 var https = require('https');
 const express = require('express');
+const helmet = require('helmet');
 var app = express();
 app.disable('view cache');
 app.set('view engine', 'ejs');
+app.use(helmet.frameguard());
+app.use(helmet.frameguard({ action: undefined }))
 
 var key  = fs.readFileSync('ssl/server.key', 'utf8');
 var cert = fs.readFileSync('ssl/server.cert', 'utf8');

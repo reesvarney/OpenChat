@@ -283,6 +283,52 @@ main {
     color: darkgrey;
 }
 
+#load_messages {
+    width: 100%;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 10px;
+    margin-bottom: 20px;
+}
+
+#load_messages a {
+    text-decoration: none;
+    border: #ebe9e9;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 20px;
+    padding: 10px;
+    background-color: #f6f6f6;
+    color: darkgrey;
+}
+
+#load_messages a:focus:hover {
+    background-color: #dadada;
+}
+
+.yt-container {
+    width: 100%;
+    height: 100%;
+    max-width: 520px;
+    max-height: 292.5px;
+}
+
+.yt-player {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+
+    box-sizing: border-box;
+}
+
+.yt-player iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 /* MESSAGE INPUT */
 #message_input_area {
     display: flex;

@@ -51,7 +51,7 @@ docker pull docker.pkg.github.com/reesvarney/openchat/openchat-docker:latest
 ```
 2. Run the image
 ```sh
-docker run --detach -p [port to expose on]:443 --name [container name] openchat-docker
+docker run --detach -p [port to expose on]:443 --name [container name] docker.pkg.github.com/reesvarney/openchat/openchat-docker
 ```
 
 #### Build your own image
@@ -67,7 +67,7 @@ docker run --detach -p [port to expose on]:443 --name [container name] [tag]
 ```
 4. Start a bash terminal in the container
 ```sh
-docker exec -it [container name]  /bin/bash
+docker exec -it [container name] /bin/bash
 ```
 5. Run the setup script
 ```sh

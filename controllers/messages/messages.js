@@ -80,7 +80,7 @@ module.exports = function(db){
                                 {
                                     "name" : "twitch",
                                     "expression" : /^(?:https?:\/\/)?(?:www\.|go\.)?twitch\.tv\/([a-z0-9_]+)($|\?)/g,
-                                    "function" : function(str){return str.replace("twitch.tv/", "player.twitch.tv/?channel=").replace("www.", "")}
+                                    "function" : function(str){return str.replace("twitch.tv/", "player.twitch.tv/?channel=").replace("www.", "").concat("&autoplay=false")}
                                 }
                             ]
 

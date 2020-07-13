@@ -311,6 +311,7 @@ main {
     height: 100%;
     max-width: 520px;
     max-height: 292.5px;
+    margin-bottom: 20px;
 }
 
 .yt-player {

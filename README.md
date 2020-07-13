@@ -53,25 +53,41 @@ docker pull docker.pkg.github.com/reesvarney/openchat/openchat-docker:latest
 ```sh
 docker run --detach -p [port to expose on]:443 --name [container name] docker.pkg.github.com/reesvarney/openchat/openchat-docker
 ```
+3. Start a bash terminal in the container
+```docker
+docker exec -it [container name] /bin/bash
+```
+4. Run the setup script
+```sh
+npm run setup
+```
+5. Restart the container
+```docker
+docker restart [container name]
+```
 
 #### Build your own image
 You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building (such as sqlite3).
 1. Clone/Download the repository
 2. Go to the directory that you installed it and build the image
-```sh
+```docker
 docker build -t [tag] .
 ```
 3. Run the image in a container
-```sh
+```docker
 docker run --detach -p [port to expose on]:443 --name [container name] [tag]
 ```
 4. Start a bash terminal in the container
-```sh
+```docker
 docker exec -it [container name] /bin/bash
 ```
 5. Run the setup script
 ```sh
 npm run setup
+```
+6. Restart the container
+```docker
+docker restart [container name]
 ```
 
 ### Further configuration

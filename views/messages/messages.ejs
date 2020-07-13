@@ -18,5 +18,10 @@ var message = data[i];
         <% var url = message.yt; %>
         <%- include('_yt_embed', {url: url}) %>
     <% } %>
+
+    <% if("twitch" in message){ %>
+        <% var url = message.twitch; %>
+        <%- include('_twitch_embed', {url: url, id: message.message_id}) %>
+    <% } %>
 </div>
 <% } %>

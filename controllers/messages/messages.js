@@ -71,15 +71,29 @@ module.exports = function(db){
                         if(links.length != 0){
                             var linkHandled = false;
 
-                            var ytRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/gim;
+                            var regEx = [
+                                {
+                                    "name": "yt",
+                                    "expression" : /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/gim,
+                                    "function" : function(str){return str.replace("watch", "embed").replace("?v=", "/")}
+                                },
+                                {
+                                    "name" : "twitch",
+                                    "expression" : /^(?:https?:\/\/)?(?:www\.|go\.)?twitch\.tv\/([a-z0-9_]+)($|\?)/g,
+                                    "function" : function(str){return str.replace("twitch.tv/", "player.twitch.tv/?channel=").replace("www.", "")}
+                                }
+                            ]
+
                             for(x = 0; x < links.length; x++){
-                                if(ytRegex.test(links[x].string)){
-                                    currentResult["yt"] = links[x].string.replace("watch", "embed").replace("?v=", "/");
-                                    result[i] = currentResult;
-                                    messageCache[currentResult.message_id] = currentResult;
-                                    resolve(i)
-                                    linkHandled = true;
-                                
+                                for(z = 0; z < regEx.length; z++){
+                                    var currentRegEx = regEx[z];
+                                    if(currentRegEx.expression.test(links[x].string)){
+                                        currentResult[currentRegEx.name] = currentRegEx.function(links[x].string);
+                                        result[i] = currentResult;
+                                        messageCache[currentResult.message_id] = currentResult;
+                                        resolve(i)
+                                        linkHandled = true;
+                                    }
                                 }
                             };
                             

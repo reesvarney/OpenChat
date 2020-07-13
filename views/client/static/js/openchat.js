@@ -92,6 +92,13 @@ function getMessages(channel_id, params){
   });
 };
 
+function fixTwitch(e){
+  //var url = e.target.src;
+  //`)
+  console.log(e);
+  //e.target.src = url;
+};
+
 function connectToServer(){
   var socket = io.connect();
 

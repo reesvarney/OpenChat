@@ -21,13 +21,13 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 
 ![User Interface](https://raw.githubusercontent.com/reesvarney/OpenChat/assets/2020-06-28-01-44-localhost.png)
 
-## Usage
+## Install/ Usage
 Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
 
 ### Local
-1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys)
-2. Clone/ Download the repository
-3. Run the setup script, which will install prequisite packages, create self-signed SSH keys, add an admin user and configure the server's secret.
+1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys) [https://nodejs.org/en/download/]()
+2. Download and unzip the latest release from [https://github.com/reesvarney/OpenChat/releases]()
+3. In the unzipped folder, run the setup script, which will install prequisite packages, create self-signed SSH keys, add an admin user and configure the server's secret.
 ```sh
 npm run setup
 ``` 
@@ -42,8 +42,20 @@ npm start
 If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
 
 ### Using Docker
-These instructions should work (although they have not been tested), however for an easier install you may want to use [Portainer](https://www.portainer.io/), to create/manage your containers after building.
+#### Premade Images
+These are created with every release which should be reasonably stable.
 
+1. Pull the image
+```docker
+docker pull docker.pkg.github.com/reesvarney/openchat/openchat-docker:latest
+```
+2. Run the image
+```sh
+docker run --detach -p [port to expose on]:443 --name [container name] openchat-docker
+```
+
+#### Build your own image
+You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building (such as sqlite3).
 1. Clone/Download the repository
 2. Go to the directory that you installed it and build the image
 ```sh
@@ -51,7 +63,7 @@ docker build -t [tag] .
 ```
 3. Run the image in a container
 ```sh
-docker run [tag] --detach -p [port to expose on]:443 --name [container name] [tag]
+docker run --detach -p [port to expose on]:443 --name [container name] [tag]
 ```
 4. Start a bash terminal in the container
 ```sh

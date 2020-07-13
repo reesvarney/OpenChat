@@ -30,8 +30,15 @@ app.set('view engine', 'ejs');
 app.use(helmet.frameguard());
 app.use(helmet.frameguard({ action: undefined }))
 
-var key  = fs.readFileSync('ssl/server.key', 'utf8');
-var cert = fs.readFileSync('ssl/server.cert', 'utf8');
+var key;
+var cert;
+
+try {
+  key  = fs.readFileSync('ssl/server.key', 'utf8');
+  cert = fs.readFileSync('ssl/server.cert', 'utf8');
+} catch (err) {
+  console.log("\n \n \n \n \n \n KEY/CERT NOT FOUND - PLEASE RUN SETUP OR CREATESSL \n \n \n \n \n \n")
+};
 
 var options = {
   key: key,

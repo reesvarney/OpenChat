@@ -14,7 +14,10 @@
   </div>
 
   <nav>
-    <h1 id="server_title"><%= conf.server.name %></h1>
+    <div class="brand">
+      <img id="oc_image" src="./img/logo.svg">
+      <h1 id="server_title"><%= conf.server.name %></h1>
+    </div>
     <a id="nav-close"><i class="fas fa-times"></i></a>
     <div id="channels">
       <h2>Channels</h2>
@@ -58,7 +61,7 @@
         <a href="#">Load More</a>
       </div>
 
-      <div style="min-height: 100%;">
+      <div style="min-height: 100%; padding-top: 20px;">
         <ol id="messages">
         
         </ol>

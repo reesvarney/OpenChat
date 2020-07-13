@@ -28,13 +28,26 @@ nav {
     min-width: 270px;
 }
 
-nav>h1 {
+.brand {
     margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+#oc_image {
+    height: 20px;
+    width: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+#server_title {
     font-weight: 500;
     font-family: 'Muli', sans-serif;
-    margin-bottom: 10px;
     font-size: 24px;
+    display: inline-block;
+    margin: 0px;
 }
+
 
 /* ALIGNMENT */
 .center-self {

@@ -187,18 +187,19 @@ function connectToServer(){
 
   $("#text_channels").on('click', '* .channel', function() {
     var channel_id = $(this).attr("id");
-    $('#text_channels li').removeClass("active");
-    $('#text_channels #' + channel_id).parent().addClass("active");
-    currentPage = 0;
-    currentText = channel_id;
-    $("#message_input_area *").each( function( index ){
-      $(this).prop('disabled', false);
-    });
-    var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
-    console.log(channelData);
-    $("#channel_name").text(channelData.channel_name)
-    $("#channel_description").text(channelData.channel_description)
-    getMessages(channel_id, {"page" : 0});
+    if(channel_id != currentText){
+      $('#text_channels li').removeClass("active");
+      $('#text_channels #' + channel_id).parent().addClass("active");
+      currentPage = 0;
+      currentText = channel_id;
+      $("#message_input_area *").each( function( index ){
+        $(this).prop('disabled', false);
+      });
+      var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
+      $("#channel_name").text(channelData.channel_name)
+      $("#channel_description").text(channelData.channel_description)
+      getMessages(channel_id, {"page" : 0});
+    }
   })
 
   $("#message_box").keypress(function (evt) {

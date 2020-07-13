@@ -16,6 +16,7 @@ function sanitize(str){
 
 module.exports = function(db){
     var ogpCache = {};
+    var messageCache = {};
 
     //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
     router.get('/channels/:channel', function(req, res){
@@ -71,6 +72,7 @@ module.exports = function(db){
                             if(firstLink in ogpCache){
                                 currentResult["ogp"] = ogpCache[firstLink];
                                 result[i] = currentResult;
+                                messageCache[currentResult.message_id] = currentResult;
                                 resolve(i)
                             } else {
                                 ogs({ url: firstLink }, (error, ogpResult, response) => {
@@ -97,12 +99,14 @@ module.exports = function(db){
                                         ogpCache[firstLink] = ogpData;
                                         currentResult["ogp"] = ogpData;
                                         result[i] = currentResult;
+                                        messageCache[currentResult.message_id] = currentResult;
                                         resolve(i)
                                     };
                                 });
                             };
                         } else {
                             result[i] = currentResult;
+                            messageCache[currentResult.message_id] = currentResult;
                             resolve(i)
                         };
                     });
@@ -111,7 +115,11 @@ module.exports = function(db){
                 var messageStatuses = [];
 
                 for(i = 0; i < result.length; i++){
-                    messageStatuses.push(getMessageData(i));
+                    if(result[i].message_id in messageCache){
+                        result[i] = messageCache[result[i].message_id];
+                    } else {
+                        messageStatuses.push(getMessageData(i));
+                    }
                 }
 
                 Promise.all(messageStatuses).then(function(){

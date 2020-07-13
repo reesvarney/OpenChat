@@ -2,11 +2,19 @@ const ogs = require('open-graph-scraper');
 var express = require('express');
 var router = express.Router();
 var sqlite3 = require('sqlite3').verbose();
-//var anchorme = require("anchorme").default;
-//var moment = require('moment');
+var anchorme = require("anchorme").default;
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+var moment = require('moment');
+const { render } = require('ejs');
+
+function sanitize(str){
+    var document = new JSDOM("<div></div>");
+    document.window.document.querySelector('div').textContent = str;
+    return document.window.document.documentElement.querySelector('div').innerHTML;
+}
 
 module.exports = function(db){
-    var messages = [];
     var ogpCache = {};
 
     //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
@@ -36,9 +44,81 @@ module.exports = function(db){
             if (err) throw err;
             if(result.length == 0){
                 result = null;
+                res.render("messages/none");
+            } else {
+                function getMessageData(i){
+                    return new Promise((resolve) => {
+                        var currentResult = result[i];
+        
+                        var content_clean = sanitize(currentResult.message_content);
+        
+                        currentResult.message_content = anchorme({
+                            input: content_clean,
+                            options : {
+                            attributes: {
+                                class: "found-link",
+                                target: "_blank"
+                            }
+                            }
+                        });
+
+                        var links = anchorme.list(content_clean);
+
+                        currentResult.message_date = moment.utc(currentResult.message_date).format('MMMM Do YYYY, h:mm a');
+
+                        if(links.length != 0){
+                            var firstLink = links[0].string;
+                            if(firstLink in ogpCache){
+                                currentResult["ogp"] = ogpCache[firstLink];
+                                result[i] = currentResult;
+                                resolve(i)
+                            } else {
+                                ogs({ url: firstLink }, (error, ogpResult, response) => {
+                                    if ("ogTitle" in ogpResult){
+                                        var ogpData = {}
+        
+                                        ogpData.imageSRC = "";
+                                        if ("ogImage" in ogpResult && "url" in ogpResult.ogImage) {
+                                            ogpData.imageSRC = ogpResult.ogImage.url
+                                        if (ogpResult.ogImage.url.startsWith("/")){
+                                            ogpData.imageSRC = (ogpResult.requestUrl || ogpResult.ogUrl) + ogpResult.ogImage.url;
+                                        }
+                                        }
+        
+                                        ogpData.siteName = "";
+                                        if ("ogSiteName" in ogpResult){
+                                            ogpData.siteName = `${ogpResult.ogSiteName} - `;
+                                        }
+                                        
+                                        ogpData.url = ogpResult.ogUrl || ogpResult.requestUrl;
+                                        ogpData.title = ogpResult.ogTitle;
+                                        ogpData.desc = ogpResult.ogDescription
+        
+                                        ogpCache[firstLink] = ogpData;
+                                        currentResult["ogp"] = ogpData;
+                                        result[i] = currentResult;
+                                        resolve(i)
+                                    };
+                                });
+                            };
+                        } else {
+                            result[i] = currentResult;
+                            resolve(i)
+                        };
+                    });
+                }
+
+                var messageStatuses = [];
+
+                for(i = 0; i < result.length; i++){
+                    messageStatuses.push(getMessageData(i));
+                }
+
+                Promise.all(messageStatuses).then(function(){
+                    res.render("messages/messages", {data: result});
+                }).catch((e) => { console.log(e) });
             }
-            //res.render("messages/container", {data: result})
-            res.send(result);
+            
         });
     });
 

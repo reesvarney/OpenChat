@@ -49,123 +49,52 @@ navigator.getUserMedia(constraints, function(localstream) {
   console.log('Failed to get local stream', err);
 });
 
-function getOGP(ogp_url, messageID){
-  $.ajax({
-    async: true,
-    type: 'GET',
-    url: "/messages/ogp", 
-    data: { "url": `${ogp_url}` },
-    success: ( function( result ){
-      var ogSource = document.getElementById("OGPCard").innerHTML;
-      var ogTemplate = Handlebars.compile(ogSource);
-      if ("ogTitle" in result){
-        var ogpImageURL = "";
-        if ("ogImage" in result && "url" in result.ogImage) {
-          ogpImageURL = result.ogImage.url
-          if (result.ogImage.url.startsWith("/")){
-            ogpImageURL = (result.requestUrl || result.ogUrl) + result.ogImage.url;
-          }
-        }
-        var ogpSiteName = "";
-        if ("ogSiteName" in result){
-          ogpSiteName = `${result.ogSiteName} - `;
-        }
-        
-        var ogData = {
-          "ogpImageURL" : ogpImageURL,
-          "ogpURL" : result.ogUrl || result.requestUrl,
-          "ogpTitle" : result.ogTitle,
-          "ogpSiteName": ogpSiteName,
-          "ogpDesc" : result.ogDescription
-        };
-        $(`#message-${messageID} .ogp-area`).empty();
-        $(`#message-${messageID} .ogp-area`).append(ogTemplate(ogData));
-      }
-    })
-  });
-};
-
-function addMessage(message, isNew){
-  var source = document.getElementById("ChatMessage").innerHTML;
-  var template = Handlebars.compile(source);
-  var messageID = message.message_id;
-  var date = moment.utc(message.message_date);
-  var data = {
-    "messageSender" : message.sender_name,
-    "messageContent" : message.message_content,
-    "messageDate" : date.format('MMMM Do YYYY, h:mm a'),
-    "messageID" : `message-${messageID}`
-  };
-
-  var result = $($.parseHTML(anchorme({
-    input: template(data),
-    options : {
-      attributes: {
-        class: "found-link",
-        target: "_blank"
-      }
-    }
-  })));
-
-  if (!isNew){
-    $('#messages').append(result);
-  } else {
-    $('#messages').prepend(result);
-  }
-
-  if ($(result).find(".found-link").length != 0){
-    var ogp_url = $(result).find(".found-link")[0].href;
-    getOGP(ogp_url, messageID)
-  };
-
-  return messageID;
-}
-
 function getMessages(channel_id, params){
   $.ajax({
     async: true,
     type: 'GET',
-    url: `/messages/channels/${channel_id}`, 
+    url: `/messages/channels/${channel_id}`,
     data: params,
     timeout: 10000,
-    success: ( function( messages ){
+    success: ( function( result){
       if("page" in params && params.page == 0){
         $('.message-card').remove();
+        $('#no_messages').remove();
       }
 
-      if(messages.length == 50){
+      var isNew;
+      if("id" in params){
+        isNew = true;
+      } else {
+        isNew = false;
+      }
+
+      var lastMessage = $("#messages>:last-child");
+
+      if (!isNew){
+        $('#messages').append(result);
+      } else {
+        $('#messages').prepend(result);
+      }
+
+      if($('#messages').children().length % 50 == 0){
         $("#load_messages").show();
       } else if("page" in params){
         $("#load_messages").hide();
       }
 
-      if(messages.length == 0){
-        //no messages, notify user
-      } else {
-        for( i = 0; i < messages.length; i++){
-          var isNew;
-          if("id" in params){
-            isNew = true;
-          } else {
-            isNew = false;
-          }
-          tempLastMessage = addMessage(messages[i], isNew);
-          if(i == 0 && "page" in params && params.page == 0) {
-            lastMessage = tempLastMessage;
-          };
-        };
-        if("page" in params){
-          scrollController.goToChild($(`#message-${lastMessage}`));
-        }
-        lastMessage = tempLastMessage;
-      };
+      if("page" in params && params.page == 0) {
+        scrollController.goToChild($("#messages>:first-child"));
+      }else if("page" in params){
+        scrollController.goToChild(lastMessage);
+      }
     })
   });
 };
 
 function connectToServer(){
   var socket = io.connect();
-  
+
   // SOCKET LISTENERS
   socket.on('connect', function() {
     //connection established, begin auth
@@ -216,7 +145,7 @@ function connectToServer(){
       }
     }
   })
-  
+
   socket.on("newMessage", function(data){
     getMessages(data.channel_id, {"id": data.message_id});
   })
@@ -260,7 +189,6 @@ function connectToServer(){
     var channel_id = $(this).attr("id");
     $('#text_channels li').removeClass("active");
     $('#text_channels #' + channel_id).parent().addClass("active");
-    lastMessage = 0;
     currentPage = 0;
     currentText = channel_id;
     $("#message_input_area *").each( function( index ){
@@ -283,7 +211,6 @@ function connectToServer(){
   $("#message_input_area").submit(function(e) {
     e.preventDefault();
     var contents = $("#message_box").val();
-    lastMessage = 0;
     socket.emit("sendMessage", {
       channel: currentText,
       content: contents

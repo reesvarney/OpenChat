@@ -132,12 +132,14 @@ function main() {
   });
 
   socket.on("closeCall", function (data) {
-    var old_channel = connected_users[data.user]["channelID"];
-    if ("call" in connected_users[data.user]){
-      connected_users[data.user].call.close();
+    if (data.user in connected_users){
+      var old_channel = connected_users[data.user]["channelID"];
+      if ("call" in connected_users[data.user]){
+        connected_users[data.user].call.close();
+      }
+      delete connected_users[data.user];
+      updateStreams(old_channel);
+      socket.emit("callClosed", data.user);
     }
-    delete connected_users[data.user];
-    updateStreams(old_channel);
-    socket.emit("callClosed", data.user);
   });
 }

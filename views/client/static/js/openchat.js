@@ -247,63 +247,28 @@ $( document ).ready(function() {
   })
 });
 
-function muteAudio(toggleStatus){
-  if(toggleStatus){
-    audioOut.muted = true;
-    $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
-
-    //IF MIC NOT MUTE
-    if(stream.getAudioTracks()[0].enabled){
-      muteMic(true);
-      isMuted = false;
-    }
-    soundeffects.mute.play();
-  } else {
-    audioOut.muted = false;
-    $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
-    soundeffects.unmute.play();
-
-    //IF MIC PREVIOUS NOT MUTE
-    if(!isMuted){
-      muteMic(false);
-    }
-  }
-};
-
-function muteMic(toggleStatus){
-  if(toggleStatus){
-    $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
-    stream.getAudioTracks()[0].enabled = false;
-  } else {
-    $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
-    stream.getAudioTracks()[0].enabled = true;
-
-    // IF AUDIO MUTE
-    if(audioOut.muted){
-      muteAudio(false);
-    } else {
-      soundeffects.unmute_mic.play();
-    }
-  }
-};
-
 $( document ).ready(function() {
   $("#mute_microphone").click(function(){
     if(!stream.getAudioTracks()[0].enabled){
-      muteMic(false);
-      isMuted = false;
+      $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
+      stream.getAudioTracks()[0].enabled = true;
+      soundeffects.unmute_mic.play();
     } else {
-      muteMic(true);
-      isMuted = true;
+      $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
+      stream.getAudioTracks()[0].enabled = false;
       soundeffects.mute_mic.play();
     }
   });
 
   $("#mute_audio").click(function(){
     if(audioOut.muted == true){
-      muteAudio(false);
+      audioOut.muted = false;
+      $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
+      soundeffects.unmute.play();
     } else {
-      muteAudio(true);
+      audioOut.muted = true;
+      $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
+      soundeffects.mute.play();
     }
   });
 });

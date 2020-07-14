@@ -573,7 +573,7 @@ main {
     nav {
         overflow-x: auto;
         position: relative;
-        display: flex;
+        display: flex !important;
         width : auto;
         height : auto;
     }

@@ -52,7 +52,7 @@ docker pull reesvarney02/openchat:[LATEST RELEASE HERE]
 ```
 2. Run the image
 ```sh
-docker run --detach -p [port to expose on]:443 --name [container name] reesvarney02/openchat
+docker run --detach -p [port to expose on]:443 --name [container name] reesvarney02/openchat:[LATEST RELEASE HERE]
 ```
 3. Start a bash terminal in the container
 ```docker

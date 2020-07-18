@@ -46,9 +46,9 @@ If you already have a SSL key and certificate, you can place them in the `/ssl` 
 #### Premade Images
 These are created with every release which should be reasonably stable.
 
-1. Pull the image
+1. Pull the image, getting the latest docker image tag from https://hub.docker.com/r/reesvarney02/openchat/tags
 ```docker
-docker pull reesvarney02/openchat
+docker pull reesvarney02/openchat:[LATEST RELEASE HERE]
 ```
 2. Run the image
 ```sh

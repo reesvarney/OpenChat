@@ -61,10 +61,7 @@ server.listen(conf.port, function(){
 
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server, {
-  ssl: {
-    key: key,
-    cert: cert
-  }
+  ssl: options
 });
 
 app.use('/rtc', peerServer);

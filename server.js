@@ -30,25 +30,27 @@ app.set('view engine', 'ejs');
 app.use(helmet.frameguard());
 app.use(helmet.frameguard({ action: undefined }))
 
-var key;
-var cert;
+var options = {};
 
 try {
   if (process.env.sslkey && process.env.sslcert){
-    key  = fs.readFileSync(process.env.sslkey);
-    cert = fs.readFileSync(process.env.sslcert);
+    options = {
+      key: fs.readFileSync(process.env.sslkey, 'utf8'),
+      cert: fs.readFileSync(process.env.sslcert, 'utf8'),
+      ca: fs.readFileSync(process.env.sslca, 'utf8')
+    }
+
   } else {
-    key = fs.readFileSync('ssl/server.key', 'utf8')
-    cert = fs.readFileSync('ssl/server.cert', 'utf8')
+    options = {
+      key: fs.readFileSync('ssl/server.key', 'utf8'),
+      cert: fs.readFileSync('ssl/server.cert', 'utf8')
+    };
   }
 } catch (err) {
   console.log("\n \n \n \n \n \n KEY/CERT NOT FOUND - PLEASE RUN SETUP OR CREATESSL \n \n \n \n \n \n")
 };
 
-var options = {
-  key: key,
-  cert: cert
-};
+var 
 
 var server = https.createServer(options, app);
 

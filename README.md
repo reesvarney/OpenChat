@@ -10,6 +10,7 @@
   <p align="center">
     A free, open-source communications platform. Built to be modified.
     <br />
+    <a href="https://openchatdemo.tech">View the Demo</a>
     <br />
   </p>
 </p>
@@ -44,16 +45,18 @@ npm start
 If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
 
 ### Using Docker
+The current docker install is slightly 'hacky' however to maintain quick development, I do not want to have to make too many severe changes to the core functionality to facilitate it.
+
 #### Premade Images
 These are created with every release which should be reasonably stable.
 
 1. Pull the image, getting the latest docker image tag from https://hub.docker.com/r/reesvarney02/openchat/tags
 ```docker
-docker pull reesvarney02/openchat:[LATEST RELEASE HERE]
+docker pull reesvarney02/openchat:latest
 ```
 2. Run the image
 ```sh
-docker run --detach -p [port to expose on]:443 --name [container name] reesvarney02/openchat:[LATEST RELEASE HERE]
+docker run --detach -p [port to expose on]:443 --name [container name] reesvarney02/openchat:latest
 ```
 3. Start a bash terminal in the container
 ```docker
@@ -90,6 +93,14 @@ npm run setup
 6. Restart the container (make sure to `exit` from the container terminal first)
 ```docker
 docker restart [container name]
+```
+
+#### Implementing letsencrypt SSL keys
+I recommend using certbot to auto renew ssl keys (https://certbot.eff.org/)
+
+Change the `docker run` command to:
+```docker
+docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]/ -v /etc/letsencrypt/archive/[URL_HERE]/:/etc/letsencrypt/archive/[URL_HERE]/ -env sslkey=/etc/letsencrypt/live/[URL_HERE]/privkey.pem -env sslcert=sslkey=/etc/letsencrypt/live/[URL_HERE]/fullchain.pem --detach -p [port to expose on]:443 --name [container name] reesvarney02/openchat:latest
 ```
 
 ### Further configuration

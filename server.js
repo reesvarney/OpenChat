@@ -37,9 +37,7 @@ try {
     options = {
       key: fs.readFileSync(process.env.sslkey, 'utf8'),
       cert: fs.readFileSync(process.env.sslcert, 'utf8'),
-      ca: fs.readFileSync(process.env.sslca, 'utf8')
     }
-
   } else {
     options = {
       key: fs.readFileSync('ssl/server.key', 'utf8'),

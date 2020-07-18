@@ -50,8 +50,6 @@ try {
   console.log("\n \n \n \n \n \n KEY/CERT NOT FOUND - PLEASE RUN SETUP OR CREATESSL \n \n \n \n \n \n")
 };
 
-var 
-
 var server = https.createServer(options, app);
 
 server.listen(conf.port, function(){

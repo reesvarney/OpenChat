@@ -34,8 +34,13 @@ var key;
 var cert;
 
 try {
-  key  = fs.readFileSync('ssl/server.key', 'utf8');
-  cert = fs.readFileSync('ssl/server.cert', 'utf8');
+  if (process.env.sslkey && process.env.sslcert){
+    key  = fs.readFileSync(process.env.sslkey);
+    cert = fs.readFileSync(process.env.sslcert);
+  } else {
+    key = fs.readFileSync('ssl/server.key', 'utf8')
+    cert = fs.readFileSync('ssl/server.cert', 'utf8')
+  }
 } catch (err) {
   console.log("\n \n \n \n \n \n KEY/CERT NOT FOUND - PLEASE RUN SETUP OR CREATESSL \n \n \n \n \n \n")
 };

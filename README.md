@@ -1,4 +1,5 @@
-![docker-build](https://github.com/reesvarney/OpenChat/workflows/docker-build/badge.svg)
+![license](https://img.shields.io/github/license/reesvarney/OpenChat)
+
 <p align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
     <img src="https://raw.githubusercontent.com/reesvarney/OpenChat/assets/logo.png" alt="Logo" width="auto" height="80">

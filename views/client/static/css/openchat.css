@@ -21,10 +21,7 @@ nav {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    border-radius: 0px;
-    background: #f5f5f5;
-    box-shadow:  5px 5px 14px #e9e9e9, 
-                -5px -5px 14px #ffffff;
+    background: #f2f2f2;
     min-width: 270px;
 }
 
@@ -60,10 +57,6 @@ div.center-self {
 
 /* CHANNELS */
 #channels {
-    border-radius: 11px;
-    background: #f5f5f5;
-    box-shadow:  6px 6px 11px #ebebeb, 
-                 -6px -6px 11px #ffffff;
     padding: 10px;
     padding-left: 20px;
     flex-grow: 1;
@@ -94,12 +87,14 @@ div.center-self {
 .channel-group>ul>li {
     text-decoration: none;
     list-style: none;
-    border-radius: 16px;
-    background: #f5f5f5;
-    box-shadow:  5px 5px 10px #e9e9e9, 
-                 -5px -5px 10px #ffffff; 
+    border-radius: 10px;
+    background: #fafafa;
     margin-right: 20px;
     margin-bottom: 10px;
+}
+
+.channel-group>ul>li:hover {
+    background: #f5f5f5;
 }
 
 .channel-group>ul>li>a{
@@ -121,6 +116,14 @@ div.center-self {
 
 #channels .active>a {
     color: rgba(22,66,199,0.52);
+}
+
+#channels .active:hover {
+    background: none;
+}
+
+#channels .active a:hover {
+    cursor: default;
 }
 
 .user-list{
@@ -160,14 +163,13 @@ div.center-self {
 }
 
 .control-button {
-    border-radius: 50%;
-    background: #e6e6e6;
-    box-shadow:  3px 3px 5px #d6d6d6, 
-                 -3px -3px 5px #f6f6f6;
+    padding: 10px;
+    margin: 10px;
+}
+
+.control-button i {
     height: 0;
     width: 0;
-    padding: 10px;
-    margin: 2px;
 }
 
 .control-button:hover {
@@ -203,7 +205,6 @@ main {
     flex-direction: column;
     flex-grow: 1;
     padding: 0px;
-    background-color: #ededed;
     max-height: 100vh;
     overflow: hidden;
     position: relative;
@@ -211,7 +212,6 @@ main {
 
 #channel_info {
     padding-left: 20px;
-    margin-bottom: 5px;
     position: relative;
 }
 
@@ -227,10 +227,12 @@ main {
 }
 
 #channel_info>h2{
+    margin-top: 20px;
     margin-bottom: 5px;
 }
 
 #channel_info>p{
+    padding-left: 10px;
     margin-top: 5px;
 }
 
@@ -250,26 +252,25 @@ main {
 }
 
 .message-card {
-    border-radius: 16px;
-    background: #ededed;
-    box-shadow:  5px 5px 10px #dfdfdf, 
-                 -5px -5px 10px #fbfbfb;
     padding: 5px;
     padding-left: 40px;
     padding-right: 40px;
-    margin-bottom: 20px;
     word-wrap: break-word;
+    margin-bottom: 20px;
+}
+
+.message-card:hover{
+    background: #fafafa;
 }
 
 .ogp-card {
     display: flex;
     flex-direction: row;
-    border-radius: 20px;
-    background: #ffffff;
-    box-shadow: inset 7px 7px 14px #f5f5f5, 
-                inset -7px -7px 14px #ffffff;
+    background: #f6f6f6;
     padding: 20px;
     align-items: flex-start;
+    width: auto;
+    max-width: 800px;
 }
 
 .ogp-card img {
@@ -348,8 +349,8 @@ main {
     display: flex;
     flex-direction: row;
     border-radius: 0px;
-    background: #e8e8e8;
-    box-shadow:  0px -7px 14px #d8d8d8;
+    background: #fcfcfc;
+    box-shadow:  0px -7px 14px #ededed;
     width: 100%;
     margin: 0;
     padding: 20px;
@@ -361,9 +362,7 @@ main {
     width:100%;
     color: grey;
     border-radius: 28px 0px 0px 28px;
-    background: #d9d9d9;
-    box-shadow: inset 5px 5px 5px #d0d0d0, 
-                inset -5px -5px 5px #e2e2e2;
+    background: #ededed;
     border: none;
     padding: 10px;
     padding-left: 15px;
@@ -384,11 +383,11 @@ main {
 
 #message_send {
     border-radius: 0px 32px 32px 0px;
-    background: #ebebeb;
-    box-shadow:  5px 5px 7px #dbdbdb, 
-                 -5px -5px 7px #fbfbfb;
+    background: #fdfdfd;
     outline: none;
-    border: none;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #fafafa;
     padding-left: 10px;
     padding-right: 20px;
 }
@@ -407,8 +406,6 @@ main {
 
 #message_send:focus:hover {
     background: #d1d1d1;
-    box-shadow: inset 5px 5px 7px #c2c2c2, 
-                inset -5px -5px 7px #e0e0e0;
 }
 
 /* OVERLAY */

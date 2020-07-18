@@ -26,6 +26,7 @@
         <h3>Voice</h3>
         <ul id="voice_channels">
         <% conf.server.channels.voice.forEach(function(e){%>
+          <% e.channel_type = "voice" %>
           <%- include('_channel', {data: e}); %>
         <% }); %>
         </ul>
@@ -35,6 +36,7 @@
         <h3>Text</h3>
         <ul id="text_channels">
           <% conf.server.channels.text.forEach(function(e){%>
+            <% e.channel_type = "text" %>
             <%- include('_channel', {data: e}); %>
           <% }); %>
         </ul>

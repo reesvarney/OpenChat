@@ -48,11 +48,11 @@ These are created with every release which should be reasonably stable.
 
 1. Pull the image
 ```docker
-docker pull docker.pkg.github.com/reesvarney/openchat/openchat-docker:latest
+docker pull reesvarney02/openchat
 ```
 2. Run the image
 ```sh
-docker run --detach -p [port to expose on]:443 --name [container name] docker.pkg.github.com/reesvarney/openchat/openchat-docker
+docker run --detach -p [port to expose on]:443 --name [container name] reesvarney02/openchat
 ```
 3. Start a bash terminal in the container
 ```docker

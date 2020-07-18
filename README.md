@@ -83,11 +83,11 @@ docker run --detach -p [port to expose on]:443 --name [container name] [tag]
 ```docker
 docker exec -it [container name] /bin/bash
 ```
-5. Run the setup script
+5. Run the setup script (after secret is successfully set, use `CTRL + C` to exit the script)
 ```sh
 npm run setup
 ```
-6. Restart the container
+6. Restart the container (make sure to `exit` from the container terminal first)
 ```docker
 docker restart [container name]
 ```

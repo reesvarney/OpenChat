@@ -16,6 +16,11 @@
           "uuid": "51067468-0b35-4250-8178-a2d2bed71892",
           "channel_description": "Desc1",
           "channel_type": "text"
+        },
+        {
+          "channel_name": "Text 2",
+          "uuid": "42932d84-5898-4ab3-b107-bb3a8878e01b",
+          "channel_description": "Desc2"
         }
       ]
     }

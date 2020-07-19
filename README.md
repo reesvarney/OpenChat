@@ -51,7 +51,7 @@ The current docker install is slightly 'hacky' however to maintain quick develop
 #### Premade Images
 These are created with every release which should be reasonably stable.
 
-1. Pull the image, getting the latest docker image tag from https://hub.docker.com/r/reesvarney02/openchat/tags
+1. Pull the docker image https://hub.docker.com/r/reesvarney02/openchat/
 ```docker
 docker pull reesvarney02/openchat:latest
 ```

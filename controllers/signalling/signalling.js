@@ -23,7 +23,7 @@ function startServer(db, io, conf) {
             if (data.type == "client") {
                 console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.brightBlue);
 
-                if (data.name.length < 32) {
+                if (data.name.length < 32 && data.name.length > 2) {
                     uservalid = true;
                 } else {
                     socket.emit("ocerror", "Name too long");
@@ -42,9 +42,11 @@ function startServer(db, io, conf) {
                         io.emit('usersChange', server_info.users);
                     } else {
                         socket.emit("ocerror", "user details are not valid");
+                        socket.disconnect(true);
                     }
                 } else {
-                    socket.emit("ocerror", "MCU has not connected yet")
+                    socket.emit("ocerror", "MCU has not connected yet");
+                    socket.disconnect(true);
                 }
 
 

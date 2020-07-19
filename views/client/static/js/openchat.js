@@ -8,6 +8,7 @@ var serverinfo,
   call,
   currentText,
   currentPage,
+  audioOut,
   lastMessage,
   soundeffects = {},
   soundfiles = [
@@ -83,10 +84,12 @@ function getMessages(channel_id, params){
         $("#load_messages").hide();
       }
 
-      if("page" in params && params.page == 0) {
+      if("page" in params && params.page == 0 || !("page" in params) && scrollController.doesScroll(200)) {
         scrollController.goToChild($("#messages>:first-child"));
       }else if("page" in params){
         scrollController.goToChild(lastMessage);
+      } else {
+        $("#new_message").show();
       }
     })
   });
@@ -127,7 +130,7 @@ function connectToServer(){
         $("#disconnect_button").show();
         $('#voice_channels li').removeClass("active");
         $('#voice_channels #' + new_channel).parent().addClass("active");
-        var audioOut = document.querySelector('audio');
+        audioOut = document.querySelector('#call_out');
         audioOut.srcObject = remoteStream;
         soundeffects.connect.play();
       });

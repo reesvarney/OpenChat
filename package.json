@@ -11,7 +11,7 @@
     "addAdmin": "node ./scripts/create_user",
     "liveDev": "nodemon --ignore 'views/' server",
     "setSecret": "node ./scripts/set_secret",
-    "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret"
+    "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret && exit 0"
   },
   "nodemonConfig": {
     "ignore": [

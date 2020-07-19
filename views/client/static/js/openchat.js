@@ -147,7 +147,9 @@ function connectToServer(){
   })
 
   socket.on("newMessage", function(data){
-    getMessages(data.channel_id, {"id": data.message_id});
+    if(data.channel_id == currentText){
+      getMessages(data.channel_id, {"id": data.message_id});
+    }
   })
 
   //start channel joining process

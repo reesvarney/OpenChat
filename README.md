@@ -12,6 +12,7 @@
     <br />
     <a href="https://openchatdemo.tech">View the Demo</a>
     <br />
+    <a> Demo may not be available at this time (for cost saving), please contact me <a href="mailto:reesvarney02@gmail.com?subject=openchat%20demo">here</a> if you require it.</a>
   </p>
 </p>
 

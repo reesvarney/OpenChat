@@ -15,6 +15,7 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
   } else {
     db.run("CREATE TABLE IF NOT EXISTS messages (message_id INTEGER PRIMARY KEY AUTOINCREMENT, message_date DATETIME DEFAULT CURRENT_TIMESTAMP, channel_id TEXT, sender_name TEXT, message_content TEXT)");
     db.run("CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, salt TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS iplogs (ip TEXT, name TEXT)");
   }
   console.log("DATABASE CONNECTED")
 });

@@ -26,7 +26,19 @@ function deleteChannel(uuid){
         type: 'DELETE',
         url: `channel/${uuid}`, 
         success: ( function( result ){
-            $(`#${uuid}`).parent().remove();
+            location.reload();
+        })
+    });
+}
+
+function removeFromBlacklist(ip){
+    $.ajax({
+        async: true,
+        type: 'DELETE',
+        url: `users/blacklist`,
+        data: {ip: ip},
+        success: ( function( result ){
+            location.reload();
         })
     });
 }

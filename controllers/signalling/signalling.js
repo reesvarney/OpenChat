@@ -12,6 +12,15 @@ function startServer(db, io, conf) {
         channels: conf.server.channels
     };
 
+    function logIP(ip, name){
+        db.run(`INSERT INTO iplogs (ip, name) SELECT $ip, $name WHERE NOT EXISTS (SELECT * FROM iplogs WHERE ip=$ip AND name=$name)`, {
+            "$ip": ip,
+            "$name": name,
+        }, function (err, result) {
+            if (err) throw err;
+        });
+    }
+
     const server_secret = conf.secret;
 
     io.on("connection", function (socket) {
@@ -23,7 +32,7 @@ function startServer(db, io, conf) {
             if (data.type == "client") {
                 console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.brightBlue);
 
-                if (data.name.length < 32 && data.name.length > 2) {
+                if (data.name.length < 32 && data.name.length > 2 && !(conf.blacklist.includes(socket.request.connection.remoteAddress))) {
                     uservalid = true;
                 } else {
                     socket.emit("ocerror", "Name too long");
@@ -32,6 +41,7 @@ function startServer(db, io, conf) {
 
                 if (mcu_id !== null) {
                     if (uservalid) {
+                        logIP(socket.request.connection.remoteAddress, data.name);
                         currentUser.info = data;
                         socket.emit("changeState", 1);
                         socket.emit("serverInfo", server_info);

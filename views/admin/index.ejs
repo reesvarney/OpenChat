@@ -78,5 +78,41 @@
                 </div>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h2>Users</h2>
+                 <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">IP</th>
+                        <th scope="col">Aliases</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                        <% var allIP = [];
+                        for (i=0; i < users.length; i++){
+                            if (!(allIP.includes(users[i].ip))) allIP.push(users[i].ip);
+                        };
+                        allIP.forEach(function(ip){ 
+                            var names = users.filter(user => {return user.ip === ip});%>
+                            <tr>
+                                <form action="users/blacklist" method="post">
+                                    <td><%= ip %></td>
+                                    <td><% names.forEach(function(user){%>
+                                        <%= user.name %>,
+                                    <%}) %>
+                                    </td>
+                                    <input name="ip" type="hidden" value="<%= ip %>">
+                                    <td><% if(!(conf.blacklist.includes(ip))){%><button type="submit" class="btn btn-danger">Add to Blacklist</button><% } else {%><button type="button" class="btn btn-dark" onclick="removeFromBlacklist('<%= ip %>')">Remove from Blacklist</button><%}%></td>
+                                </form>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>

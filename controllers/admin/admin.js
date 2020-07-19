@@ -35,10 +35,12 @@ module.exports = function (db, conf, fs) {
 
     function updateConf(res){
         fs.writeFile("./conf.json", JSON.stringify(conf, null, 2), function(err) {
-            if(err) {
-                res.sendStatus(500);
+            if(res){
+                if(err) {
+                    res.sendStatus(500);
+                }
+                res.redirect(302, "/admin");
             }
-            res.redirect(302, "/admin");
         }); 
     }
 
@@ -59,9 +61,14 @@ module.exports = function (db, conf, fs) {
     }
 
     router.get("/", checkAuth, function (req, res, next) {
-        res.render('admin/index', {
-            conf: conf
-        });
+        db.all("SELECT * FROM iplogs", {}, function(err, result){
+            if (err) throw err;
+            res.render('admin/index', {
+                conf: conf,
+                users: result
+            });
+        })
+
     });
 
     router.get("/login", checkNotAuth, function(req, res){
@@ -90,10 +97,11 @@ module.exports = function (db, conf, fs) {
     });
 
     router.delete("/channel/:uuid", checkAuth, function(req, res) {
-        var index = conf.server.channels.findIndex(({ uuid } )=> uuid == req.params.uuid);
-        var type = conf.server.channels[index].channel_type;
-        conf.server.channels.splice(index, 1);
-        updateConf(res);
+        var channel = findChannel(req.params.uuid);
+        var index = channel.index;
+        var type = channel.type;
+        conf.server.channels[type].splice(index, 1);
+        updateConf();
         if(type == "text"){
             db.run(`DELETE FROM messages WHERE channel_id=?`, req.params.uuid, function(err) {
                 if (err) {
@@ -102,7 +110,7 @@ module.exports = function (db, conf, fs) {
                 console.log(`Message(s) deleted ${this.changes}`);
             });
         }
-        res.redirect(302, "/admin");
+        res.status(200).send();
     });
 
     router.post("/channel/:uuid/update", checkAuth, function(req,res){
@@ -119,17 +127,33 @@ module.exports = function (db, conf, fs) {
         updateConf(res);
     });
 
+    router.post("/users/blacklist", checkAuth, function(req,res){
+        var ip = req.body.ip;
+        conf.blacklist.push(ip);
+        updateConf(res);
+    })
+
+    router.delete("/users/blacklist", checkAuth, function(req,res){
+        var ip = req.query.ip;
+        var index = conf.blacklist.indexOf(ip);
+        conf.blacklist.splice(index, 1);
+        updateConf();
+        res.status(200).send();
+    })
+
     router.post("/channel/new", checkAuth, function(req,res){
         var uuid = uuidv4();
         var name = req.body.name;
-        var description = req.body.description;
         var type = req.body.type;
         var channel_data = {
             "channel_name" : name,
             "uuid" : uuid
         };
-        if (description.length > 0){
-            channel_data.channel_description = description;
+        if(type == "text"){
+            var description = req.body.description;
+            if (description.length > 0){
+                channel_data.channel_description = description;
+            }
         }
         conf.server.channels[type].push(channel_data);
         updateConf(res);

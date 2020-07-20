@@ -2,3 +2,4 @@ node_modules/
 db/openchat.db
 ssl/*.key
 ssl/*.cert
+.vs

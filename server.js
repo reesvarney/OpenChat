@@ -65,10 +65,25 @@ const peerServer = ExpressPeerServer(server, {
 
 app.use('/rtc', peerServer);
 
+
+// EXTENSION LOADER //
+// Configure extensions here
+
+var extensionController = new (require('./controllers/extensions/extensionController.js'))();
+// Add to this object as more variables/ data are accessible to extensions, so they can maintain compatibility
+var extension_data = {
+  controller: extensionController
+}
+
+conf.extensions.forEach(function(directory){
+  require(`./extensions/${directory}/bot.js`)(extension_data)
+})
+
+
 //SIGNALLING
 
 var io = require('socket.io')(server);
-require('./controllers/signalling/signalling.js')(db, io, conf);
+require('./controllers/signalling/signalling.js')(db, io, conf, extensionController);
 
 
 // MCU CLIENT //

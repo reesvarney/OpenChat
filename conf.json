@@ -28,5 +28,6 @@
     }
   },
   "secret": "idfho39ytu2p93u",
-  "blacklist": []
+  "blacklist": [],
+  "extensions": []
 }

@@ -4,7 +4,7 @@ var sqlite3 = require('sqlite3').verbose();
 var mcu_id = null;
 
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
-function startServer(db, io, conf) {
+function startServer(db, io, conf, extensionController) {
     var server_info = {
         name: conf.server.name,
         users: {},
@@ -22,6 +22,44 @@ function startServer(db, io, conf) {
     }
 
     const server_secret = conf.secret;
+
+    function addMessage(message){
+        var channel_search = server_info.channels.text.find(({ uuid }) => uuid == message.channel);
+        if (channel_search != undefined) {
+            if (message.content != "") {
+                if (message.content.length <= 2000) {
+                    db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( $content, $sender, $channel)`, {
+                        "$content": message.content,
+                        "$sender": message.sender,
+                        "$channel": message.channel
+                    }, function (err, result) {
+                        if (err) throw err;
+                        var data =  {
+                            message_content: message.content,
+                            sender_name: message.sender,
+                            channel_id: message.channel,
+                            message_id: this.lastID
+                        };
+                        io.emit("newMessage", data);
+                        extensionController.messageListener.emit("newMessage", data);
+                    });
+    
+                };
+            } else {
+                throw "MSG_EMPTY"
+            }
+        } else {
+            throw "CHNL_INVALID"
+        }
+    }
+
+    extensionController.messageListener.on('sendMessage', function(message){
+        try{
+            addMessage(message)
+        } catch (err) {
+            console.log(err)
+        }
+    });
 
     io.on("connection", function (socket) {
         var currentUser = {};
@@ -77,38 +115,13 @@ function startServer(db, io, conf) {
 
         //WHEN USER SENDS A MESSAGE
         socket.on("sendMessage", function (message) {
-            var sender = server_info.users[socket.id].name;
-            var channel = message.channel;
-            var content = message.content;
-            var channel_search = server_info.channels.text.find(({
-                uuid
-            }) => uuid == channel);
-            if (channel_search != undefined) {
-                if (content != "") {
-                    if (content.length <= 2000) {
-                        console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
-                        db.run(`INSERT INTO messages (message_content, sender_name, channel_id) VALUES ( $content, $sender, $channel)`, {
-                            "$content": message.content,
-                            "$sender": sender,
-                            "$channel": channel
-                        }, function (err, result) {
-                            if (err) throw err;
-                            io.emit("newMessage", {
-                                message_content: message.content,
-                                sender_name: sender,
-                                channel_id: channel,
-                                message_id: this.lastID
-                            });
-                        });
-
-                    };
-                } else {
-                    socket.emit("ocerror", "Cannot send empty message")
-                }
-
-            } else {
-                socket.emit("ocerror", "Invalid Channel");
+            message.sender = server_info.users[socket.id].name;
+            try{
+                addMessage(message)
+            } catch (err) {
+                socket.emit('ocerror', err)
             }
+            console.log(`${socket.id} SENT MESSAGE TO CHANNEL ${message.channel} : ${message.content}`.magenta);
         });
 
         //WHEN USER TRIES TO JOIN A CHANNEL

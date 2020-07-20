@@ -148,7 +148,7 @@ To install an extension simply add the extension directory in `/extensions` to `
 ### Extension Data
 This is the data that each extension can access.
 
-#### controller.messageListener
+#### `controller.messageListener`
 This handles messages which can be both read and sent by the extension.
 
 ##### Events:
@@ -179,10 +179,10 @@ data =  {
 }
 ```
 
-#### server_config
+#### `server_config`
 This includes the config stored in `conf.json`.
 
-#### database
+#### `database`
 This is the sqlite3 `db` object which can be used to access the server's database.
 
 MORE TO BE ADDED - WORK IN PROGRESS

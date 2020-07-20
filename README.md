@@ -149,14 +149,12 @@ To install an extension simply add the extension directory in `/extensions` to `
 This is the data that each extension can access.
 
 #### `controller.messageListener`
-This handles messages which can be both read and sent by the extension.
+This is an event emitter which can be used to read messages being sent and send messages itself.
 
-##### Events:
+##### Reading messages sent by the client
 ```js
 messageListener.on('newMessage', function(data){
 ```
-This is triggered when a new message is sent from someone using the client.
-
 ```
 data =  {
   message_content // The content of the message
@@ -166,11 +164,10 @@ data =  {
 }
 ```
 
+##### Sending messages
 ```js
 messageListener.emit('sendMessage', data)
 ```
-This is used to send messages from the server-side.
-
 ```
 data =  {
   content // The content of the message

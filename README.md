@@ -114,10 +114,78 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
  - Markdown support
  - Add some kind of session tracking or authentication to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
  - Combine signalling into single system with native WebRTC implementation
- - Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would also provide the benefit of providing a less disjointed product as there would be less need for individual versions/forks. It may feature things such as:
+ - IN PROGRESS: Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would also provide the benefit of providing a less disjointed product as there would be less need for individual versions/forks. It may feature things such as:
    - Bots
    - Front-end appearance modification
    - Completely additional functionality
+
+## Extensions
+Openchat extensions are the best way to tune and modify Openchat to your liking. Like with everything else, extensions are written in JS and the system is designed to be accessible but also highly capable.
+
+A basic bot can be made in just a few lines, as shown in the following code.
+
+extension.js:
+```js
+var botName = "TestBot";
+
+module.exports = function(extData){
+    var messageListener = extData.controller.messageListener;
+    messageListener.on('newMessage', function(msg){
+        if(msg.message_content == "!foo"){
+            messageListener.emit('sendMessage', {
+                sender: botName,
+                content: "bar!",
+                channel: msg.channel_id
+            })
+        }
+    })
+}
+```
+
+To install an extension simply add the extension directory in `/extensions` to `conf.json` under "extensions" (to be added to admin panel).
+
+
+### Extension Data
+This is the data that each extension can access.
+
+#### controller.messageListener
+This handles messages which can be both read and sent by the extension.
+
+##### Events:
+```js
+messageListener.on('newMessage', function(data){
+```
+This is triggered when a new message is sent from someone using the client.
+
+```
+data =  {
+  message_content // The content of the message
+  sender_name // The name of whoever sent the message
+  channel_id // The ID of the channel which the message was sent to
+  message_id // The database ID of the message that was sent
+}
+```
+
+```js
+messageListener.emit('sendMessage', data)
+```
+This is used to send messages from the server-side.
+
+```
+data =  {
+  content // The content of the message
+  sender // The name to display
+  channel // The ID of the channel to send it to
+}
+```
+
+#### server_config
+This includes the config stored in `conf.json`.
+
+#### database
+This is the sqlite3 `db` object which can be used to access the server's database.
+
+MORE TO BE ADDED - WORK IN PROGRESS
 
 ## Bugs
 If you encounter any issues with OpenChat, please raise an issue so that it can be fixed as quickly as possible.

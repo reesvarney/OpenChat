@@ -72,12 +72,10 @@ app.use('/rtc', peerServer);
 var extensionController = new (require('./controllers/extensions/extensionController.js'))();
 // Add to this object as more variables/ data are accessible to extensions, so they can maintain compatibility
 var extension_data = {
-  controller: extensionController
+  controller: extensionController,
+  server_config: conf,
+  database: db
 }
-
-conf.extensions.forEach(function(directory){
-  require(`./extensions/${directory}/bot.js`)(extension_data)
-})
 
 
 //SIGNALLING
@@ -116,3 +114,9 @@ app.use("/client", clientController);
 app.use("/admin", adminController);
 app.use("/mcu", mcuController);
 app.use("/messages", messageController);
+
+
+// LOAD EXTENSIONS LAST
+conf.extensions.forEach(function(directory){
+  require(`./extensions/${directory}/extension.js`)(extension_data)
+})

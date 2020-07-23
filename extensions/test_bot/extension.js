@@ -10,5 +10,5 @@ module.exports = function(extData){
                 channel: msg.channel_id
             })
         }
-    })
+    });
 }

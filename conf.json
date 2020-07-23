@@ -29,5 +29,5 @@
   },
   "secret": "idfho39ytu2p93u",
   "blacklist": [],
-  "extensions": []
+  "extensions": ["test_bot"]
 }

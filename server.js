@@ -56,6 +56,11 @@ server.listen(conf.port, function(){
 });
 
 
+// SOCKET IO
+
+var io = require('socket.io')(server);
+
+
 //PEER SERVER
 
 const { ExpressPeerServer } = require('peer');
@@ -66,10 +71,11 @@ const peerServer = ExpressPeerServer(server, {
 app.use('/rtc', peerServer);
 
 
-// EXTENSION LOADER //
-// Configure extensions here
+// EXTENSIONS //
+// This is the controller that allows extensions to interact with openchat and provides functions to them
 
 var extensionController = new (require('./controllers/extensions/extensionController.js'))();
+
 // Add to this object as more variables/ data are accessible to extensions, so they can maintain compatibility
 var extension_data = {
   controller: extensionController,
@@ -77,10 +83,8 @@ var extension_data = {
   database: db
 }
 
-
 //SIGNALLING
 
-var io = require('socket.io')(server);
 require('./controllers/signalling/signalling.js')(db, io, conf, extensionController);
 
 

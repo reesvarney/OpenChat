@@ -180,7 +180,7 @@ This converts the stream into realtime and then pipes it to the combiner stream.
  - ##### `.on('end')`
     Event emitted when previous input has finished being played in realtime, this should be used to then set the next stream to be played.
 
-### `server_config`
+#### `server_config`
 This includes the config stored in `conf.json`.
 
 MORE TO BE ADDED - WORK IN PROGRESS

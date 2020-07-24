@@ -151,36 +151,37 @@ This is the data that each extension can access.
 #### `controller.messageListener`
 This is an event emitter which can be used to read messages being sent and send messages itself.
 
-##### Reading messages sent by the client
-```js
-messageListener.on('newMessage', function(data){
-```
-```
-data =  {
-  message_content // The content of the message
-  sender_name // The name of whoever sent the message
-  channel_id // The ID of the channel which the message was sent to
-  message_id // The database ID of the message that was sent
-}
-```
+##### `messageListener.on('newMessage', function(data){})`
+ - This event is emitted when a message is sent from a user. The data object contains the following data:
+    ```
+    data =  {
+      message_content // The content of the message
+      sender_name // The name of whoever sent the message
+      channel_id // The ID of the channel which the message was sent to
+      message_id // The database ID of the message that was sent
+    }
+    ```
 
-##### Sending messages
-```js
-messageListener.emit('sendMessage', data)
-```
-```
-data =  {
-  content // The content of the message
-  sender // The name to display
-  channel // The ID of the channel to send it to
-}
-```
+##### `messageListener.emit('sendMessage', data)`
+ - This sends a message to the specified channel, with the content and sender set in the data object in the following format:
+    ```
+    data =  {
+      content // The content of the message
+      sender // The name to display
+      channel // The ID of the channel to send it to
+    }
+    ```
+#### `controller.createStream(channel)`
+This creates an empty combiner stream, allowing users to connect to it. Only one stream can exist per channel.
 
-#### `server_config`
+#### `controller.sendStream(stream, channel, format_in)`
+This converts the stream into realtime and then pipes it to the combiner stream. Must provide the `format_in` as an [ffmpeg supported format](https://ffmpeg.org/ffmpeg-formats.html).
+
+ - ##### `.on('end')`
+    Event emitted when previous input has finished being played in realtime, this should be used to then set the next stream to be played.
+
+### `server_config`
 This includes the config stored in `conf.json`.
-
-#### `database`
-This is the sqlite3 `db` object which can be used to access the server's database.
 
 MORE TO BE ADDED - WORK IN PROGRESS
 

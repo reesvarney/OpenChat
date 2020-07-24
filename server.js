@@ -80,7 +80,6 @@ var extensionController = new (require('./controllers/extensions/extensionContro
 var extension_data = {
   controller: extensionController,
   server_config: conf,
-  database: db
 }
 
 //SIGNALLING
@@ -109,6 +108,7 @@ var clientController = require('./controllers/client/client.js')(conf);
 var adminController = require('./controllers/admin/admin.js')(db, conf, fs);
 var mcuController = require('./controllers/mcu/mcu.js')(conf.secret);
 var messageController = require('./controllers/messages/messages.js')(db);
+var streamController = require('./controllers/client/stream.js')(extensionController);
 
 app.get('/', function(req, res){
   res.redirect('/client')
@@ -118,7 +118,7 @@ app.use("/client", clientController);
 app.use("/admin", adminController);
 app.use("/mcu", mcuController);
 app.use("/messages", messageController);
-
+app.use("/streams", streamController);
 
 // LOAD EXTENSIONS LAST
 conf.extensions.forEach(function(directory){

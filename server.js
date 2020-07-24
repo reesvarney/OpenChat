@@ -1,7 +1,9 @@
 var arguments = process.argv.slice(2);
 const fs = require('fs')
 const conf = require("./conf.json");
-conf.port =  process.env.PORT || conf.port; 
+var ffmpegLoc = require('ffmpeg-static');
+process.env.FFMPEG_PATH = ffmpegLoc;
+conf.port =  process.env.PORT || conf.port;
 console.log("WELCOME TO OPENCHAT")
 
 
@@ -64,6 +66,7 @@ var io = require('socket.io')(server);
 //PEER SERVER
 
 const { ExpressPeerServer } = require('peer');
+const { ffmpeg } = require('ffmpeg-stream/lib');
 const peerServer = ExpressPeerServer(server, {
   ssl: options
 });

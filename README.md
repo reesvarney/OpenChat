@@ -171,6 +171,7 @@ This is an event emitter which can be used to read messages being sent and send 
       channel // The ID of the channel to send it to
     }
     ```
+    
 #### `controller.createStream(channel)`
 This creates an empty combiner stream, allowing users to connect to it. Only one stream can exist per channel.
 

@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var session = require('express-session');
-var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser')();
 var initializePassport = require('./passport-init.js');
 const { v4: uuidv4 } = require('uuid');
@@ -11,13 +10,12 @@ Array.prototype.move = function (from, to) {
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
-module.exports = function (db, conf, fs) {
+module.exports = function (db, conf, fs, extCont, extensions) {
     router.use(session({ secret: conf.secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
     initializePassport(passport, db);
     router.use("/", express.static('./views/admin/static'));
     router.use(passport.initialize());
     router.use(cookieParser);
-    router.use(bodyParser.urlencoded({ extended: false }));
     router.use(passport.session());
     
     function findChannel(ch_uuid){
@@ -65,7 +63,8 @@ module.exports = function (db, conf, fs) {
             if (err) throw err;
             res.render('admin/index', {
                 conf: conf,
-                users: result
+                users: result,
+                extensions: extensions
             });
         })
 
@@ -91,8 +90,9 @@ module.exports = function (db, conf, fs) {
         data : {
             channel_type: req.query.type,
             channel_name: "",
-            new: true
-        }
+            new: true,
+        },
+        extensions: extensions
         });
     });
 
@@ -115,7 +115,6 @@ module.exports = function (db, conf, fs) {
 
     router.post("/channel/:uuid/update", checkAuth, function(req,res){
         var name = req.body.name;
-        var description = req.body.description;
         var channel = findChannel(req.params.uuid);
         var pos = req.body.position;
         if (pos != channel.index && pos >= 0 && pos < conf.server.channels[channel.type].length && pos % 1 == 0){
@@ -123,7 +122,8 @@ module.exports = function (db, conf, fs) {
             channel.index = pos;
         }
         conf.server.channels[channel.type][channel.index].channel_name = name;
-        conf.server.channels[channel.type][channel.index].channel_description = description;
+        if (channel.type == "text") conf.server.channels[channel.type][channel.index].channel_description = req.body.description;
+        if(channel.type == "extensions") conf.server.channels[channel.type][channel.index].handler = req.body.handler;
         updateConf(res);
     });
 
@@ -145,16 +145,23 @@ module.exports = function (db, conf, fs) {
         var uuid = uuidv4();
         var name = req.body.name;
         var type = req.body.type;
+
         var channel_data = {
             "channel_name" : name,
             "uuid" : uuid
         };
+
         if(type == "text"){
             var description = req.body.description;
             if (description.length > 0){
                 channel_data.channel_description = description;
             }
         }
+
+        if(type == "extensions"){ 
+            channel_data.handler = req.body.handler;
+        };
+
         conf.server.channels[type].push(channel_data);
         updateConf(res);
     });

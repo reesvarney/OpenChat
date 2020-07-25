@@ -10,7 +10,7 @@
                 <button class="btn btn-danger" type="button" onclick="cancelChannel('<%= data.uuid %>')">Cancel</button>
                 </a>
             </div>
-        <% }else if(data.channel_type == "text"){ %>
+        <% } else if(data.channel_type == "text"){ %>
             <div id="new_channel">
                 <a class="channel">
                     <input  id="pos-in" class="form-control" name="position" value="" readonly></input>
@@ -18,6 +18,22 @@
                     <input id="name-in" class="form-control" name="name"></input>
                     <input id="desc-in" class="form-control" name="description"></input>
                     <input name="type" type="hidden" value="<%= data.channel_type %>">
+                    <button class="btn btn-success" type="submit">Save</button>
+                    <button class="btn btn-danger" type="button" onclick="cancelChannel('<%= data.uuid %>')">Cancel</button>
+                </a>
+            </div>
+        <% } else if(data.channel_type == "extensions") { %>
+            <div id="new_channel">
+                <a class="channel">
+                    <input  id="pos-in" class="form-control" name="position" value="" readonly></input>
+                    <input id="uuid-in" class="form-control" type="extensions" placeholder="" readonly>
+                    <input id="name-in" class="form-control" name="name"></input>
+                    <input name="type" type="hidden" value="<%= data.channel_type %>">
+                    <select class="form-control" name="handler">
+                        <% for(extension in extensions){ %>
+                            <option value="<%= extension %>" ><%= extensions[extension].oc_config.disp_name %></option>
+                        <% };%>
+                    </select>
                     <button class="btn btn-success" type="submit">Save</button>
                     <button class="btn btn-danger" type="button" onclick="cancelChannel('<%= data.uuid %>')">Cancel</button>
                 </a>
@@ -43,6 +59,25 @@
                     <input id="uuid-in"  class="form-control" type="text" placeholder="<%= data.uuid %>" readonly>
                     <input  id="name-in" class="form-control" name="name" value="<%= data.channel_name %>"></input>
                     <input id="desc-in" class="form-control" name="description" value="<%= data.channel_description %>"></input>
+                    <button class="btn btn-success update-btn" type="submit">Update</button>
+                    <button class="btn btn-danger delete-btn" type="button" onclick="deleteChannel('<%= data.uuid %>')">Delete</button>
+                </a>
+            </div>
+        <% } else if(data.channel_type == "extensions") { %>
+            <div>
+                <a id="<%= data.uuid %>" class="channel">
+                    <input  id="pos-in" class="form-control" name="position" value="<%= data.index %>"></input>
+                    <input id="uuid-in"  class="form-control" type="extensions"  placeholder="<%= data.uuid %>" readonly>
+                    <input  id="name-in" class="form-control" name="name" value="<%= data.channel_name %>"></input>
+                    <select class="form-control" name="handler">
+                        <% for(extension in extensions){ %>
+                            <% if (extensions[extension].name != data.handler){ %>
+                                <option value="<%= extension %>" ><%= extensions[extension].oc_config.disp_name %></option>
+                            <% } else { %>
+                                <option  value="<%= extension %>" selected><%= extensions[extension].oc_config.disp_name %></option>
+                            <% } %>
+                        <% };%>
+                    </select>
                     <button class="btn btn-success update-btn" type="submit">Update</button>
                     <button class="btn btn-danger delete-btn" type="button" onclick="deleteChannel('<%= data.uuid %>')">Delete</button>
                 </a>

@@ -50,7 +50,7 @@
                     <button onclick="addChannel('text')" class="btn btn-primary add-channel">Add Channel</button>
                 </div>
 
-                <div class="container">
+                <div class="container" style="margin-bottom: 40px;">
                     <h5>Voice</h5>
                     <div id="voice_channels">
                         <div class="form-group">
@@ -75,6 +75,33 @@
                         </div>
                     </div>
                     <button onclick="addChannel('voice')" class="btn btn-primary add-channel">Add Channel</button>
+                </div>
+
+                <div class="container" style="margin-bottom: 40px;">
+                    <h5>Extensions</h5>
+                    <div id="extensions_channels">
+                        <div class="form-group">
+                            <form class="form-inline headings-form">
+                                <div>
+                                    <a>
+                                        <input class="form-control" placeholder="Position" readonly></input>
+                                        <input class="form-control" placeholder="UUID" readonly></input>
+                                        <input class="form-control" placeholder="Name" readonly></input>
+                                    </a>
+                                </div>
+                            </form>
+                            <% conf.server.channels.extensions.forEach(function(e, i){ %>
+                            <% 
+                                var data = Object.create(e);
+                                data.new = false; 
+                                data.index = i;
+                                data.channel_type = "extensions";
+                            %>
+                            <%- include('_channel', {data: data, conf: conf, extensions: extensions}); %>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <button onclick="addChannel('extensions')" class="btn btn-primary add-channel">Add Channel</button>
                 </div>
             </div>
         </div>
@@ -106,7 +133,13 @@
                                     <%}) %>
                                     </td>
                                     <input name="ip" type="hidden" value="<%= ip %>">
-                                    <td><% if(!(conf.blacklist.includes(ip))){%><button type="submit" class="btn btn-danger">Add to Blacklist</button><% } else {%><button type="button" class="btn btn-dark" onclick="removeFromBlacklist('<%= ip %>')">Remove from Blacklist</button><%}%></td>
+                                    <td>
+                                        <% if(!(conf.blacklist.includes(ip))){%>
+                                            <button type="submit" class="btn btn-danger">Add to Blacklist</button>
+                                        <% } else {%>
+                                            <button type="button" class="btn btn-dark" onclick="removeFromBlacklist('<%= ip %>')">Remove from Blacklist</button>
+                                        <%}%>
+                                    </td>
                                 </form>
                             </tr>
                         <% }) %>

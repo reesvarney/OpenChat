@@ -78,6 +78,7 @@ div.center-self {
     font-family: 'Muli', sans-serif;
     margin-bottom: 10px;
     color: darkgrey;
+    text-transform: capitalize;
 }
 
 .channel-group>ul{
@@ -236,7 +237,7 @@ main {
     margin-top: 5px;
 }
 
-#message_scroll {
+#channel_content {
     position: relative;
 }
 

@@ -1,37 +1,88 @@
-
-//CREATE THESE DYNAMICALLY, TESTING ONLY
-var botName = "TestBot";
-var channel = "test";
-
+var express = require('express');
+var router = express.Router();
 var ytdl = require('ytdl-core');
+var config = require('./package.json');
+const path = require('path');
+var channels = {};
 
 module.exports = function(extData){
     var messageListener = extData.controller.messageListener;
+
     messageListener.on('newMessage', function(msg){
         if(msg.message_content == "!foo"){
             messageListener.emit('sendMessage', {
-                sender: botName,
+                sender: config.oc_config.disp_name,
                 content: "bar!",
                 channel: msg.channel_id
             })
         }
     });
 
-    var queue = ["https://www.youtube.com/watch?v=9RTaIpVuTqE","https://www.youtube.com/watch?v=QrYyURSQPis"];
-    function getNextStream(){
-        if (queue.length != 0 ) {
-            play(ytdl(queue.shift(), { filter: format => format.container === 'mp4' }));
+    class channel{
+        constructor(){
+            this.queue = [];
+            this.stream = extData.controller.createStream("mp3");
+            this.isPlaying = false;
+            this.nowPlaying = {};
         }
-    }
 
-    extData.controller.createStream(channel, "mp3");
+        play(url){
+            this.isPlaying = true;
+            var stream = ytdl(`${url}`, { filter: format => format.container === 'mp4' }) //mp4 for maximum compatibility
+            extData.controller.setStream(stream, "mp4", this.stream).on('end', function(){
+                if(this.queue.length != 0) {
+                    this.play(this.queue.shift())
+                } else {
+                    this.isPlaying = false;
+                }
+            }.bind(this));
+        };
 
-    function play(stream){
-        extData.controller.sendStream(stream, channel, "mp4").on('end', function(){
-            getNextStream();
+        addURL(url){
+            if(this.isPlaying){
+                this.queue.push(url);
+            } else {
+                this.play(url);
+            }
+        }
+    };
+
+    router.use(express.static(path.join(__dirname, './views/static')));
+
+    router.get('/channel/:channelid', function(req, res){
+        if(!(req.params.channelid in channels)){
+            channels[req.params.channelid] = new channel();
+        }
+        res.render(path.join(__dirname, './views/channel'), {
+            channel_id: req.params.channelid,
+            config: config,
+            channelData: channels[req.params.channelid]
+        })
+    });
+
+    router.get('/stream/:channelid', function(req, res) {
+        res.writeHead(200, {
+              "Connection": "keep-alive"
+            , "Content-Type": "application/x-mpegURL"             
         });
-    }
+        if(req.params.channelid in channels){
+            channels[req.params.channelid].stream.output.pipe(res);
+        } else {
+            channels[req.params.channelid] = new channel();
+            channels[req.params.channelid].stream.output.pipe(res);
+        }
+    });
 
-    getNextStream();
+    router.post('/stream/:channelid/queue', function(req, res) {
+        if(req.params.channelid in channels){
+            channels[req.params.channelid].addURL(req.body.vid_url);
+        } else {
+            channels[req.params.channelid] = new channel();
+            channels[req.params.channelid].addURL(req.body.vid_url);
+        }
+        res.sendStatus(200);
+    });
+
+    extData.controller.createRoute(`/${config.name}`, router);
     
 }

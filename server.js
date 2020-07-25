@@ -2,6 +2,7 @@ var arguments = process.argv.slice(2);
 const fs = require('fs')
 const conf = require("./conf.json");
 var ffmpegLoc = require('ffmpeg-static');
+const { exec } = require("child_process");
 process.env.FFMPEG_PATH = ffmpegLoc;
 conf.port =  process.env.PORT || conf.port;
 console.log("WELCOME TO OPENCHAT")
@@ -27,11 +28,14 @@ var db = new sqlite3.Database('./db/openchat.db', sqlite3.OPEN_READWRITE | sqlit
 var https = require('https');
 const express = require('express');
 const helmet = require('helmet');
+var bodyParser = require('body-parser');
+
 var app = express();
 app.disable('view cache');
 app.set('view engine', 'ejs');
 app.use(helmet.frameguard());
 app.use(helmet.frameguard({ action: undefined }))
+app.use(bodyParser.urlencoded({ extended: false }));
 
 var options = {};
 
@@ -77,6 +81,7 @@ app.use('/rtc', peerServer);
 // EXTENSIONS //
 // This is the controller that allows extensions to interact with openchat and provides functions to them
 
+var extensions = {}
 var extensionController = new (require('./controllers/extensions/extensionController.js'))();
 
 // Add to this object as more variables/ data are accessible to extensions, so they can maintain compatibility
@@ -108,10 +113,9 @@ require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 // Store routes here
 
 var clientController = require('./controllers/client/client.js')(conf);
-var adminController = require('./controllers/admin/admin.js')(db, conf, fs);
+var adminController = require('./controllers/admin/admin.js')(db, conf, fs, extensionController, extensions);
 var mcuController = require('./controllers/mcu/mcu.js')(conf.secret);
 var messageController = require('./controllers/messages/messages.js')(db);
-var streamController = require('./controllers/client/stream.js')(extensionController);
 
 app.get('/', function(req, res){
   res.redirect('/client')
@@ -121,9 +125,20 @@ app.use("/client", clientController);
 app.use("/admin", adminController);
 app.use("/mcu", mcuController);
 app.use("/messages", messageController);
-app.use("/streams", streamController);
+app.use("/extensions", extensionController.router);
 
-// LOAD EXTENSIONS LAST
+// LOAD EXTENSIONS
 conf.extensions.forEach(function(directory){
-  require(`./extensions/${directory}/extension.js`)(extension_data)
+  if (fs.existsSync(`./extensions/${directory}/node_modules/`)) {
+    //dependencies exist
+    extensions[directory] = require(`./extensions/${directory}/package.json`);
+    require(`./extensions/${directory}`)(extension_data);
+  } else {
+    //install dependencies
+    exec("npm i", {cwd: `./extensions/${directory}/`}, function(error, stdout, stderr) {
+      console.log(stdout);
+      extensions[directory] = require(`./extensions/${directory}/package.json`);
+      require(`./extensions/${directory}`)(extension_data);
+    })
+  }
 })

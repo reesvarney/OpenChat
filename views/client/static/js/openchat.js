@@ -6,7 +6,7 @@ var serverinfo,
   isMuted = false,
   peer,
   call,
-  currentText,
+  currentChannel,
   currentPage,
   audioOut,
   lastMessage,
@@ -22,7 +22,7 @@ var serverinfo,
   scrollController,
   constraints = {
     audio: {
-        sampleRate: 64000,
+        sampleRate: 48000,
         volume: 1.0,
         noiseSuppression: false,
         echoCancellation: false,
@@ -30,6 +30,7 @@ var serverinfo,
     },
     video: false
   },
+  socket,
   stream;
 
 for(i = 0; i < soundfiles.length; i++){
@@ -37,12 +38,7 @@ for(i = 0; i < soundfiles.length; i++){
   soundeffects[soundfiles[i]].loop = false;
 };
 
-navigator.getUserMedia = (
-  navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia ||
-  navigator.msGetUserMedia
-);
+navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia );
 
 navigator.getUserMedia(constraints, function(localstream) {
   stream = localstream;
@@ -95,10 +91,22 @@ function getMessages(channel_id, params){
   });
 };
 
-function connectToServer(){
-  var socket = io.connect();
+function getExtensionChannel(uuid, handler){
+  $.ajax({
+    async: true,
+    type: 'GET',
+    url: `/extensions/${handler}/channel/${uuid}`,
+    timeout: 10000,
+    success: ( function( result){
+      $("#extension_content").html(result);
+    })
+  });
+}
 
-  // SOCKET LISTENERS
+//SOCKET LISTENERS
+function connectToServer(){
+  socket = io.connect();
+
   socket.on('connect', function() {
     //connection established, begin auth
     socket.emit('userinfo', {
@@ -111,7 +119,6 @@ function connectToServer(){
     window.location.reload();
   });
 
-  //openchat related errors
   socket.on("ocerror", function(data){
     console.log("OPENCHAT ERROR: " + data);
   })
@@ -150,27 +157,29 @@ function connectToServer(){
   })
 
   socket.on("newMessage", function(data){
-    if(data.channel_id == currentText){
+    if(data.channel_id == currentChannel){
       getMessages(data.channel_id, {"id": data.message_id});
     }
   })
+};
 
-  //start channel joining process
-  function joinChannel(channel_id){
-    if(!(serverinfo.users[socket.id].channel == channel_id)){
-      socket.emit('joinChannel', channel_id);
-      new_channel = channel_id;
-    } else {
-      console.log('ALREADY CONNECTED');
-    }
-
+function joinChannel(channel_id){
+  if(!(serverinfo.users[socket.id].channel == channel_id)){
+    socket.emit('joinChannel', channel_id);
+    new_channel = channel_id;
+  } else {
+    console.log('ALREADY CONNECTED');
   }
 
-  function leaveChannel(){
-    socket.emit('leaveChannel');
-  };
+}
 
-  scrollController = new smartScroll($('#message_scroll'));
+function leaveChannel(){
+  socket.emit('leaveChannel');
+};
+
+//DOM Listeners
+$( document ).ready(function() {
+  scrollController = new smartScroll($('#channel_content'));
 
   $("#disconnect_button").click(function(){
     leaveChannel();
@@ -182,7 +191,7 @@ function connectToServer(){
 
   $("#load_messages a").click(function(){
     currentPage += 1
-    getMessages(currentText, {"page": currentPage})
+    getMessages(currentChannel, {"page": currentPage})
   });
 
 
@@ -192,18 +201,37 @@ function connectToServer(){
 
   $("#text_channels").on('click', '* .channel', function() {
     var channel_id = $(this).attr("id");
-    if(channel_id != currentText){
+    if(channel_id != currentChannel){
       $('#text_channels li').removeClass("active");
+      $('#extensions_channels li').removeClass("active");
       $('#text_channels #' + channel_id).parent().addClass("active");
       currentPage = 0;
-      currentText = channel_id;
-      $("#message_input_area *").each( function( index ){
-        $(this).prop('disabled', false);
-      });
+      currentChannel = channel_id;
+      $("#extension_content").empty();
+      $("#extension_content").hide();
+      $("#message_input_area").show();
+      $("#message_scroll").show();
       var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
       $("#channel_name").text(channelData.channel_name)
       $("#channel_description").text(channelData.channel_description)
       getMessages(channel_id, {"page" : 0});
+    }
+  })
+
+  $("#extensions_channels").on('click', '* .channel', function() {
+    var channel_id = $(this).attr("id");
+    if(channel_id != currentChannel){
+      $("#extension_content").empty();
+      $('#text_channels li').removeClass("active");
+      $('#extensions_channels li').removeClass("active");
+      $('#extensions_channels #' + channel_id).parent().addClass("active");
+      currentChannel = channel_id;
+      $("#message_input_area").hide();
+      $("#message_scroll").hide();
+      $("#extension_content").show();
+      var channelData = serverinfo.channels.extensions.find(({ uuid } )=> uuid == channel_id);
+      $("#channel_name").text(channelData.channel_name)
+      getExtensionChannel(channel_id, channelData.handler)
     }
   })
 
@@ -218,15 +246,13 @@ function connectToServer(){
     e.preventDefault();
     var contents = $("#message_box").val();
     socket.emit("sendMessage", {
-      channel: currentText,
+      channel: currentChannel,
       content: contents
     });
     $("#message_box").val("");
     scrollController.goToBottom(true);
   });
-};
 
-$( document ).ready(function() {
   $( "#connect_form" ).submit(function( event ) {
     event.preventDefault();
     client.name = $("#name_input").val();
@@ -250,9 +276,7 @@ $( document ).ready(function() {
   $("#new_msg_close").click(function(){
     $("#new_message").toggleClass('hidden');
   })
-});
 
-$( document ).ready(function() {
   $("#mute_microphone").click(function(){
     if(!stream.getAudioTracks()[0].enabled){
       $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
@@ -276,4 +300,12 @@ $( document ).ready(function() {
       soundeffects.mute.play();
     }
   });
+
+  $("#player_volume").on('input', function() {
+      $('#player').prop("volume", (this.value / 10));
+  });
+
+  $("#call_volume").on('input', function() {
+    audioOut.volume = (this.value / 10);
+});
 });

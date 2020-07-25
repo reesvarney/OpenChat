@@ -21,26 +21,17 @@
     <a id="nav-close"><i class="fas fa-times"></i></a>
     <div id="channels">
       <h2>Channels</h2>
-
-      <div class="channel-group">
-        <h3>Voice</h3>
-        <ul id="voice_channels">
-        <% conf.server.channels.voice.forEach(function(e){%>
-          <% e.channel_type = "voice" %>
-          <%- include('_channel', {data: e}); %>
-        <% }); %>
-        </ul>
-      </div>
-
-      <div class="channel-group">
-        <h3>Text</h3>
-        <ul id="text_channels">
-          <% conf.server.channels.text.forEach(function(e){%>
-            <% e.channel_type = "text" %>
-            <%- include('_channel', {data: e}); %>
-          <% }); %>
-        </ul>
-      </div>
+      <% Object.keys(conf.server.channels).forEach(function(type){%>
+        <div class="channel-group">
+          <h3><%= type %></h3>
+          <ul id="<%= type %>_channels">
+            <% conf.server.channels[type].forEach(function(e){%>
+              <% e.channel_type = type %>
+              <%- include('_channel', {data: e}); %>
+            <% }); %>
+          </ul>
+        </div>
+      <% }); %>
     </div>
 
     <div id="control_area">
@@ -50,6 +41,25 @@
           class="fas fa-phone-slash fa-lg"></i></a>
     </div>
 
+    <table>
+      <tr>
+        <td>
+          <label for="call_volume">Call Volume</label>
+        </td>
+        <td>
+          <input type="range" min="0" max="10" class="slider" value="10" id="call_volume">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="player_volume">Misc Audio Volume</label>
+        </td>
+        <td>
+          <input type="range" min="0" max="10" class="slider" value="10" id="player_volume">
+        </td>
+      </tr>
+    </table>
+
   </nav>
 
   <main>
@@ -58,15 +68,18 @@
       <h2 id="channel_name"></h2>
       <p id="channel_description"></p>
     </div>
-    <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll;" id="message_scroll">
+    <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll; position: relative;" id="channel_content">
       <div id="load_messages" style="width: 100%; text-align: center; margin-top: auto; display: none;">
         <a href="#">Load More</a>
       </div>
 
-      <div style="min-height: 100%; padding-top: 20px;">
+      <div id="message_scroll" style="min-height: 100%;">
         <ol id="messages">
         
         </ol>
+      </div>
+      <div id="extension_content">
+
       </div>
     </div>
     <div id="new_message" class="notification bottom hidden">
@@ -76,14 +89,13 @@
         <a style="cursor: pointer; size: 5px; margin-left: 10px;" id="new_msg_close"><i class="fas fa-times"></i></a>
       </div>
     </div>
-    <form id="message_input_area">
-      <textarea rows="1" id="message_box" disabled></textarea>
-      <button id="message_send" disabled>Send</button>
+    <form id="message_input_area" style="display: none">
+      <textarea rows="1" id="message_box"></textarea>
+      <button id="message_send">Send</button>
     </form>
   </main>
 </body>
 
 <audio id="call_out" autoplay></audio>
 <audio id="player" autoplay></audio>
-
 </html>

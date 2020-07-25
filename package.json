@@ -9,15 +9,9 @@
     "showmcu": "node server showmcu",
     "createSSL": "openssl req -nodes -new -x509 -keyout ./ssl/server.key -out ./ssl/server.cert",
     "addAdmin": "node ./scripts/create_user",
-    "liveDev": "nodemon server --ignore views/*",
+    "liveDev": "nodemon server.js -i \"**/views/**\" -i \"**.json\" --delay 5",
     "setSecret": "node ./scripts/set_secret",
     "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret && exit 0"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "views/*",
-      "conf.json"
-    ]
   },
   "author": "RV",
   "license": "GPL-3.0",
@@ -41,7 +35,6 @@
     "peer": "^0.5.3",
     "puppeteer": "^3.1.0",
     "socket.io": "^2.3.0",
-    "sqlite3": "^4.2.0",
-    "ytdl-core": "^3.1.2"
+    "sqlite3": "^4.2.0"
   }
 }

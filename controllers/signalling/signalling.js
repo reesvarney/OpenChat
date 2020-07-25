@@ -12,6 +12,7 @@ function startServer(db, io, conf, extensionController) {
         channels: conf.server.channels
     };
 
+    //IP LOGGING FOR ADMINISTRATION
     function logIP(ip, name){
         db.run(`INSERT INTO iplogs (ip, name) SELECT $ip, $name WHERE NOT EXISTS (SELECT * FROM iplogs WHERE ip=$ip AND name=$name)`, {
             "$ip": ip,
@@ -23,6 +24,7 @@ function startServer(db, io, conf, extensionController) {
 
     const server_secret = conf.secret;
 
+    // ADD MESSAGE TO DB
     function addMessage(message){
         var channel_search = server_info.channels.text.find(({ uuid }) => uuid == message.channel);
         if (channel_search != undefined) {
@@ -53,6 +55,7 @@ function startServer(db, io, conf, extensionController) {
         }
     }
 
+    // WHEN EXTENSION SENDS MESSAGE
     extensionController.messageListener.on('sendMessage', function(message){
         try{
             addMessage(message)

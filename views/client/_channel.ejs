@@ -11,4 +11,10 @@
             <%= data.channel_name %>
         </a>
     </li>
-<% }; %>
+<% }else if(data.channel_type == "extensions") {%>
+    <li>
+        <a id="<%= data.uuid %>" class="channel">
+            <%= data.channel_name %>
+        </a>
+    </li>
+<% } %>

@@ -3,3 +3,4 @@ db/openchat.db
 ssl/*.key
 ssl/*.cert
 .vs
+extensions/*/*

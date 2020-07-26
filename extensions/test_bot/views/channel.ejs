@@ -1,0 +1,55 @@
+<%- include('_head', {directory: config.name}) %>
+<div style="padding: 30px; height: 100%;">
+    <form action="/extensions/<%= config.name %>/stream/<%= channel_id %>/queue" method="post" id="vid_form" style="margin-bottom: 40px;">
+        <label for="queueURL" style="margin-right: 20px;">YouTube URL/ Name </label>
+        <input id="queueURL" class="form-control" name="vid_url" style="color: grey; margin-right: 0px; background: #ededed; border: none; padding: 10px; padding-left: 15px; min-width: 30%; display: inline-block;"></input>
+        <button style="background: #fdfdfd; outline: none; border-width: 1px; border-style: solid; border-color: #fafafa;padding: 10px; padding-left: 10px; padding-right: 20px;">Add to queue</button>
+    </form>
+    <% if(channelData.isPlaying){ %>
+        <div>
+            <img height="150px" src="<%= channelData.nowPlaying.thumbnail %>">
+            <div style="display: inline-block; height: 150px; vertical-align: top;">
+                <h2><%= channelData.nowPlaying.title %></h2>
+                <h3><%= channelData.nowPlaying.author.name %></h3>
+            </div>
+        </div>
+    <% } %>
+    <table class="table" style="width:100%; text-align: left;">
+        <tr>
+            <th>
+                Thumbnail
+            </th>
+            <th>
+                Artist
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Length
+            </th>
+        </tr>
+        <% channelData.queue.forEach(video => { %>
+            <tr>
+                <td>
+                    <img height="120px" src="<%= video.thumbnail %>">
+                </td>
+                <td>
+                    <%= video.author.name %>
+                </td>
+                <td>
+                    <%= video.title %>
+                </td>
+                <td>
+                    <%= video.timestamp %>
+                </td>
+    
+            </tr>
+        <% }); %>
+    </table>
+    <script>
+        if($('#player').attr("src") != "/extensions/<%= config.name %>/stream/<%= channel_id %>"){
+            $('#player').attr("src", "/extensions/<%= config.name %>/stream/<%= channel_id %>");
+        }
+    </script>
+</div>

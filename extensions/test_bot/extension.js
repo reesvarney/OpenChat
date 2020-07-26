@@ -66,7 +66,8 @@ module.exports = function(extData){
     router.get('/stream/:channelid', function(req, res) {
         res.writeHead(200, {
               "Connection": "keep-alive"
-            , "Content-Type": "application/x-mpegURL"             
+            , "Content-Type": "application/x-mpegURL"
+            , "Transfer-Encoding" : "chunked"        
         });
         if(req.params.channelid in channels){
             channels[req.params.channelid].stream.output.pipe(res);

@@ -125,7 +125,6 @@ function connectToServer(){
 
   socket.on('serverInfo', function(server_info){
     serverinfo = server_info;
-    console.log(serverinfo)
     peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
   });
 
@@ -302,10 +301,15 @@ $( document ).ready(function() {
   });
 
   $("#player_volume").on('input', function() {
-      $('#player').prop("volume", (this.value / 10));
+    var vol = (this.value / 10);
+    $('#player').prop("volume", (this.value / 10));
+    for(i = 0; i < soundfiles.length; i++){
+      soundeffects[soundfiles[i]].volume = vol;
+    };
   });
 
   $("#call_volume").on('input', function() {
-    audioOut.volume = (this.value / 10);
-});
+    var vol = (this.value / 10);
+    audioOut.volume = vol;
+  });
 });

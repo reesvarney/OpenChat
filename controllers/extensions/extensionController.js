@@ -26,7 +26,7 @@ module.exports = class {
         var realtime_in = converter.createInputStream({f: fmt_in, re: true});
         stream_in.pipe(realtime_in);
         converter.createOutputStream({f: stream_out.format}).pipe(stream_out.input, {end: false});
-        converter.run();
+        setTimeout(function(){ converter.run()}, 4000); //add delay to try and remove some audio bugs on end
         return realtime_in;
     }
 

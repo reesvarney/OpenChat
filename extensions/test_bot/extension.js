@@ -22,7 +22,7 @@ module.exports = function(extData){
     class channel{
         constructor(){
             this.queue = [];
-            this.stream = extData.controller.createStream("mp3");
+            this.stream = new extData.controller.stream("mp3");
             this.isPlaying = false;
             this.nowPlaying = {};
         }
@@ -32,7 +32,7 @@ module.exports = function(extData){
             this.nowPlaying = data;
             this.isPlaying = true;
             var stream = ytdl(`${url}`, { filter: format => format.container === 'mp4' }) //mp4 for maximum compatibility
-            extData.controller.setStream(stream, "mp4", this.stream).on('end', function(){
+            this.stream.setStream(stream, "mp4").on('end', function(){
                 if(this.queue.length != 0) {
                     this.play(this.queue.shift())
                 } else {

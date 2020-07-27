@@ -40,6 +40,7 @@ module.exports = function(extController){
                     } else {
                         this.isPlaying = false;
                     }
+                    room.emit('queueChange', this.id);
                 }.bind(this));
             }.bind(this));
         };

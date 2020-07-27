@@ -17,12 +17,12 @@ var OCstream = class {
         converter.run();
 
         //stop the connection from timing out by sending silent audio
-        // setInterval(function(){ 
-        //     if(!this.isPlaying){
-        //         console.log('send silence')
-        //         this.setStream(createReadStream(path.join(__dirname, './silence.m4a')), "m4a");
-        //     }
-        // }.bind(this), 20000);
+        setInterval(function(){ 
+            if(!this.isPlaying){
+                console.log('send silence')
+                this.setStream(createReadStream(path.join(__dirname, './silence.m4a')), "m4a");
+            }
+        }.bind(this), 20000);
     }
 
     //Converts a readable stream into realtime and pipes it into a combiner stream

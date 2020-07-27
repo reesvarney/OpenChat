@@ -34,7 +34,7 @@ Support for deployment methods such as heroku will be added in the future, howev
 3. In the unzipped folder, run the setup script, which will install prequisite packages, create self-signed SSH keys, add an admin user and configure the server's secret.
 ```sh
 npm run setup
-``` 
+```
 4. Port forward the port `443` in your router software to allow users to connect from outside the local network ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
 5. Start the server
 ```sh
@@ -122,33 +122,10 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
 ## Extensions
 Openchat extensions are the best way to tune and modify Openchat to your liking. Like with everything else, extensions are written in JS and the system is designed to be accessible but also highly capable.
 
-A basic bot can be made in just a few lines, as shown in the following code.
-
-extension.js:
-```js
-var botName = "TestBot";
-
-module.exports = function(extData){
-    var messageListener = extData.controller.messageListener;
-    messageListener.on('newMessage', function(msg){
-        if(msg.message_content == "!foo"){
-            messageListener.emit('sendMessage', {
-                sender: botName,
-                content: "bar!",
-                channel: msg.channel_id
-            })
-        }
-    })
-}
-```
-
-To install an extension simply add the extension directory in `/extensions` to `conf.json` under "extensions" (to be added to admin panel).
-
-
 ### Extension Data
 This is the data that each extension can access.
 
-#### `controller.messageListener`
+#### EventEmitter: `controller.messageListener`
 This is an event emitter which can be used to read messages being sent and send messages itself.
 
 ##### `messageListener.on('newMessage', function(data){})`
@@ -171,14 +148,17 @@ This is an event emitter which can be used to read messages being sent and send 
       channel // The ID of the channel to send it to
     }
     ```
-    
-#### `controller.createStream(channel)`
-This creates an empty combiner stream, allowing users to connect to it. Only one stream can exist per channel.
 
-#### `controller.sendStream(stream, channel, format_in)`
-This converts the stream into realtime and then pipes it to the combiner stream. Must provide the `format_in` as an [ffmpeg supported format](https://ffmpeg.org/ffmpeg-formats.html).
+#### Class: `controller.stream(output_format)`
+This sets up a stream to be used to send to the user. It allows for things such as converting readable streams into realtime.
 
- - ##### `.on('end')`
+##### `stream.output`
+This is the resulting output stream which can be piped as a response or to another stream.
+
+##### `stream.sendStream(stream, input_format)`
+This converts the input `stream` into realtime and then pipes it to the output. Must provide an `input_format` as an [ffmpeg supported format](https://ffmpeg.org/ffmpeg-formats.html).
+
+ - ###### `.on('end')`
     Event emitted when previous input has finished being played in realtime, this should be used to then set the next stream to be played.
 
 #### `server_config`

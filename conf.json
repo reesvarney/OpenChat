@@ -6,40 +6,35 @@
       "voice": [
         {
           "channel_name": "Voice 1",
-          "uuid": "cb5d090e-a961-4bbc-8fed-bf03859ae0ea",
-          "channel_type": "voice"
+          "uuid": "cb5d090e-a961-4bbc-8fed-bf03859ae0ea"
         },
         {
           "channel_name": "Voice 2",
-          "uuid": "34537d5a-fdfe-4b1e-a7b7-dc440b7920f8",
-          "channel_type": "voice"
+          "uuid": "34537d5a-fdfe-4b1e-a7b7-dc440b7920f8"
         }
       ],
       "text": [
         {
           "channel_name": "Text 1",
           "uuid": "51067468-0b35-4250-8178-a2d2bed71892",
-          "channel_description": "",
-          "channel_type": "text"
+          "channel_description": ""
         },
         {
           "channel_name": "Text 2",
           "uuid": "42932d84-5898-4ab3-b107-bb3a8878e01b",
-          "channel_description": "",
-          "channel_type": "text"
+          "channel_description": ""
         }
       ],
       "extensions": [
         {
           "channel_name": "Music",
           "uuid": "111d5fda-90b8-4101-bf14-f4c5816c670c",
-          "handler": "test_bot",
-          "channel_type": "extensions"
+          "handler": "test_bot"
         }
       ]
     }
   },
   "secret": "idfho39ytu2p93u",
   "blacklist": [],
-  "extensions": []
+  "extensions": ["test_bot"]
 }

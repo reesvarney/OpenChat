@@ -10,7 +10,7 @@ Array.prototype.move = function (from, to) {
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
-module.exports = function (db, conf, fs, extCont, extensions) {
+module.exports = function (db, conf, fs, extController) {
     router.use(session({ secret: conf.secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
     initializePassport(passport, db);
     router.use("/", express.static('./views/admin/static'));
@@ -64,7 +64,7 @@ module.exports = function (db, conf, fs, extCont, extensions) {
             res.render('admin/index', {
                 conf: conf,
                 users: result,
-                extensions: extensions
+                extensions: extController.extensions
             });
         })
 
@@ -88,11 +88,11 @@ module.exports = function (db, conf, fs, extCont, extensions) {
     router.get("/channel/template", checkAuth, function(req,res){
         res.render("admin/_channel", { 
         data : {
-            channel_type: req.query.type,
             channel_name: "",
             new: true,
         },
-        extensions: extensions
+        channel_type: req.query.type,
+        extensions: extController.extensions
         });
     });
 

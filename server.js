@@ -81,14 +81,13 @@ app.use('/rtc', peerServer);
 // EXTENSIONS //
 // This is the controller that allows extensions to interact with openchat and provides functions to them
 
-var extensions = {}
-var extensionController = new (require('./controllers/extensions/extensionController.js'))();
-
 // Add to this object as more variables/ data are accessible to extensions, so they can maintain compatibility
 var extension_data = {
-  controller: extensionController,
   server_config: conf,
+  io: io
 }
+
+var extensionController = new (require('./controllers/extensions/extensionController.js'))(extension_data);
 
 //SIGNALLING
 
@@ -113,7 +112,7 @@ require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 // Store routes here
 
 var clientController = require('./controllers/client/client.js')(conf);
-var adminController = require('./controllers/admin/admin.js')(db, conf, fs, extensionController, extensions);
+var adminController = require('./controllers/admin/admin.js')(db, conf, fs, extensionController);
 var mcuController = require('./controllers/mcu/mcu.js')(conf.secret);
 var messageController = require('./controllers/messages/messages.js')(db);
 
@@ -131,14 +130,14 @@ app.use("/extensions", extensionController.router);
 conf.extensions.forEach(function(directory){
   if (fs.existsSync(`./extensions/${directory}/node_modules/`)) {
     //dependencies exist
-    extensions[directory] = require(`./extensions/${directory}/package.json`);
-    require(`./extensions/${directory}`)(extension_data);
+    extensionController.extensions[directory] = require(`./extensions/${directory}/package.json`);
+    require(`./extensions/${directory}`)(extensionController);
   } else {
     //install dependencies
     exec("npm i", {cwd: `./extensions/${directory}/`}, function(error, stdout, stderr) {
       console.log(stdout);
-      extensions[directory] = require(`./extensions/${directory}/package.json`);
-      require(`./extensions/${directory}`)(extension_data);
+      extensionController.extensions[directory] = require(`./extensions/${directory}/package.json`);
+      require(`./extensions/${directory}`)(extensionController);
     })
   }
 })

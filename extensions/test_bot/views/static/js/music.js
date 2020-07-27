@@ -9,3 +9,9 @@ $('#vid_form').submit(function(e){
         }
     });
 });
+
+socket.on('queueChange', function(channel){
+    if (channel == currentChannel){
+        getExtensionChannel(channel, serverinfo.channels.extensions.find(({ uuid } )=> uuid == channel).handler);
+    }
+})

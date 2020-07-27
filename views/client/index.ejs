@@ -26,8 +26,7 @@
           <h3><%= type %></h3>
           <ul id="<%= type %>_channels">
             <% conf.server.channels[type].forEach(function(e){%>
-              <% e.channel_type = type %>
-              <%- include('_channel', {data: e}); %>
+              <%- include('_channel', {data: e, channel_type: type}); %>
             <% }); %>
           </ul>
         </div>

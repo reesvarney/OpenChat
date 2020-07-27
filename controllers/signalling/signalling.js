@@ -184,6 +184,10 @@ function startServer(db, io, conf, extensionController) {
             delete server_info.users[socket.id];
             socket.broadcast.emit('usersChange', server_info.users);
         });
+
+        socket.on("joinRoom", function(room){
+            socket.join(room);
+        })
     });
 };
 

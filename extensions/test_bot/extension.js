@@ -6,43 +6,47 @@ var config = require('./package.json');
 const path = require('path');
 var channels = {};
 
-module.exports = function(extData){
-    var messageListener = extData.controller.messageListener;
+module.exports = function(extController){
+    var messageListener = extController.messageListener;
 
     messageListener.on('newMessage', function(msg){
         if(msg.message_content == "!foo"){
-            messageListener.emit('sendMessage', {
-                sender: config.oc_config.disp_name,
-                content: "bar!",
-                channel: msg.channel_id
-            })
+            extController.sendMessage({content: "bar!", channel: msg.channel_id}, config.name);
         }
     });
+    
+    //SOCKET
+    var room = new extController.room(config.name).socket;
 
     class channel{
-        constructor(){
+        constructor(channel_id){
             this.queue = [];
-            this.stream = new extData.controller.stream("mp3");
+            this.stream = new extController.stream("mp3");
             this.isPlaying = false;
             this.nowPlaying = {};
+            this.id = channel_id;
         }
 
         play(data){
             var url = data.url;
             this.nowPlaying = data;
+            room.emit('queueChange', this.id);
             this.isPlaying = true;
-            var stream = ytdl(`${url}`, { filter: format => format.container === 'mp4' }) //mp4 for maximum compatibility
-            this.stream.setStream(stream, "mp4").on('end', function(){
-                if(this.queue.length != 0) {
-                    this.play(this.queue.shift())
-                } else {
-                    this.isPlaying = false;
-                }
+            var stream = ytdl(`${url}`, { filter: 'audioonly' });
+            stream.on('info', function(info, format){
+                this.stream.setStream(stream, format.container).on('end', function(){
+                    if(this.queue.length != 0) {
+                        this.play(this.queue.shift())
+                    } else {
+                        this.isPlaying = false;
+                    }
+                }.bind(this));
             }.bind(this));
         };
 
         addURL(data){
             if(this.isPlaying){
+                room.emit('queueChange', this.id);
                 this.queue.push(data);
             } else {
                 this.play(data);
@@ -50,11 +54,13 @@ module.exports = function(extData){
         }
     };
 
+    //EXPRESS ROUTER
+
     router.use(express.static(path.join(__dirname, './views/static')));
 
     router.get('/channel/:channelid', function(req, res){
         if(!(req.params.channelid in channels)){
-            channels[req.params.channelid] = new channel();
+            channels[req.params.channelid] = new channel(req.params.channelid);
         }
         res.render(path.join(__dirname, './views/channel'), {
             channel_id: req.params.channelid,
@@ -72,7 +78,7 @@ module.exports = function(extData){
         if(req.params.channelid in channels){
             channels[req.params.channelid].stream.output.pipe(res);
         } else {
-            channels[req.params.channelid] = new channel();
+            channels[req.params.channelid] = new channel(req.params.channelid);
             channels[req.params.channelid].stream.output.pipe(res);
         }
     });
@@ -92,13 +98,13 @@ module.exports = function(extData){
             if(req.params.channelid in channels){
                 channels[req.params.channelid].addURL(r.videos[0]);
             } else {
-                channels[req.params.channelid] = new channel();
+                channels[req.params.channelid] = new channel(req.params.channelid);
                 channels[req.params.channelid].addURL(r.videos[0]);
             }
             res.sendStatus(200);
         });
     });
 
-    extData.controller.createRoute(`/${config.name}`, router);
+    extController.createRoute(`/${config.name}`, router);
     
 }

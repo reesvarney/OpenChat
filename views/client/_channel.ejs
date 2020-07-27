@@ -1,17 +1,17 @@
-<% if (data.channel_type == "voice"){ %>
+<% if (channel_type == "voice"){ %>
     <li>
         <a id="<%= data.uuid %>" class="channel">
         <%= data.channel_name %>
         </a>
         <ul id="<%= data.uuid %>-users" class="user-list"></ul>
     </li>
-<% }else if(data.channel_type == "text"){ %>
+<% }else if(channel_type == "text"){ %>
     <li>
         <a id="<%= data.uuid %>" class="channel">
             <%= data.channel_name %>
         </a>
     </li>
-<% }else if(data.channel_type == "extensions") {%>
+<% }else if(channel_type == "extensions") {%>
     <li>
         <a id="<%= data.uuid %>" class="channel">
             <%= data.channel_name %>

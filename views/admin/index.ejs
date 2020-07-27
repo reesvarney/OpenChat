@@ -41,9 +41,8 @@
                                 var data = Object.create(e);
                                 data.new = false; 
                                 data.index = i; 
-                                data.channel_type = "text";
                             %>
-                            <%- include('_channel', {data: data}); %>
+                            <%- include('_channel', {data: data, channel_type: "text"}); %>
                             <% }); %>
                         </div>
                     </div>
@@ -68,9 +67,8 @@
                                 var data = Object.create(e);
                                 data.new = false; 
                                 data.index = i;
-                                data.channel_type = "voice";
                             %>
-                            <%- include('_channel', {data: data}); %>
+                            <%- include('_channel', {data: data, channel_type: "voice"}); %>
                             <% }); %>
                         </div>
                     </div>
@@ -95,9 +93,8 @@
                                 var data = Object.create(e);
                                 data.new = false; 
                                 data.index = i;
-                                data.channel_type = "extensions";
                             %>
-                            <%- include('_channel', {data: data, conf: conf, extensions: extensions}); %>
+                            <%- include('_channel', {data: data, conf: conf, extensions: extensions, channel_type: "extensions"}); %>
                             <% }); %>
                         </div>
                     </div>

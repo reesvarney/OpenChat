@@ -16,13 +16,12 @@ var OCstream = class {
         this.output = converter.createOutputStream({f: fmt_out, end: false});
         converter.run();
 
-        //stop the connection from timing out by sending silent audio
+        //stop the connection from timing out by sending silent audio every 30 seconds
         setInterval(function(){ 
             if(!this.isPlaying){
-                console.log('send silence')
                 this.setStream(createReadStream(path.join(__dirname, './silence.m4a')), "m4a");
             }
-        }.bind(this), 20000);
+        }.bind(this), 30000);
     }
 
     //Converts a readable stream into realtime and pipes it into a combiner stream

@@ -32,7 +32,7 @@ module.exports = function(extController){
             this.nowPlaying = data;
             room.emit('queueChange', this.id);
             this.isPlaying = true;
-            var stream = ytdl(`${url}`, { filter: 'audioonly' });
+            var stream = ytdl(`${url}`, { filter: 'audioonly', highWaterMark: 4096}); //Increase buffer to hopefully resolve error 416
             stream.on('info', function(info, format){
                 this.stream.setStream(stream, format.container).on('end', function(){
                     if(this.queue.length != 0) {

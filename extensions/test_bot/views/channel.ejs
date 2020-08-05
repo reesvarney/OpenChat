@@ -1,6 +1,29 @@
-<%- include('_head', {directory: config.name}) %>
-<div style="padding: 30px; height: 100%;">
-    <form action="/extensions/<%= config.name %>/stream/<%= channel_id %>/queue" method="post" id="vid_form" style="margin-bottom: 40px;">
+<div style="padding: 50px; height: 100%;">
+    <script>
+        var ext_url = "/extensions/<%= config.name %>/stream/<%= channel_id %>";
+    </script>
+    <% if(channelData.isPlaying){ %>
+        <script>
+            var ext_media_data = {
+                title: "<%= channelData.nowPlaying.title %>",
+                caption: "<%= channelData.nowPlaying.author.name %>",
+                thumbnail: "<%= channelData.nowPlaying.thumbnail %>", 
+                source: "<%= channelData.id %>"
+            }
+        </script>
+    <% } else { %>
+        <script>
+            var ext_media_data = {
+                title: "Nothing", 
+                caption: "", 
+                thumbnail: "", 
+                source: "<%= channelData.id %>"}
+        </script>
+    <% } %>
+    
+    <i onclick="playStream(ext_url, ext_media_data)" class="fas fa-play"></i>
+
+    <form action="/extensions/<%= config.name %>/stream/<%= channel_id %>/queue" method="post" onsubmit="addToQueue(event)" id="vid_form" style="margin-bottom: 40px;">
         <label for="queueURL" style="margin-right: 20px;">YouTube URL/ Name </label>
         <input id="queueURL" class="form-control" name="vid_url" style="color: grey; margin-right: 0px; background: #ededed; border: none; padding: 10px; padding-left: 15px; min-width: 30%; display: inline-block;"></input>
         <button style="background: #fdfdfd; outline: none; border-width: 1px; border-style: solid; border-color: #fafafa;padding: 10px; padding-left: 10px; padding-right: 20px;">Add to queue</button>
@@ -48,9 +71,4 @@
             </tr>
         <% }); %>
     </table>
-    <script>
-        if($('#player').attr("src") != "/extensions/<%= config.name %>/stream/<%= channel_id %>"){
-            $('#player').attr("src", "/extensions/<%= config.name %>/stream/<%= channel_id %>");
-        }
-    </script>
 </div>

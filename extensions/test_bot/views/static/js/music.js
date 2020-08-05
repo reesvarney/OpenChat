@@ -1,4 +1,4 @@
-$('#vid_form').submit(function(e){
+function addToQueue(e){
     e.preventDefault();
     $.ajax({
         url: $('#vid_form').attr('action'),
@@ -8,10 +8,12 @@ $('#vid_form').submit(function(e){
             $("#queueURL").val('');
         }
     });
-});
+};
 
-socket.on('queueChange', function(channel){
-    if (channel == currentChannel){
-        getExtensionChannel(channel, serverinfo.channels.extensions.find(({ uuid } )=> uuid == channel).handler);
+socket.on('queueChange', function(data){
+    console.log("queue Change")
+    if (data.id == currentChannel){
+        getExtensionChannel(data.id, serverinfo.channels.extensions.find(({ uuid } )=> uuid == data.id).handler);
     }
+    setMediaMetadata(data);
 })

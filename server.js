@@ -130,14 +130,12 @@ app.use("/extensions", extensionController.router);
 conf.extensions.forEach(function(directory){
   if (fs.existsSync(`./extensions/${directory}/node_modules/`)) {
     //dependencies exist
-    extensionController.extensions[directory] = require(`./extensions/${directory}/package.json`);
-    require(`./extensions/${directory}`)(extensionController);
+    new extensionController.extension(require(`./extensions/${directory}/package.json`));
   } else {
     //install dependencies
     exec("npm i", {cwd: `./extensions/${directory}/`}, function(error, stdout, stderr) {
       console.log(stdout);
-      extensionController.extensions[directory] = require(`./extensions/${directory}/package.json`);
-      require(`./extensions/${directory}`)(extensionController);
+      new extensionController.extension(require(`./extensions/${directory}/package.json`));
     })
   }
 })

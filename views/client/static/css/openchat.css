@@ -501,7 +501,49 @@ main {
     outline: 0;  
 }
 
+/* MEDIA PLAYER */
+#media_player {
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 20px;
+    min-width: 20%;
+    max-width: 100%;
+    min-height: 5%;
+    max-height: 30%;
+    z-index: 100;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+}
 
+#media_player>div {
+    position: relative;
+    display: block;
+}
+
+#media_info {
+    vertical-align: top;
+    display: inline-block;
+}
+
+#media_info * {
+    margin: 0px;
+}
+
+#media_controls {
+    margin-top: auto;
+    margin-bottom: auto;
+    vertical-align: top;
+    display: inline-block;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+#media_controls * {
+    margin-top: auto;
+    margin-bottom: auto;
+}
 
 /* detect sub 700 wide displays */
 #nav-toggle, #nav-close {

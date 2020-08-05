@@ -1,12 +1,12 @@
 var serverinfo,
   client = {},
+  currentChannel,
   new_channel = null,
   isConnected = false,
   audioOut = $('#call_out'),
   isMuted = false,
   peer,
   call,
-  currentChannel,
   currentPage,
   audioOut,
   lastMessage,
@@ -31,6 +31,8 @@ var serverinfo,
     video: false
   },
   socket,
+  extensions_loaded = [],
+  media_source = "",
   stream;
 
 for(i = 0; i < soundfiles.length; i++){
@@ -91,7 +93,21 @@ function getMessages(channel_id, params){
   });
 };
 
+//EXTENSION SUPPORT
 function getExtensionChannel(uuid, handler){
+  if(!extensions_loaded.includes(handler)){
+    $.ajax({
+      async: true,
+      type: 'GET',
+      url: `/extensions/${handler}/scripts`,
+      timeout: 10000,
+      success: ( function( result){
+        $("head").append(result)
+        extensions_loaded.push(handler);
+      })
+    });
+  }
+
   $.ajax({
     async: true,
     type: 'GET',
@@ -101,6 +117,28 @@ function getExtensionChannel(uuid, handler){
       $("#extension_content").html(result);
     })
   });
+}
+
+function setMediaMetadata(data){
+  if (data.id == media_source){
+    $("#media_thumbnail").attr('src', data.thumbnail)
+    $("#media_title").text(data.title);
+    $("#media_caption").text(data.caption);
+  }
+}
+
+function playStream(url, data){
+  if($('#player').attr("src") != url){
+    $('#player').attr("src", url);
+    media_source = data.id
+  };
+  setMediaMetadata(data);
+  $("#media_player").show();
+}
+
+function stopStream(){
+  $('#player').attr("src", "");
+  $("#media_player").hide();
 }
 
 //SOCKET LISTENERS
@@ -116,7 +154,8 @@ function connectToServer(){
   });
 
   socket.on('disconnect', function(){
-    window.location.reload();
+    console.log("disconnected")
+    //window.location.reload();
   });
 
   socket.on("ocerror", function(data){
@@ -299,6 +338,11 @@ $( document ).ready(function() {
       soundeffects.mute.play();
     }
   });
+
+  $("#media_stop").click(function(){
+    stopStream();
+  });
+
 
   $("#player_volume").on('input', function() {
     var vol = (this.value / 10);

@@ -6,22 +6,16 @@ var config = require('./package.json');
 const path = require('path');
 var channels = {};
 
-module.exports = function(extController){
-    var messageListener = extController.messageListener;
-
-    messageListener.on('newMessage', function(msg){
-        if(msg.message_content == "!foo"){
-            extController.sendMessage({content: "bar!", channel: msg.channel_id}, config.name);
-        }
-    });
-    
+module.exports = function(extension){  
     //SOCKET
-    var room = new extController.room(config.name).socket;
 
     class channel{
         constructor(channel_id){
             this.queue = [];
-            this.stream = new extController.stream("mp3");
+            this.stream = new extController.stream({
+                channel: channel_id,
+                format: "mp3"
+            });
             this.isPlaying = false;
             this.nowPlaying = {};
             this.id = channel_id;
@@ -30,24 +24,28 @@ module.exports = function(extController){
         play(data){
             var url = data.url;
             this.nowPlaying = data;
-            room.emit('queueChange', this.id);
             this.isPlaying = true;
-            var stream = ytdl(`${url}`, { filter: 'audioonly', highWaterMark: 4096}); //Increase buffer to hopefully resolve error 416
+            var ytstream = ytdl(`${url}`, { filter: 'audioonly', highWaterMark: 4096}); //Increase buffer to hopefully resolve error 416
             stream.on('info', function(info, format){
-                this.stream.setStream(stream, format.container).on('end', function(){
+                this.stream.setStream({
+                    stream: ytstream,
+                    format: format.container,
+                    metdata: {
+                        name: "",
+                        source: ""
+                    }
+                }).on('end', function(){
                     if(this.queue.length != 0) {
                         this.play(this.queue.shift())
                     } else {
                         this.isPlaying = false;
                     }
-                    room.emit('queueChange', this.id);
                 }.bind(this));
             }.bind(this));
         };
 
         addURL(data){
             if(this.isPlaying){
-                room.emit('queueChange', this.id);
                 this.queue.push(data);
             } else {
                 this.play(data);
@@ -59,30 +57,7 @@ module.exports = function(extController){
 
     router.use(express.static(path.join(__dirname, './views/static')));
 
-    router.get('/channel/:channelid', function(req, res){
-        if(!(req.params.channelid in channels)){
-            channels[req.params.channelid] = new channel(req.params.channelid);
-        }
-        res.render(path.join(__dirname, './views/channel'), {
-            channel_id: req.params.channelid,
-            config: config,
-            channelData: channels[req.params.channelid]
-        })
-    });
 
-    router.get('/stream/:channelid', function(req, res) {
-        res.writeHead(200, {
-              "Connection": "keep-alive"
-            , "Content-Type": "application/x-mpegURL"
-            , "Transfer-Encoding" : "chunked"        
-        });
-        if(req.params.channelid in channels){
-            channels[req.params.channelid].stream.output.pipe(res);
-        } else {
-            channels[req.params.channelid] = new channel(req.params.channelid);
-            channels[req.params.channelid].stream.output.pipe(res);
-        }
-    });
 
     router.post('/stream/:channelid/queue', function(req, res) {
         var opts = {};
@@ -94,7 +69,7 @@ module.exports = function(extController){
             opts.query = {videoId : id};
         }
 
-        yts( req.body.vid_url, function ( err, r ) {
+        yts( opts, function ( err, r ) {
             if ( err ) throw err
             if(req.params.channelid in channels){
                 channels[req.params.channelid].addURL(r.videos[0]);

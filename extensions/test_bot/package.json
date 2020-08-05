@@ -9,7 +9,7 @@
         "yt-search": "2.1.6"
     },
     "oc_config": {
-        "stream": true,
+        "channelSupported": true,
         "stream_format": "mp3",
         "disp_name": "OpenChat Bot"
     }

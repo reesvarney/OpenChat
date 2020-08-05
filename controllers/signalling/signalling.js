@@ -43,7 +43,7 @@ function startServer(db, io, conf, extensionController) {
                             message_id: this.lastID
                         };
                         io.emit("newMessage", data);
-                        extensionController.messageListener.emit("newMessage", data);
+                        extensionController.messageListener.emit("new", data);
                     });
     
                 };
@@ -56,7 +56,7 @@ function startServer(db, io, conf, extensionController) {
     }
 
     // WHEN EXTENSION SENDS MESSAGE
-    extensionController.messageListener.on('sendMessage', function(message){
+    extensionController.messageListener.on('send', function(message){
         try{
             addMessage(message)
         } catch (err) {

@@ -1,1 +1,1 @@
-require('./db/init.js');
+const db = require('./db/init.js');

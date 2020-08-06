@@ -41,3 +41,5 @@ for (const [name, model] of Object.entries(model_data)) {
 };
 
 status.resolve();
+
+module.exports = models;

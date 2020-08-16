@@ -1,0 +1,17 @@
+<% for(i = 0; i < data.length; i++){ 
+var message = data[i];
+%>
+    <div id="<%= message.message_id %>" class="message-card">
+        <p>
+            <strong><%= message.sender_name %></strong>
+            <i><%= message.message_date %></i>
+            <br>
+            <%- message.message_content %>
+        </p>
+        
+        <% if("ogp" in message){ %>
+            <% var ogp = message.ogp; %>
+            <%- include('_ogp', {ogp: ogp}) %>
+        <% } %>
+    </div>
+<% } %>

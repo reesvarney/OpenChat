@@ -33,42 +33,58 @@ module.exports =  {
       },
       type: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
           isIn: [['voice', 'text', 'custom']]
         }
       },
       name: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
           len: [3, 32]
         }
       }
     },
     options: {},
-    relations: {
-      hasMany: "Message",
-    }
+    relations: {}
   },
 
   User: {
     attributes: {
-      id: {
+      oauth: {
         type: DataTypes.UUIDV4,
-        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
         primaryKey: true,
         unique: true,
       },
-      name_hashed: {
-        
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false
       },
-      pass_hashed: {
-
-      },
-      salt: {
-
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true
       }
     },
     options: {},
-    relations: {}
+    relations: {
+      hasMany: 'IpLog'
+    }
   },
+
+  IpLog: {
+    attributes: {
+      ip: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        primaryKey: true
+      }
+    },
+    options: {},
+    relations: {
+      belongsTo: 'User'
+    }
+  }
 };

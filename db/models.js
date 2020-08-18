@@ -52,20 +52,24 @@ module.exports =  {
 
   User: {
     attributes: {
-      oauth: {
-        type: DataTypes.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-        unique: true,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
       id: {
         type: DataTypes.UUIDV4,
         defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
         unique: true
+      },
+      pass_hashed: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      salt: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     },
     options: {},

@@ -9,8 +9,8 @@
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
-    "sequelize": "^6.3.3",
-    "sqlite3": "^5.0.0"
+    "sequelize": "^6.3.3"
   }
 }

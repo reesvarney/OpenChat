@@ -64,6 +64,7 @@ var messageController = require('./controllers/messages/messages.js')(db);
 app.get('/', function(req, res){
   res.redirect('/client')
 });
+
 app.use("/client", clientController);
 app.use("/admin", adminController);
 app.use("/messages", messageController);

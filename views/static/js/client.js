@@ -1,3 +1,5 @@
+const { authenticate } = require("passport");
+
 var serverinfo,
   client = {},
   new_channel = null,
@@ -94,6 +96,10 @@ function getMessages(channel_id, params){
     })
   });
 };
+
+function authenticate(name, pass){
+
+}
 
 function connectToServer(){
   var socket = io.connect();
@@ -229,8 +235,9 @@ function connectToServer(){
 $( document ).ready(function() {
   $( "#connect_form" ).submit(function( event ) {
     event.preventDefault();
-    client.name = $("#name_input").val();
-    connectToServer();
+    var name = $("#name_input").val();
+    var pass = $("#pass_input").val();
+    authenticate(name, pass);
     $("#connect_overlay").removeClass("active");
   });
 

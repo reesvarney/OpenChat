@@ -3,6 +3,7 @@ const model_data = require("./models.js");
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db/sqlite/db.sqlite",
+  logging: false
 });
 
 const relations = {

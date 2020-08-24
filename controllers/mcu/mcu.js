@@ -10,7 +10,7 @@ module.exports = function({secret}){
         } else {
             res.status(400).send('MCU needs to be ran locally');
         }
-    }, express.static('./views/mcu/static'));
+    }, express.static('./views/static'));
 
     router.get('/', function(req, res) {
         res.render('mcu/index', {mcu_secret: secret});

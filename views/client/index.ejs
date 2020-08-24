@@ -2,82 +2,82 @@
 <html lang="en">
 <%- include('_head') %>
 
-<body>
-  <div class="overlay active" id="connect_overlay">
-    <div class="modal" id="connect_modal">
-      <h2 class="center-self">Enter a display name</h2>
-      <form class="login-form" id="connect_form">
-        <input type="text" id="name_input">
-        <button>Connect</button>
+  <body>
+    <div class="overlay active" id="connect_overlay">
+      <div class="modal" id="connect_modal">
+        <h2 class="center-self">Login</h2>
+        <form class="login-form" id="connect_form">
+          <input type="text" id="name_input">
+          <input type="password" id="pass_input">
+
+          <button>Connect</button>
+        </form>
+      </div>
+    </div>
+
+    <nav>
+      <div class="brand">
+        <img id="oc_image" src="./img/logo.svg">
+        <h1 id="server_title"><%= config.name %></h1>
+      </div>
+      <a id="nav-close"><i class="fas fa-times"></i></a>
+      <div id="channels">
+        <h2>Channels</h2>
+          <% db.models.Channel.aggregate('type', 'DISTINCT', { plain: false }).then(function(result){%>
+            <% result.forEach(type => { %>
+              <div class="channel-group">
+                <h3><%= type %></h3>
+                <ul id="<%= type %>_channels">
+                  <% db.models.Channel.findAll({
+                    where: {
+                      type: type
+                    }
+                  }).forEach(function(channel){ %>
+                    <%- include(`./views/client/_${type}_channel`, channel) %>
+                  <% }) %>
+                </ul>
+              </div>
+            <% }); %>
+          <% });%>
+
+      <div id="control_area">
+        <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
+        <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>
+        <a id="disconnect_button" class="control-button" style="display: none;"><i
+            class="fas fa-phone-slash fa-lg"></i></a>
+      </div>
+
+    </nav>
+
+    <main>
+      <div id="channel_info">
+        <a id="nav-toggle" style="font-size: 2em;"><i class="fas fa-bars"></i></a>
+        <h2 id="channel_name"></h2>
+        <p id="channel_description"></p>
+      </div>
+      <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll;" id="message_scroll">
+        <div id="load_messages" style="width: 100%; text-align: center; margin-top: auto; display: none;">
+          <a href="#">Load More</a>
+        </div>
+
+        <div style="min-height: 100%; padding-top: 20px;">
+          <ol id="messages">
+          
+          </ol>
+        </div>
+      </div>
+      <div id="new_message" class="notification bottom hidden">
+        <a>New Message</a>
+        <div style="display: inline;">
+          <a style="cursor: pointer;" id="new_msg_btn">View</a>
+          <a style="cursor: pointer; size: 5px; margin-left: 10px;" id="new_msg_close"><i class="fas fa-times"></i></a>
+        </div>
+      </div>
+      <form id="message_input_area">
+        <textarea rows="1" id="message_box" disabled></textarea>
+        <button id="message_send" disabled>Send</button>
       </form>
-    </div>
-  </div>
-
-  <nav>
-    <div class="brand">
-      <img id="oc_image" src="./img/logo.svg">
-      <h1 id="server_title"><%= config.name %></h1>
-    </div>
-    <a id="nav-close"><i class="fas fa-times"></i></a>
-    <div id="channels">
-      <h2>Channels</h2>
-
-      <div class="channel-group">
-        <h3>Voice</h3>
-        <ul id="voice_channels">
-        <% db.models.Channel.aggregate('type', 'DISTINCT', { plain: false }).then(function(result){
-          console.log(result)
-        });%>
-        </ul>
-      </div>
-
-      <div class="channel-group">
-        <h3>Text</h3>
-        <ul id="text_channels">
-        </ul>
-      </div>
-    </div>
-
-    <div id="control_area">
-      <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
-      <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>
-      <a id="disconnect_button" class="control-button" style="display: none;"><i
-          class="fas fa-phone-slash fa-lg"></i></a>
-    </div>
-
-  </nav>
-
-  <main>
-    <div id="channel_info">
-      <a id="nav-toggle" style="font-size: 2em;"><i class="fas fa-bars"></i></a>
-      <h2 id="channel_name"></h2>
-      <p id="channel_description"></p>
-    </div>
-    <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll;" id="message_scroll">
-      <div id="load_messages" style="width: 100%; text-align: center; margin-top: auto; display: none;">
-        <a href="#">Load More</a>
-      </div>
-
-      <div style="min-height: 100%; padding-top: 20px;">
-        <ol id="messages">
-        
-        </ol>
-      </div>
-    </div>
-    <div id="new_message" class="notification bottom hidden">
-      <a>New Message</a>
-      <div style="display: inline;">
-        <a style="cursor: pointer;" id="new_msg_btn">View</a>
-        <a style="cursor: pointer; size: 5px; margin-left: 10px;" id="new_msg_close"><i class="fas fa-times"></i></a>
-      </div>
-    </div>
-    <form id="message_input_area">
-      <textarea rows="1" id="message_box" disabled></textarea>
-      <button id="message_send" disabled>Send</button>
-    </form>
-  </main>
-</body>
-
-<audio id="call_out" autoplay></audio>
-
+    </main>
+  </body>
+  <audio id="call_out" autoplay></audio>
 </html>

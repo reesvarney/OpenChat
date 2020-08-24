@@ -25,6 +25,7 @@ module.exports = function ({db, config, fs, passport}) {
      * @param {string} params.salt 
      * @param {string} params.hash 
      */
+    
     function addUser(params){
         if(salts[params.username] == params.salt){
             db.User.create({name: params.username, salt: params.salt, pass_hashed: params.hash})
@@ -39,9 +40,10 @@ module.exports = function ({db, config, fs, passport}) {
 
     };
 
-    router.get('/', checkAuth, function(req,res){
-        
-    });
+    router.get('/salts', function(req,res){
+        var user = req.body.name;
+
+    })
 
     router.get('/login', checkNotAuth, function(req,res){
         res.render('auth/login');

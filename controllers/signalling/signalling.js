@@ -8,11 +8,11 @@ function startServer({db, io, config, secret, port}) {
     var server_info = {
         name: config.name,
         users: {},
-        peerPort: port,
+        peerPort: port
     };
 
     function logIP(ip, id){
-        db.IpLog.create({ip: ip, userId: id})
+        db.models.IpLog.create({ip: ip, userId: id})
     }
 
     io.on("connection", function (socket) {

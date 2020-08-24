@@ -4,13 +4,31 @@
   "description": "Free and open source communication platform",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server",
+    "showmcu": "node server showmcu",
+    "createSSL": "openssl req -nodes -new -x509 -keyout ./ssl/server.key -out ./ssl/server.cert",
+    "addAdmin": "node ./scripts/create_user",
+    "liveDev": "nodemon --ignore 'views/' server",
+    "setSecret": "node ./scripts/set_secret",
+    "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret && exit 0"
   },
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "anchorme": "^2.1.2",
+    "cookie-parser": "^1.4.5",
     "crypto": "^1.0.1",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "sequelize": "^6.3.3"
+    "express-session": "^1.17.1",
+    "jsdom": "^16.4.0",
+    "open-graph-scraper": "^4.5.1",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "peer": "^0.5.3",
+    "puppeteer": "^5.2.1",
+    "sequelize": "^6.3.3",
+    "socket.io": "^2.3.0",
+    "sqlite3": "^5.0.0"
   }
 }

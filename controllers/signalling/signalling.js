@@ -1,23 +1,19 @@
-var colors = require('colors');
 const { User, IpLog } = require('../../db/models');
 var sqlite3 = require('sqlite3').verbose();
 
 var mcu_id = null;
 
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
-function startServer(db, io, conf) {
+function startServer({db, io, config, secret, port}) {
     var server_info = {
-        name: conf.server.name,
+        name: config.name,
         users: {},
-        peerPort: conf.port,
-        channels: conf.server.channels
+        peerPort: port,
     };
 
     function logIP(ip, id){
         db.IpLog.create({ip: ip, userId: id})
     }
-
-    const server_secret = conf.secret;
 
     io.on("connection", function (socket) {
         var currentUser = {};
@@ -26,9 +22,11 @@ function startServer(db, io, conf) {
         //WHEN USER SENDS THEIR INFORMATION
         socket.on("userinfo", function (data) {
             if (data.type == "client") {
-                console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`.brightBlue);
+                console.log(`User ${socket.id} connected from IP ${socket.request.connection.remoteAddress}`);
 
-                if (data.name.length < 32 && data.name.length > 2 && !(conf.blacklist.includes(socket.request.connection.remoteAddress))) {
+                //&& !(conf.blacklist.includes(socket.request.connection.remoteAddress))
+                //REMEMBER TO RE-ADD BLACKLIST
+                if (data.name.length < 32 && data.name.length > 2 ) {
                     uservalid = true;
                 } else {
                     socket.emit("ocerror", "Name too long");
@@ -57,15 +55,15 @@ function startServer(db, io, conf) {
 
 
             } else if (data.type == "server") {
-                if (data.secret == server_secret) {
+                if (data.secret == secret) {
                     console.log("MCU CONNECTED");
                     console.log("READY TO RECEIVE CALLS")
                     mcu_id = socket.id;
                     socket.emit("serverInfo", {
-                        "peerPort": conf.port
+                        "peerPort": port
                     })
                 } else {
-                    console.log('MCU WITH WRONG SECRET HAS TRIED TO CONNECT'.bgRed)
+                    console.log('MCU WITH WRONG SECRET HAS TRIED TO CONNECT')
                 }
             }
 
@@ -75,7 +73,7 @@ function startServer(db, io, conf) {
         socket.on("joinChannel", function (channel) {
             var channel_search = server_info.channels.voice.find(({ uuid }) => uuid == channel);
             if (channel_search != undefined) {
-                console.log(`User ${socket.id} changing to channel ${channel_search.uuid}`.cyan);
+                console.log(`User ${socket.id} changing to channel ${channel_search.uuid}`);
                 io.to(mcu_id).emit('setChannel', {
                     user: socket.id,
                     channel: channel
@@ -95,12 +93,12 @@ function startServer(db, io, conf) {
         socket.on('peerConnected', function (data) {
             server_info.users[data.user].channel = data.channel;
             io.emit('usersChange', server_info.users);
-            console.log(`User ${data.user} has successfully joined channel ${server_info.users[data.user].channel}`.green);
+            console.log(`User ${data.user} has successfully joined channel ${server_info.users[data.user].channel}`);
         });
 
         //WHEN USER REQUESTS TO LEAVE THEIR CURRENT CHANNEL
         socket.on("leaveChannel", function () {
-            console.log(`User ${socket.id} leaving channel ${server_info.users[socket.id].channel}`.yellow);
+            console.log(`User ${socket.id} leaving channel ${server_info.users[socket.id].channel}`);
             io.to(mcu_id).emit('closeCall', {
                 user: socket.id
             });
@@ -114,12 +112,12 @@ function startServer(db, io, conf) {
                 server_info.users[user].channel = null;
                 io.emit('usersChange', server_info.users);
             };
-            console.log(`User ${user} has been disconnected from ${temp_channel}`.yellow)
+            console.log(`User ${user} has been disconnected from ${temp_channel}`)
         });
 
         //WHEN USER HAS DISCONNECTED FROM THE SOCKET
         socket.on("disconnect", function () {
-            console.log(`User ${socket.id} Disconnected`.brightRed);
+            console.log(`User ${socket.id} Disconnected`);
             io.to(mcu_id).emit('closeCall', {
                 user: socket.id
             });

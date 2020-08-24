@@ -1,13 +1,13 @@
 const global_args = process.argv.slice(2);
 const fs = require('fs')
 const db = require('./db/init.js');
-var config = require('./config.json')
-config.port = process.env.PORT || 443; 
+const secret = fs.readFileSync('./secret.txt', 'utf8');
+const port = process.env.PORT || 443; 
+var config = require('./config.json');
 
 //HTTP SERVER
 var https = require('https');
 const express = require('express');
-const helmet = require('helmet');
 var app = express();
 app.disable('view cache');
 app.set('view engine', 'ejs');
@@ -31,9 +31,22 @@ try {
 };
 
 var server = https.createServer(options, app);
-server.listen(config.port, function(){
+server.listen(port, function(){
   console.log("HTTPS Server Running")
 });
+
+//AUTH
+var passport = require('passport');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser')();
+var initializePassport = require('./controllers/auth/init.js');
+app.use(session({ secret: secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
+initializePassport(passport, db);
+app.use(passport.initialize());
+app.use(cookieParser);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(passport.session());
 
 
 //PEER SERVER
@@ -46,25 +59,30 @@ app.use('/rtc', peerServer);
 
 //SIGNALLING
 var io = require('socket.io')(server);
-require('./controllers/signalling/signalling.js')(db, io, config);
+require('./controllers/signalling/signalling.js')({db: db, io: io, config: config, port: port, secret: secret});
+
+
+// ROUTING //
+// Store routes here
+var controllerParams = {
+  db: db, 
+  passport: passport, 
+  config: config,
+  secret: secret
+};
+
+var clientController = require('./controllers/client/client.js')(controllerParams);
+var mcuController = require('./controllers/mcu/mcu.js')(controllerParams);
+var messageController = require('./controllers/messages/messages.js')(controllerParams);
+var authController = require('./controllers/auth/auth.js')(controllerParams);
+
+app.use('/auth', authController)
+app.use("/", clientController);
+app.use("/messages", messageController);
+app.use('/mcu', mcuController);
 
 // MCU CLIENT //
 // Configure params for starting the MCU here
 var mcu_params = {};
-mcu_params.isHeadless = arguments.includes("showmcu") ? false : true;
+mcu_params.isHeadless = process.argv.includes("showmcu") ? false : true;
 require('./controllers/mcu/mcu_launcher.js')(mcu_params);
-
-// ROUTING //
-// Store routes here
-var clientController = require('./controllers/client/client.js')(config);
-var adminController = require('./controllers/admin/admin.js')(db, config, fs);
-var mcuController = require('./controllers/mcu/mcu.js')(config.secret);
-var messageController = require('./controllers/messages/messages.js')(db);
-
-app.get('/', function(req, res){
-  res.redirect('/client')
-});
-
-app.use("/client", clientController);
-app.use("/admin", adminController);
-app.use("/messages", messageController);

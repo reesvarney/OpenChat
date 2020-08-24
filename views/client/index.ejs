@@ -16,7 +16,7 @@
   <nav>
     <div class="brand">
       <img id="oc_image" src="./img/logo.svg">
-      <h1 id="server_title"><%= conf.server.name %></h1>
+      <h1 id="server_title"><%= config.name %></h1>
     </div>
     <a id="nav-close"><i class="fas fa-times"></i></a>
     <div id="channels">
@@ -25,20 +25,15 @@
       <div class="channel-group">
         <h3>Voice</h3>
         <ul id="voice_channels">
-        <% conf.server.channels.voice.forEach(function(e){%>
-          <% e.channel_type = "voice" %>
-          <%- include('_channel', {data: e}); %>
-        <% }); %>
+        <% db.models.Channel.aggregate('type', 'DISTINCT', { plain: false }).then(function(result){
+          console.log(result)
+        });%>
         </ul>
       </div>
 
       <div class="channel-group">
         <h3>Text</h3>
         <ul id="text_channels">
-          <% conf.server.channels.text.forEach(function(e){%>
-            <% e.channel_type = "text" %>
-            <%- include('_channel', {data: e}); %>
-          <% }); %>
         </ul>
       </div>
     </div>

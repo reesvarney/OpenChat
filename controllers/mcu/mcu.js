@@ -3,7 +3,7 @@ var express = require('express');
 var router = express.Router();
 
 
-module.exports = function(secret){
+module.exports = function({secret}){
     router.use((req, res, next) => {
         if (req.connection.localAddress === req.connection.remoteAddress){
             next();

@@ -17,10 +17,9 @@ function sanitize(str){
 module.exports = function(db){
     var ogpCache = {};
     var messageCache = {};
-    var ytCache = {};
 
     //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
-    router.get('/channels/:channel', function(req, res){
+    router.get('/:channel', function(req, res){
         if(req.query.page == undefined){
             req.query.page = 0;
         };

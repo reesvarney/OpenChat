@@ -6,6 +6,7 @@ function hash(salt, message) {
 
 $( document ).ready(function() {
     $('#login-form').submit(function() {
+        $('#login-form').hide();
         var pass = $('#password').val();
         var salt = $('#salt').val();
         $('#password').val(hash(salt, pass));

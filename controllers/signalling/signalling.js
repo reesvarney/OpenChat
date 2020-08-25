@@ -12,7 +12,7 @@ function startServer({db, io, config, secret, port}) {
     };
 
     function logIP(ip, id){
-        db.models.IpLog.create({ip: ip, userId: id})
+        db.models.IpLog.upsert({ip: ip, userId: id})
     }
 
     io.on("connection", function (socket) {
@@ -52,8 +52,6 @@ function startServer({db, io, config, secret, port}) {
                     socket.emit("ocerror", "MCU has not connected yet");
                     socket.disconnect(true);
                 }
-
-
             } else if (data.type == "server") {
                 if (data.secret == secret) {
                     console.log("MCU CONNECTED");

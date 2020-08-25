@@ -1,4 +1,5 @@
 var LocalStrategy = require('passport-local').Strategy;
+var crypto = require('crypto');
 
 function initialize(passport, db){
     passport.serializeUser(function(user, done) {
@@ -6,24 +7,29 @@ function initialize(passport, db){
     });
         
     passport.deserializeUser(function(id, done) {
-        var res = db.User.findOne({
+        db.models.User.findOne({
             where: {
               id: id
             }
+        }).then(function(result){
+            if (result === null) return done(null, false);
+            return done(null, result); 
         });
-        if (res === null) return done(null, false);
-        return done(null, res); 
     });
     
-    passport.use(new LocalStrategy(function (username, password, done) {
-        var res = db.User.findOne({
+    passport.use(new LocalStrategy(function(username, password, done) {
+        var hash = crypto.createHash('sha256');
+        hash.update(password);
+        db.models.User.findOne({
             where: {
               name: username,
-              pass_hashed: password
             }
-        });
-        if (res === null) return done(null, false);
-        return done(null, res); 
+        }).then(function(result){
+            hash.update(result.private_salt);
+            if (result === null && result.pass_hashed != hash.digest('hex')) return done(null, false);
+            return done(null, result); 
+        })
+
     }));
 }
 

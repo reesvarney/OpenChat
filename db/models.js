@@ -20,6 +20,7 @@ module.exports =  {
     options: {},
     relations: {
       belongsTo: "Channel",
+      belongsTo: "User"
     }
   },
 
@@ -68,6 +69,10 @@ module.exports =  {
         allowNull: false
       },
       salt: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      private_salt: {
         type: DataTypes.STRING,
         allowNull: false
       }

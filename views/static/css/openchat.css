@@ -158,6 +158,7 @@ div.center-self {
 
 /* CONTROLS */
 #control_area {
+    justify-self: flex-end;
     padding: 10px;
     margin-top: 10px;
 }
@@ -550,8 +551,10 @@ main {
     }
 
     #channels {
+        display: flex;
+        flex-direction: column;
         min-height: 20vh;
-        height: auto;
+        height: 100%;
     }
 
     #nav-toggle{

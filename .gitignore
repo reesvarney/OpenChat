@@ -1,5 +1,6 @@
 *.db
 *.sqlite
+*.sqlite-journal
 node_modules/
 *.cert
 *.key

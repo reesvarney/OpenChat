@@ -1,5 +1,4 @@
-const { authenticate } = require("passport");
-
+const isStandalone = /electron/i.test(navigator.userAgent);
 var serverinfo,
   client = {},
   new_channel = null,
@@ -12,6 +11,7 @@ var serverinfo,
   currentPage,
   audioOut,
   lastMessage,
+  socket,
   soundeffects = {},
   soundfiles = [
     "mute",
@@ -97,139 +97,82 @@ function getMessages(channel_id, params){
   });
 };
 
-function authenticate(name, pass){
-
-}
-
-function connectToServer(){
-  var socket = io.connect();
-
-  // SOCKET LISTENERS
+var socket;
+if (!isStandalone){ 
+  socket = io.connect()
   socket.on('connect', function() {
     //connection established, begin auth
     socket.emit('userinfo', {
       type: 'client',
-      name: client.name
+      name: client.name,
+      client: "browser"
     });
+  });
+
+  socket.on('serverInfo', function(server_info){
+    serverinfo = server_info;
+    peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
   });
 
   socket.on('disconnect', function(){
     window.location.reload();
   });
+} else {
+  socket = window.electronSocket
+};
 
-  //openchat related errors
-  socket.on("ocerror", function(data){
-    console.log("OPENCHAT ERROR: " + data);
-  })
+//openchat related errors
+socket.on("ocerror", function(data){
+  console.log("OPENCHAT ERROR: " + data);
+})
 
-  socket.on('serverInfo', function(server_info){
-    serverinfo = server_info;
-    console.log(serverinfo)
-    peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
-  });
+socket.on('canJoin', function(canJoin){
+  if(canJoin == true){
+    call = peer.call('server', stream);
+    call.on('stream', function(remoteStream) {
+      isConnected = true;
+      $("#disconnect_button").show();
+      $('#voice_channels li').removeClass("active");
+      $('#voice_channels #' + new_channel).parent().addClass("active");
+      audioOut = document.querySelector('#call_out');
+      audioOut.srcObject = remoteStream;
+      soundeffects.connect.play();
+    });
+  } else {
+    console.log("NEGOTIATION ERROR");
+  }
+})
 
-  socket.on('canJoin', function(canJoin){
-    if(canJoin == true){
-      call = peer.call('server', stream);
-      call.on('stream', function(remoteStream) {
-        isConnected = true;
-        $("#disconnect_button").show();
-        $('#voice_channels li').removeClass("active");
-        $('#voice_channels #' + new_channel).parent().addClass("active");
-        audioOut = document.querySelector('#call_out');
-        audioOut.srcObject = remoteStream;
-        soundeffects.connect.play();
-      });
-    } else {
-      console.log("NEGOTIATION ERROR");
+socket.on('usersChange', function(users){
+  console.log(users);
+  $('.user-list').empty();
+  serverinfo.users = users;
+  for(i = 0; i < Object.keys(users).length; i++){
+    if(users[Object.keys(users)[i]].channel != null){
+      $("<li><a></a></li>").text(users[Object.keys(users)[i]].name).appendTo('#' + users[Object.keys(users)[i]].channel + "-users");
     }
-  })
+  }
+})
 
-  socket.on('usersChange', function(users){
-    $('.user-list').empty();
-    serverinfo.users = users;
-    for(i = 0; i < Object.keys(users).length; i++){
-      if(users[Object.keys(users)[i]].channel != null){
-        $("<li><a></a></li>").text(users[Object.keys(users)[i]].name).appendTo('#' + users[Object.keys(users)[i]].channel + "-users");
-      }
-    }
-  })
+socket.on("newMessage", function(data){
+  if(data.channel_id == currentText){
+    getMessages(data.channel_id, {"id": data.message_id});
+  }
+})
 
-  socket.on("newMessage", function(data){
-    if(data.channel_id == currentText){
-      getMessages(data.channel_id, {"id": data.message_id});
-    }
-  })
-
-  //start channel joining process
-  function joinChannel(channel_id){
-    if(!(serverinfo.users[socket.id].channel == channel_id)){
-      socket.emit('joinChannel', channel_id);
-      new_channel = channel_id;
-    } else {
-      console.log('ALREADY CONNECTED');
-    }
-
+//start channel joining process
+function joinChannel(channel_id){
+  if(!(serverinfo.users[socket.id].channel == channel_id)){
+    socket.emit('joinChannel', channel_id);
+    new_channel = channel_id;
+  } else {
+    console.log('ALREADY CONNECTED');
   }
 
-  function leaveChannel(){
-    socket.emit('leaveChannel');
-  };
+}
 
-  scrollController = new smartScroll($('#message_scroll'));
-
-  $("#disconnect_button").click(function(){
-    leaveChannel();
-    $("#disconnect_button").hide();
-    isConnected = false;
-    $('#voice_channels li').removeClass("active");
-    soundeffects.disconnect.play();
-  });
-
-  $("#load_messages a").click(function(){
-    currentPage += 1
-    getMessages(currentText, {"page": currentPage})
-  });
-
-
-  $("#voice_channels").on('click', '* .channel', function() {
-    joinChannel($(this).attr("id"));
-  })
-
-  $("#text_channels").on('click', '* .channel', function() {
-    var channel_id = $(this).attr("id");
-    if(channel_id != currentText){
-      $('#text_channels li').removeClass("active");
-      $('#text_channels #' + channel_id).parent().addClass("active");
-      currentPage = 0;
-      currentText = channel_id;
-      $("#message_input_area *").each( function( index ){
-        $(this).prop('disabled', false);
-      });
-      var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
-      $("#channel_name").text(channelData.channel_name)
-      $("#channel_description").text(channelData.channel_description)
-      getMessages(channel_id, {"page" : 0});
-    }
-  })
-
-  $("#message_box").keypress(function (evt) {
-    if(evt.keyCode == 13 && !evt.shiftKey) {
-      evt.preventDefault();
-      $("#message_input_area").submit();
-    }
-  });
-
-  $("#message_input_area").submit(function(e) {
-    e.preventDefault();
-    var contents = $("#message_box").val();
-    socket.emit("sendMessage", {
-      channel: currentText,
-      content: contents
-    });
-    $("#message_box").val("");
-    scrollController.goToBottom(true);
-  });
+function leaveChannel(){
+  socket.emit('leaveChannel');
 };
 
 $( document ).ready(function() {
@@ -283,4 +226,59 @@ $( document ).ready(function() {
       soundeffects.mute.play();
     }
   });
+
+  $("#disconnect_button").click(function(){
+    leaveChannel();
+    $("#disconnect_button").hide();
+    isConnected = false;
+    $('#voice_channels li').removeClass("active");
+    soundeffects.disconnect.play();
+  });
+  
+  $("#load_messages a").click(function(){
+    currentPage += 1
+    getMessages(currentText, {"page": currentPage})
+  });
+  
+  
+  $("#voice_channels").on('click', '* .channel', function() {
+    joinChannel($(this).attr("id"));
+  })
+  
+  $("#text_channels").on('click', '* .channel', function() {
+    var channel_id = $(this).attr("id");
+    if(channel_id != currentText){
+      $('#text_channels li').removeClass("active");
+      $('#text_channels #' + channel_id).parent().addClass("active");
+      currentPage = 0;
+      currentText = channel_id;
+      $("#message_input_area *").each( function( index ){
+        $(this).prop('disabled', false);
+      });
+      var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
+      $("#channel_name").text(channelData.channel_name)
+      $("#channel_description").text(channelData.channel_description)
+      getMessages(channel_id, {"page" : 0});
+    }
+  })
+  
+  $("#message_box").keypress(function (evt) {
+    if(evt.keyCode == 13 && !evt.shiftKey) {
+      evt.preventDefault();
+      $("#message_input_area").submit();
+    }
+  });
+  
+  $("#message_input_area").submit(function(e) {
+    e.preventDefault();
+    var contents = $("#message_box").val();
+    socket.emit("sendMessage", {
+      channel: currentText,
+      content: contents
+    });
+    $("#message_box").val("");
+    scrollController.goToBottom(true);
+  });
+
+  scrollController = new smartScroll($('#message_scroll'));
 });

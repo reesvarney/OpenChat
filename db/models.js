@@ -62,19 +62,13 @@ module.exports =  {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: false,
+        defaultValue: "New User"
+      },
+      pub_key: {
+        type: DataTypes.STRING(512),
+        allowNull: false,
         unique: true
-      },
-      pass_hashed: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      salt: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      private_salt: {
-        type: DataTypes.STRING,
-        allowNull: false
       }
     },
     options: {},

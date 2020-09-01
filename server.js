@@ -8,9 +8,32 @@ var config = require('./config.json');
 //HTTP SERVER
 var https = require('https');
 const express = require('express');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser')();
+var session = require('express-session');
+var SequelizeStore = require("connect-session-sequelize")(session.Store);
+
+var sessionStore = new SequelizeStore({db});
+
+var sessionMiddleware = session({
+  key: 'express.sid',
+  secure: true,
+  secret: secret,
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: true },
+});
+sessionStore.sync();
+
 var app = express();
+
+
 app.disable('view cache');
 app.set('view engine', 'ejs');
+app.use(sessionMiddleware);
+app.use(cookieParser);
+app.use(bodyParser.urlencoded({ extended: false }));
 
 var options = {};
 
@@ -37,17 +60,10 @@ server.listen(port, function(){
 
 //AUTH
 var passport = require('passport');
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser')();
 var initializePassport = require('./controllers/auth/init.js');
-app.use(session({ secret: secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
 initializePassport(passport, db);
 app.use(passport.initialize());
-app.use(cookieParser);
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.session());
-
 
 //PEER SERVER
 const { ExpressPeerServer } = require('peer');
@@ -59,6 +75,11 @@ app.use('/rtc', peerServer);
 
 //SIGNALLING
 var io = require('socket.io')(server);
+
+io.use(function(socket, next){
+  sessionMiddleware(socket.request, socket.request.res, next);
+});
+
 require('./controllers/signalling/signalling.js')({db: db, io: io, config: config, port: port, secret: secret});
 
 

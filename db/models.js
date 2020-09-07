@@ -1,6 +1,6 @@
 const { DataTypes, Sequelize } = require("sequelize");
 
-module.exports =  {
+module.exports = {
   Message: {
     attributes: {
       id: {
@@ -15,13 +15,29 @@ module.exports =  {
         validate: {
           len: [3, 32],
         },
-      }
+      },
     },
     options: {},
-    relations: {
-      belongsTo: "Channel",
-      belongsTo: "User"
-    }
+    relations: [
+      {
+        relation: "belongsTo", 
+        model: "Channel"
+      },
+      {
+        relation: "belongsToMany",
+        model: "User",
+        options: {
+          through: "UserMessage",
+        },
+      },
+      {
+        relation: "belongsToMany",
+        model: "Session",
+        options: {
+          through: "SessionMessage",
+        },
+      }
+    ],
   },
 
   Channel: {
@@ -36,19 +52,19 @@ module.exports =  {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isIn: [['voice', 'text', 'custom']]
-        }
+          isIn: [["voice", "text", "custom"]],
+        },
       },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [3, 32]
-        }
-      }
+          len: [3, 32],
+        },
+      },
     },
     options: {},
-    relations: {}
+    relations: {},
   },
 
   User: {
@@ -57,24 +73,118 @@ module.exports =  {
         type: DataTypes.UUIDV4,
         defaultValue: Sequelize.UUIDV4,
         unique: true,
-        primaryKey: true
+        primaryKey: true,
       },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
-        defaultValue: "New User"
+        defaultValue: "New User",
       },
       pub_key: {
         type: DataTypes.STRING(512),
         allowNull: false,
-        unique: true
-      }
+        unique: true,
+      },
     },
     options: {},
-    relations: {
-      hasMany: 'IpLog'
-    }
+    relations: [
+    {      
+      relation: "hasMany",
+      model: "IpLog"
+    },
+    {
+      relation: "belongsToMany",
+      model: "Role",
+      options: {
+        through: "RoleAssignment",
+      },
+    },
+    ]
+  },
+
+  //Store permissions here. Some permissions have been added which may not need to be used however it will allow for less migrations to be needed in the future
+  Role: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        defaultValue: "New Role",
+      },
+      isAdmin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_join: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      permission_speak: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      permission_listen: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      permission_send_message: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      permission_move: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_ban: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_kick: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_mute: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_deafen: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_delete_message: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_edit_channels: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      permission_edit_server: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+    },
+    options: {},
+    relations: [
+      {
+        relation: "belongsToMany",
+        target: "User",
+        through: "RoleAssignment",
+      },
+    ],
+  },
+
+  RoleAssignment: {
+    attributes: {},
+    relations: [],
+    options: {},
   },
 
   IpLog: {
@@ -82,12 +192,15 @@ module.exports =  {
       ip: {
         type: DataTypes.STRING,
         allowNull: false,
-        primaryKey: true
-      }
+        primaryKey: true,
+      },
     },
     options: {},
-    relations: {
-      belongsTo: 'User'
-    }
-  }
+    relations: [
+      {
+        relation: "belongsTo",
+        model : "User",
+      }
+    ],
+  },
 };

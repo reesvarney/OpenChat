@@ -3,38 +3,62 @@
 <%- include('_head') %>
 
   <body>
+    <div id="overlay">
+    <% if (!req.isAuthenticated()){ %>
+        <div class="modal" id="connect">
+          <h2>Enter a display name</h2>
+          <form class="login-form" id="connect_form">
+            <input type="text" id="name_input">
+            <button>Connect</button>
+          </form>
+        </div>
+    <%} else if(req.user.permissions.permission_edit_channels){%>
+      <div class="modal" id="add_channel">
+        <h2>New Channel</h2>
+        <form action="admin/channel/new" method="post" >
+          <!-- Create radios dynamically for each defined channel type -->
+          <input type="radio" id="type_select_voice" name="type" value="voice">
+          <label for="type_select_voice">Voice</label>
+          <br>
+          <input type="radio" id="type_select_text" name="type" value="text">
+          <label for="type_select_text">Text</label>
+          <input type="text" name="name" placeholder="Channel Name">
+          <button>Add</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+
     <nav>
       <div class="brand">
         <img id="oc_image" src="./img/logo.svg">
         <h1 id="server_title"><%= config.name %></h1>
       </div>
       <a id="nav-close"><i class="fas fa-times"></i></a>
+      <div id="channel_heading">
+        <a>Channels</a>
+        <% if(req.isAuthenticated() && req.user.permissions.permission_edit_channels){ %> 
+          <a href="#" id="add_channel_btn"><i class="fas fa-plus"></i></a> 
+        <% } %>
+      </div>
       <div id="channels">
-        <h2>Channels</h2>
-          <% db.models.Channel.aggregate('type', 'DISTINCT', { plain: false }).then(function(result){%>
-            <% result.forEach(type => { %>
-              <div class="channel-group">
-                <h3><%= type %></h3>
-                <ul id="<%= type %>_channels">
-                  <% db.models.Channel.findAll({
-                    where: {
-                      type: type
-                    }
-                  }).forEach(function(channel){ %>
-                    <%- include(`./views/client/_${type}_channel`, channel) %>
-                  <% }) %>
-                </ul>
-              </div>
-            <% }); %>
-          <% });%>
-
+        <% for (const [type, type_channels] of Object.entries(channels)) { %>
+          <div class="channel-group">
+            <h4><%= type.toUpperCase() %></h4>
+            <ul id="<%= type %>_channels">
+              <% type_channels.forEach(data => {%>
+                <%- include(`_${type}_channel`, data) %>
+              <%}); %>
+              </ul>
+            </div>
+        <%};%>
+      </div>
       <div id="control_area">
         <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
         <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>
         <a id="disconnect_button" class="control-button" style="display: none;"><i
             class="fas fa-phone-slash fa-lg"></i></a>
       </div>
-
     </nav>
 
     <main>

@@ -1,20 +1,21 @@
 var mcu_id = null;
-function validateUser(data, socket){
-    if (mcu_id !== null){
-        if(data.client == "standalone" && data.name !== undefined && data.name.length >= 3){
-            console.log(socket.request.session.passport.user)
-            return true;
-        };
-
-        if (data.client == "browser" && data.name !== undefined && data.name.length >= 3){
-            return true;
-        };
-    }
-    return true;
-}
 
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
 function startServer({db, io, config, secret, port}) {
+    function validateUser(data, socket){
+        if (mcu_id !== null){
+            if(socket.request.session.passport !== undefined && data.name !== undefined && data.name.length >= 3){
+                if(server_info.users[socket.id] === undefined) {
+                    db.models.User.update({name: data.name}, {where: {id: socket.request.session.passport.user}})
+                };
+                return true;
+            } else if (data.name !== undefined && data.name.length >= 3){
+                return true;
+            };
+        }
+        return false;
+    }
+
     var server_info = {
         name: config.name,
         channels: [],
@@ -29,14 +30,15 @@ function startServer({db, io, config, secret, port}) {
         socket.on("userinfo", function (data) {
             if (data.type == "client") {
                 console.log(`User ${socket.id} Connected`);
-
                 if (validateUser(data, socket)) {
                     currentUser.info = data;
                     socket.emit("serverInfo", server_info);
+                    socket.request.session.name = data.name;
                     server_info.users[socket.id] = {
                         name: data.name,
                         channel: null,
-                        status: "online"
+                        status: "online",
+                        id: (socket.request.session.passport !== undefined) ? socket.request.session.passport.user : null
                     };
                     io.emit('usersChange', server_info.users);
                 } else {

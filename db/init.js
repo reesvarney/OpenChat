@@ -7,17 +7,17 @@ const sequelize = new Sequelize({
 });
 
 const relations = {
-  belongsTo: function (model, target) {
-    sequelize.models[model].belongsTo(sequelize.models[target]);
+  belongsTo: function (model, target, opts) {
+    sequelize.models[model].belongsTo(sequelize.models[target], opts);
   },
-  hasMany: function (model, target) {
-    sequelize.models[model].hasMany(sequelize.models[target]);
+  hasMany: function (model, target, opts) {
+    sequelize.models[model].hasMany(sequelize.models[target], opts);
   },
-  belongsToMany: function (model, target) {
-    sequelize.models[model].belongsToMany(sequelize.models[target]);
+  belongsToMany: function (model, target, opts) {
+    sequelize.models[model].belongsToMany(sequelize.models[target], opts);
   },
-  hasOne: function (model, target) {
-    sequelize.models[model].hasOne(sequelize.models[target]);
+  hasOne: function (model, target, opts) {
+    sequelize.models[model].hasOne(sequelize.models[target], opts);
   },
 };
 
@@ -32,10 +32,12 @@ var status = new class{
 for (const [name, model] of Object.entries(model_data)) {
   sequelize.define(name, model.attributes, model.options);
   status.promise.then(() => {
-    for (const [relation, target] of Object.entries(model.relations)) {
-      relations[relation](name, target);
+    if("relations" in model){
+      model.relations.forEach( (relationship) => {
+          relations[relationship.relation](name, relationship.model, relationship.options);
+      });
     };
-    sequelize.models[name].sync();
+    sequelize.models[name].sync({alter: {drop: true}});
   })
 };
 

@@ -36,7 +36,7 @@ module.exports = function(db){
         } else {
             query = {
                 where: {
-                    channelId: req.params.channel
+                    ChannelId: req.params.channel
                 },
                 order: [['createdAt', 'DESC']],
                 limit: 50,
@@ -44,7 +44,7 @@ module.exports = function(db){
             }
         };
 
-        var messages = db.Messages.findAll(query);
+        var messages = db.models.Messages.findAll(query);
 
         if(messages.length == 0){
             res.render("messages/none");
@@ -162,6 +162,16 @@ module.exports = function(db){
             }).catch((e) => { console.log(e) });
         }
     });
+
+    router.post('/:channel', (req, res) => {
+            db.models.Message.create({
+                ChannelId: req.params.channel,
+                content: req.body.content
+            }).then((message) => {
+                
+            });
+
+    })
 
     return router;
 };

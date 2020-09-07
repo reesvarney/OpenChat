@@ -3,7 +3,6 @@ var crypto = require('crypto');
 
 function initialize(passport, db){
     passport.serializeUser(function(user, done) {
-        console.log(user.id)
         return done(null, user.id);
     });
         
@@ -11,10 +10,30 @@ function initialize(passport, db){
         db.models.User.findOne({
             where: {
               id: id
-            }
+            },
+            include: [
+                db.models.Role,
+            ]
         }).then(function(result){
+            var user = result.dataValues;
+            var permissions = {}
+            user.Roles.some((data) => {
+                var role = data.dataValues;
+                if (role.isAdmin){
+                    for (const [key, value] of Object.entries(role)) {
+                        if(~key.indexOf("permission")){permissions[key] = true};
+                    };
+                    return true;
+                } else {
+                    for (const [key, value] of Object.entries(role)) {
+                        if(~key.indexOf("permission")){permissions[key] = (value) ? true : false;}
+                    };
+                    return false;
+                };
+            });
+            user.permissions = permissions;
             if (result === null) return done(null, false);
-            return done(null, result.dataValues); 
+            return done(null, user); 
         });
     });
 
@@ -24,12 +43,14 @@ function initialize(passport, db){
         passReqToCallback: true
         },function(req, username, password, done) {
         if(Buffer.from(JSON.parse(password).data).equals(Buffer.from(req.session.authData.data))){
+            var key_raw = req.session.publicKey
+            var publicKey = key_raw.replace(/(?:\r\n|\r|\n)/g, "");
             db.models.User.findOrCreate({
                 where: {
-                    pub_key: req.session.publicKey
+                    pub_key: publicKey
                 },
-                defaults: {//object containing fields and values to apply
-                    pub_key: req.session.publicKey
+                defaults: {
+                    pub_key: publicKey
                 }
             }).then((result) => {
                 return done(null, result[0].dataValues);

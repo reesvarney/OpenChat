@@ -13,7 +13,11 @@ var cookieParser = require('cookie-parser')();
 var session = require('express-session');
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
-var sessionStore = new SequelizeStore({db});
+var sessionStore = new SequelizeStore({
+  db: db,
+  checkExpirationInterval: 60 * 1000, 
+  expiration: 24 * 60 * 60 * 1000
+});
 
 var sessionMiddleware = session({
   key: 'express.sid',
@@ -96,8 +100,10 @@ var clientController = require('./controllers/client/client.js')(controllerParam
 var mcuController = require('./controllers/mcu/mcu.js')(controllerParams);
 var messageController = require('./controllers/messages/messages.js')(controllerParams);
 var authController = require('./controllers/auth/auth.js')(controllerParams);
+var adminController = require('./controllers/admin/admin.js')(controllerParams);
 
-app.use('/auth', authController)
+app.use('/auth', authController);
+app.use('/admin', adminController);
 app.use("/", clientController);
 app.use("/messages", messageController);
 app.use('/mcu', mcuController);

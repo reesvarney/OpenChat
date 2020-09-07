@@ -34,6 +34,17 @@ var serverinfo,
   },
   stream;
 
+var overlay = {
+  show: function (div) {
+    $("#overlay").show();
+    $(`#overlay>*`).hide();
+    $(`#overlay>#${div}`).show();
+  },
+  hide: function () {
+    $("#overlay").hide();
+  },
+};
+
 for(i = 0; i < soundfiles.length; i++){
   soundeffects[soundfiles[i]] = new Audio(`./audio/${soundfiles[i]}.mp3`);
   soundeffects[soundfiles[i]].loop = false;
@@ -98,22 +109,12 @@ function getMessages(channel_id, params){
 };
 
 var socket;
-if (!isStandalone){ 
-  socket = io.connect()
-  socket.on('connect', function() {
-    //connection established, begin auth
-    socket.emit('userinfo', {
-      type: 'client',
-      name: client.name,
-      client: "browser"
-    });
-  });
-
+if (!isStandalone){
+  socket = io.connect();
   socket.on('serverInfo', function(server_info){
     serverinfo = server_info;
     peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
   });
-
   socket.on('disconnect', function(){
     window.location.reload();
   });
@@ -144,7 +145,6 @@ socket.on('canJoin', function(canJoin){
 })
 
 socket.on('usersChange', function(users){
-  console.log(users);
   $('.user-list').empty();
   serverinfo.users = users;
   for(i = 0; i < Object.keys(users).length; i++){
@@ -168,7 +168,6 @@ function joinChannel(channel_id){
   } else {
     console.log('ALREADY CONNECTED');
   }
-
 }
 
 function leaveChannel(){
@@ -176,12 +175,19 @@ function leaveChannel(){
 };
 
 $( document ).ready(function() {
+  if(!isStandalone) overlay.show('connect');
   $( "#connect_form" ).submit(function( event ) {
     event.preventDefault();
     var name = $("#name_input").val();
-    var pass = $("#pass_input").val();
-    authenticate(name, pass);
-    $("#connect_overlay").removeClass("active");
+    socket.emit('userinfo', {
+      type: 'client',
+      name: name
+    });
+    overlay.hide();
+  });
+
+  $("#add_channel_btn").click(function () {
+    overlay.show("add_channel");
   });
 
   $("#nav-toggle").click(function(){
@@ -255,9 +261,6 @@ $( document ).ready(function() {
       $("#message_input_area *").each( function( index ){
         $(this).prop('disabled', false);
       });
-      var channelData = serverinfo.channels.text.find(({ uuid } )=> uuid == channel_id);
-      $("#channel_name").text(channelData.channel_name)
-      $("#channel_description").text(channelData.channel_description)
       getMessages(channel_id, {"page" : 0});
     }
   })

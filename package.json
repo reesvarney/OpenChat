@@ -10,12 +10,13 @@
     "addAdmin": "node ./scripts/create_user",
     "liveDev": "nodemon --ignore 'views/' server",
     "setSecret": "node ./scripts/set_secret",
-    "setup": "npm i && npm run createSSL && npm run addAdmin && npm run setSecret && exit 0"
+    "setup": "npm i && node ./scripts/setup && exit 0"
   },
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "anchorme": "^2.1.2",
+    "connect-session-sequelize": "^7.0.1",
     "cookie-parser": "^1.4.5",
     "crypto": "^1.0.1",
     "ejs": "^3.1.5",

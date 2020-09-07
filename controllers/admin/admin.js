@@ -1,63 +1,18 @@
 var express = require('express');
 var router = express.Router();
-var passport = require('passport');
-var session = require('express-session');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser')();
-var initializePassport = require('./passport-init.js');
 const { v4: uuidv4 } = require('uuid');
 
 Array.prototype.move = function (from, to) {
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
-module.exports = function (db, conf, fs) {
-    router.use(session({ secret: conf.secret, resave: true, saveUninitialized: true, cookie: { secure: true } }));
-    initializePassport(passport, db);
-    router.use("/", express.static('./views/admin/static'));
-    router.use(passport.initialize());
-    router.use(cookieParser);
-    router.use(bodyParser.urlencoded({ extended: false }));
-    router.use(passport.session());
-    
-    function findChannel(ch_uuid){
-        var data = {};
-        var types = Object.keys(conf.server.channels);
-        for(i = 0; i < types.length; i++){
-            var results = conf.server.channels[types[i]].find(({ uuid } )=> uuid == ch_uuid);
-            if( results != undefined){
-                data.index = conf.server.channels[types[i]].findIndex(({ uuid } )=> uuid == ch_uuid);
-                data.type = types[i];
-            }
-        }
-        return data
-    }
-
-    function updateConf(res){
-        fs.writeFile("./conf.json", JSON.stringify(conf, null, 2), function(err) {
-            if(res){
-                if(err) {
-                    res.sendStatus(500);
-                }
-                res.redirect(302, "/admin");
-            }
-        }); 
-    }
-
+module.exports = function ({db, conf}) {
     function checkAuth(req, res, next){
         if (req.isAuthenticated()){
             return next();
         };
 
         res.redirect('/admin/login')
-    }
-
-    function checkNotAuth(req, res, next){
-        if (!req.isAuthenticated()){
-            return next();
-        };
-
-        res.redirect('/admin')
     }
 
     router.get("/", checkAuth, function (req, res, next) {
@@ -69,31 +24,6 @@ module.exports = function (db, conf, fs) {
             });
         })
 
-    });
-
-    router.get("/login", checkNotAuth, function(req, res){
-        res.render('admin/login')
-    });
-
-    router.post("/login", 
-    passport.authenticate('local', {failureRedirect: "login"}), 
-    function(req,res){
-        res.redirect("/admin");
-    });
-
-    router.get('/logout', checkAuth, function(req, res){
-        req.logout();
-        res.redirect('/admin/login');
-    });
-
-    router.get("/channel/template", checkAuth, function(req,res){
-        res.render("admin/_channel", { 
-        data : {
-            channel_type: req.query.type,
-            channel_name: "",
-            new: true
-        }
-        });
     });
 
     router.delete("/channel/:uuid", checkAuth, function(req, res) {
@@ -145,18 +75,12 @@ module.exports = function (db, conf, fs) {
         var uuid = uuidv4();
         var name = req.body.name;
         var type = req.body.type;
-        var channel_data = {
-            "channel_name" : name,
-            "uuid" : uuid
-        };
-        if(type == "text"){
-            var description = req.body.description;
-            if (description.length > 0){
-                channel_data.channel_description = description;
-            }
-        }
-        conf.server.channels[type].push(channel_data);
-        updateConf(res);
+        db.models.Channel.create({
+            name : name,
+            type: type
+        }).then((result)=>{
+            res.redirect('/')
+        });
     });
 
     router.post("/server/update", checkAuth, function(req,res){

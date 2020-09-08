@@ -1,10 +1,10 @@
 const global_args = process.argv.slice(2);
 const fs = require('fs')
-const db = require('./db/init.js');
+const dbProm = require('./db/init.js');
 const secret = fs.readFileSync('./secret.txt', 'utf8');
 const port = process.env.PORT || 443; 
 var config = require('./config.json');
-
+dbProm.then((db)=> {
 //HTTP SERVER
 var https = require('https');
 const express = require('express');
@@ -113,3 +113,4 @@ app.use('/mcu', mcuController);
 var mcu_params = {};
 mcu_params.isHeadless = process.argv.includes("showmcu") ? false : true;
 require('./controllers/mcu/mcu_launcher.js')(mcu_params);
+})

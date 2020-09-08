@@ -1,10 +1,18 @@
 var express = require("express");
 var router = express.Router();
 
+function checkAuth(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/auth/anon");
+};
+
 module.exports = function ({ config, db }) {
   router.use(express.static("./views/static"));
 
-  router.get("/", function (req, res) {
+  router.get("/", checkAuth, function (req, res) {
+    console.log('test')
     var channels = {};
     db.models.Channel.aggregate("type", "DISTINCT", { plain: false }).then((result) => {
       (async () => {

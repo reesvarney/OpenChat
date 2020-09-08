@@ -22,20 +22,6 @@ module.exports = {
       {
         relation: "belongsTo", 
         model: "Channel"
-      },
-      {
-        relation: "belongsToMany",
-        model: "User",
-        options: {
-          through: "UserMessage",
-        },
-      },
-      {
-        relation: "belongsToMany",
-        model: "Session",
-        options: {
-          through: "SessionMessage",
-        },
       }
     ],
   },
@@ -64,7 +50,7 @@ module.exports = {
       },
     },
     options: {},
-    relations: {},
+    relations: [],
   },
 
   User: {
@@ -78,21 +64,16 @@ module.exports = {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false,
         defaultValue: "New User",
       },
       pub_key: {
-        type: DataTypes.STRING(512),
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
     },
     options: {},
     relations: [
-    {      
-      relation: "hasMany",
-      model: "IpLog"
-    },
     {
       relation: "belongsToMany",
       model: "Role",
@@ -175,8 +156,10 @@ module.exports = {
     relations: [
       {
         relation: "belongsToMany",
-        target: "User",
-        through: "RoleAssignment",
+        model: "User",
+        options: {
+          through: "RoleAssignment"
+        },
       },
     ],
   },
@@ -185,22 +168,5 @@ module.exports = {
     attributes: {},
     relations: [],
     options: {},
-  },
-
-  IpLog: {
-    attributes: {
-      ip: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        primaryKey: true,
-      },
-    },
-    options: {},
-    relations: [
-      {
-        relation: "belongsTo",
-        model : "User",
-      }
-    ],
   },
 };

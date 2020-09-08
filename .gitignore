@@ -4,4 +4,4 @@
 node_modules/
 *.cert
 *.key
-./secret.txt
+secret.txt

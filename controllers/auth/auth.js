@@ -11,8 +11,10 @@ function checkAuth(req, res, next) {
 
 function checkNotAuth(req, res, next) {
   if (!req.isAuthenticated()) {
+    console.log('attt')
     return next();
   }
+  console.log('ttt')
   res.redirect("/");
 }
 
@@ -28,7 +30,8 @@ function encrypt(pub_key, data) {
 }
 
 module.exports = function ({ db, passport }) {
-  router.get("/", checkNotAuth, function (req, res) {
+  router.get("/pubkey", checkNotAuth, function (req, res) {
+    
     var pub_key = req.query.public_key;
     req.session.authData = crypto.randomBytes(128);
     req.session.publicKey = pub_key;
@@ -36,19 +39,20 @@ module.exports = function ({ db, passport }) {
     res.send({ encoded_data: enc_data });
   });
 
-  router.post("/",  passport.authenticate("local", { failureRedirect: "/loginFailed" }), function (req, res) {
+  router.post("/pubkey",  passport.authenticate("pub_key", { failureRedirect: "/auth" }), function (req, res) {
       res.redirect("/");
     }
   );
 
-  router.post("/anon", (req, res) => {
-    if (req.body.name !== undefined &&req.body.name.length >= 3 &&req.body.name.length <= 32) {
-      req.session.name = req.body.name;
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(400);
-    }
+  router.get("/anon", checkNotAuth, (req, res) => {
+    res.render('auth/anon')
   });
+
+  router.post("/anon", passport.authenticate("anon", { failureRedirect: "/auth/anon" }), (req, res) => {
+    res.redirect('/');
+  });
+
+  router.use(express.static("./views/static"));
 
   return router;
 };

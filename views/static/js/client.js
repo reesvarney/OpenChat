@@ -175,7 +175,13 @@ function leaveChannel(){
 };
 
 $( document ).ready(function() {
-  if(!isStandalone) overlay.show('connect');
+  $("#overlay").on("click", function (e) {
+    if (e.target !== this) return;
+    overlay.hide();
+  });
+
+  if(!isStandalone){ overlay.show('connect')};
+  
   $( "#connect_form" ).submit(function( event ) {
     event.preventDefault();
     var name = $("#name_input").val();

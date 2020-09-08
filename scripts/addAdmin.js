@@ -1,6 +1,4 @@
-var db = require('../db/init.js')
-
-module.exports = (admin_key) => {
+module.exports = (db, admin_key) => {
     //Create basic administrator role, this will be 
     db.models.Role.findOrCreate({
             where: {
@@ -10,6 +8,8 @@ module.exports = (admin_key) => {
                 name: "owner",
                 isAdmin: true
             }
+    }).catch((err) => {
+        console.log(err);
     }).then((role) => {
         db.models.User.findOrCreate({
             where: {
@@ -19,8 +19,12 @@ module.exports = (admin_key) => {
                 name: "admin",
                 pub_key: admin_key
             }
+        }).catch((err) => {
+            console.log(err);
         }).then((user) => {
-            user[0].addRole(role);
+            user[0].addRole(role[0]).catch((err) => {
+                console.log(err);
+            });
         });
     });
 };

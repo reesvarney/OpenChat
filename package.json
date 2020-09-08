@@ -7,9 +7,8 @@
     "start": "node --no-warnings server",
     "showmcu": "node server showmcu",
     "createSSL": "openssl req -nodes -new -x509 -keyout ./ssl/server.key -out ./ssl/server.cert",
-    "addAdmin": "node ./scripts/create_user",
+    "addAdmin": "node ./scripts/setup",
     "liveDev": "nodemon --ignore 'views/' server",
-    "setSecret": "node ./scripts/set_secret",
     "setup": "npm i && node ./scripts/setup && exit 0"
   },
   "author": "RV",
@@ -29,6 +28,7 @@
     "peer": "^0.5.3",
     "puppeteer": "^5.2.1",
     "sequelize": "^6.3.3",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "sqlite3": "^5.0.0"
   }
 }

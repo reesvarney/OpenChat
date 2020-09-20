@@ -6,8 +6,6 @@ const sequelize = new Sequelize({
   logging: false
 });
 
-console.log('Initialising DB')
-
 const relations = {
   belongsTo: function (model, target, opts) {
     sequelize.models[model].belongsTo(sequelize.models[target], opts);
@@ -40,4 +38,6 @@ module.exports = new Promise((resolve, reject) => {
   sequelize.sync({alter: {drop: false}}).then(() => {
     resolve(sequelize);
   });
-})
+});
+
+console.log('Database ✔');

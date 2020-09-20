@@ -15,12 +15,12 @@ var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 var sessionStore = new SequelizeStore({
   db: db,
-  checkExpirationInterval: 60 * 1000, 
+  checkExpirationInterval: 5 * 60 * 1000, 
   expiration: 24 * 60 * 60 * 1000
 });
 
 var sessionMiddleware = session({
-  key: 'express.sid',
+  name: 'middleware',
   secure: true,
   secret: secret,
   store: sessionStore,
@@ -28,6 +28,7 @@ var sessionMiddleware = session({
   saveUninitialized: false,
   cookie: { secure: true },
 });
+
 sessionStore.sync();
 
 var app = express();
@@ -59,13 +60,14 @@ try {
 
 var server = https.createServer(options, app);
 server.listen(port, function(){
-  console.log("HTTPS Server Running")
+  console.log("HTTPS Server ✔")
 });
 
 //AUTH
+var temp_users = {};
 var passport = require('passport');
 var initializePassport = require('./controllers/auth/init.js');
-initializePassport(passport, db);
+initializePassport(passport, db, temp_users);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -81,10 +83,17 @@ app.use('/rtc', peerServer);
 var io = require('socket.io')(server);
 
 io.use(function(socket, next){
-  sessionMiddleware(socket.request, socket.request.res, next);
+  sessionMiddleware(socket.request, {}, next);
 });
 
-require('./controllers/signalling/signalling.js')({db: db, io: io, config: config, port: port, secret: secret});
+require('./controllers/signalling/signalling.js')({
+  db: db,
+  io: io,
+  config: config,
+  port: port,
+  secret: secret,
+  temp_users: temp_users
+});
 
 
 // ROUTING //
@@ -108,9 +117,11 @@ app.use("/", clientController);
 app.use("/messages", messageController);
 app.use('/mcu', mcuController);
 
+console.log("Controllers ✔")
+
 // MCU CLIENT //
 // Configure params for starting the MCU here
 var mcu_params = {};
 mcu_params.isHeadless = process.argv.includes("showmcu") ? false : true;
-require('./controllers/mcu/mcu_launcher.js')(mcu_params);
+  require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 })

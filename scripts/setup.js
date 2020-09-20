@@ -20,7 +20,6 @@ require('../db/init.js').then((db)=> {
     var secret = crypto.randomBytes(128).toString('hex');
     fs.writeFile('secret.txt', secret, (err) => {
         if (err) throw err;
-    })
-    
+    });
 })
 

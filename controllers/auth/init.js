@@ -1,6 +1,5 @@
 var LocalStrategy = require("passport-local").Strategy;
 const { v4: uuidv4 } = require('uuid');
-var temp_users = {};
 
 function validateUser(username){
   if (username !== undefined && username.length >= 3 && username.length <= 32){
@@ -10,17 +9,18 @@ function validateUser(username){
   }
 }
 
-function initialize(passport, db) {
+function initialize(passport, db, temp_users) {
   passport.serializeUser(function (user, done) {
     return done(null, user.id);
   });
 
   passport.deserializeUser(function (id, done) {
     if(id.startsWith("t::")){
-      if (temp_users[id] in [null, undefined]) return done(null, false);
+      if (temp_users[id] === undefined) return done(null, false);
       var all_permissions = db.models.Role.rawAttributes;
       temp_users[id]["permissions"] = Object.keys(all_permissions).filter( field => field.startsWith('permission')).reduce((obj, key) => {obj[key] = all_permissions[key]['defaultValue']; return obj;}, {});
-      return done(null, temp_users[id])
+      temp_users[id]["permissions"].permission_send_message = false;
+      return done(null, temp_users[id]);
     } else {
       db.models.User.findOne({
         where: {

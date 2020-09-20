@@ -11,10 +11,8 @@ function checkAuth(req, res, next) {
 
 function checkNotAuth(req, res, next) {
   if (!req.isAuthenticated()) {
-    console.log('attt')
     return next();
   }
-  console.log('ttt')
   res.redirect("/");
 }
 
@@ -29,7 +27,7 @@ function encrypt(pub_key, data) {
   );
 }
 
-module.exports = function ({ db, passport }) {
+module.exports = function ({ passport }) {
   router.get("/pubkey", checkNotAuth, function (req, res) {
     
     var pub_key = req.query.public_key;
@@ -40,9 +38,8 @@ module.exports = function ({ db, passport }) {
   });
 
   router.post("/pubkey",  passport.authenticate("pub_key", { failureRedirect: "/auth" }), function (req, res) {
-      res.redirect("/");
-    }
-  );
+    res.send("success");
+  });
 
   router.get("/anon", checkNotAuth, (req, res) => {
     res.render('auth/anon')

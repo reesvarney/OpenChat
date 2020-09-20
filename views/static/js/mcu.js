@@ -18,7 +18,7 @@ function main() {
 
   // SOCKET LISTENERS
   socket.on("connect", function () {
-    socket.emit("userinfo", {
+    socket.emit("userInfo", {
       type: "server",
       secret: server_secret,
     });

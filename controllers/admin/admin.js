@@ -7,6 +7,19 @@ Array.prototype.move = function (from, to) {
 };
 
 module.exports = function ({db, conf}) {
+    function hasPermission(perm){
+        return function(req, res, next){
+            if (req.isAuthenticated()){
+                if(req.user.permissions[perm]){
+                    return next();
+                }
+                res.redirect('/');
+            };
+    
+            res.redirect('/admin/login')
+        }
+    };
+
     function checkAuth(req, res, next){
         if (req.isAuthenticated()){
             return next();
@@ -71,8 +84,7 @@ module.exports = function ({db, conf}) {
         res.status(200).send();
     })
 
-    router.post("/channel/new", checkAuth, function(req,res){
-        var uuid = uuidv4();
+    router.post("/channel/new", hasPermission('permission_edit_channels'), function(req,res){
         var name = req.body.name;
         var type = req.body.type;
         db.models.Channel.create({

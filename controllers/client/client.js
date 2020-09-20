@@ -12,7 +12,6 @@ module.exports = function ({ config, db }) {
   router.use(express.static("./views/static"));
 
   router.get("/", checkAuth, function (req, res) {
-    console.log('test')
     var channels = {};
     db.models.Channel.aggregate("type", "DISTINCT", { plain: false }).then((result) => {
       (async () => {

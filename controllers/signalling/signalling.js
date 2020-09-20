@@ -1,7 +1,7 @@
 var mcu_id = null;
 
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
-function startServer({db, io, config, secret, port}) {
+function startServer({db, io, config, secret, port, temp_users}) {
     var server_info = {
         name: config.name,
         channels: [],
@@ -11,39 +11,47 @@ function startServer({db, io, config, secret, port}) {
 
     io.on("connection", function (socket) {
         var currentUser = {};
-
         //USER DATA/ INFORMATION
-        socket.on("userinfo", function (data) {
+        socket.on("userInfo", function (data) {
             if (data.type == "client") {
-                console.log(`User ${socket.id} Connected`);
                 if (mcu_id !== null) {
-                    currentUser.info = data;
-                    socket.emit("serverInfo", server_info);
-                    socket.request.session.name = data.name;
-                    server_info.users[socket.id] = {
-                        name: data.name,
-                        channel: null,
-                        status: "online",
-                        id: socket.request.session.passport.user
-                    };
-                    io.emit('usersChange', server_info.users);
+                    db.models.User.findOne({ where: {id: socket.request.session.passport.user }}).then((user) => {
+                        if( user == null){
+                            user = temp_users[socket.request.session.passport.user]
+                        } else {
+                            user = user.dataValues;
+                        };
+                        console.log(`User ${socket.id} Connected`);
+                        currentUser.info = data;
+                        socket.emit("serverInfo", server_info);
+                        server_info.users[socket.id] = {
+                            name: user.name,
+                            channel: null,
+                            status: "online",
+                            id: socket.request.session.passport.user
+                        };
+                        io.emit('usersChange', server_info.users);
+                    });
                 } else {
                     socket.disconnect(true);
                 };
 
                 //INITIATE CHANNEL JOIN PROCESS
                 socket.on("joinChannel", (channel) => {
-                    var channel_search = server_info.channels.voice.find(({ uuid }) => uuid == channel);
-                    if (channel_search != undefined) {
-                        console.log(`User ${socket.id} changing to channel ${channel_search.uuid}`);
-                        io.to(mcu_id).emit('setChannel', {
-                            user: socket.id,
-                            channel: channel
-                        });
-                        server_info.users[socket.id].channel = channel;
-                    } else {
-                        socket.emit("ocerror", "Channel is not valid");
-                    };
+                    db.models.Channel.findOne({where: {
+                        id: channel
+                    }}).then((result)=> {
+                        if (result !== undefined) {
+                            console.log(`User ${socket.id} changing to channel ${result.dataValues.id}`);
+                            io.to(mcu_id).emit('setChannel', {
+                                user: socket.id,
+                                channel: channel
+                            });
+                            server_info.users[socket.id].channel = channel;
+                        } else {
+                            socket.emit("ocerror", "Channel is not valid");
+                        };
+                    })
                 });
 
                 socket.on("leaveChannel", function () {
@@ -64,7 +72,7 @@ function startServer({db, io, config, secret, port}) {
 
             } else if (data.type == "server") {
                 if (data.secret == secret) {
-                    console.log("MCU CONNECTED")
+                    console.log('Multipoint Control Unit ✔');
                     mcu_id = socket.id;
                     socket.emit("serverInfo", {
                         "peerPort": port
@@ -99,6 +107,7 @@ function startServer({db, io, config, secret, port}) {
             };
         });
     });
+    console.log('Signalling ✔');
 };
 
 module.exports = startServer;

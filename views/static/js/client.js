@@ -8,6 +8,7 @@ var serverinfo,
   peer,
   call,
   currentText,
+  currentVoice,
   currentPage,
   audioOut,
   lastMessage,
@@ -67,7 +68,7 @@ function getMessages(channel_id, params){
   $.ajax({
     async: true,
     type: 'GET',
-    url: `/messages/channels/${channel_id}`,
+    url: `/messages/${channel_id}`,
     data: params,
     timeout: 10000,
     success: ( function( result){
@@ -111,21 +112,29 @@ function getMessages(channel_id, params){
 var socket;
 if (!isStandalone){
   socket = io.connect();
+  socket.emit('userInfo', {
+    type: "client"
+  });
+  
   socket.on('serverInfo', function(server_info){
     serverinfo = server_info;
     peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
   });
+
   socket.on('disconnect', function(){
     window.location.reload();
   });
+
 } else {
-  socket = window.electronSocket
+  socket = window.electronSocket;
+  serverinfo = window.server_info;
+  peer =  new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: serverinfo.peerPort});
 };
 
 //openchat related errors
 socket.on("ocerror", function(data){
   console.log("OPENCHAT ERROR: " + data);
-})
+});
 
 socket.on('canJoin', function(canJoin){
   if(canJoin == true){
@@ -138,11 +147,12 @@ socket.on('canJoin', function(canJoin){
       audioOut = document.querySelector('#call_out');
       audioOut.srcObject = remoteStream;
       soundeffects.connect.play();
+      currentVoice = new_channel;
     });
   } else {
     console.log("NEGOTIATION ERROR");
   }
-})
+});
 
 socket.on('usersChange', function(users){
   $('.user-list').empty();
@@ -152,17 +162,17 @@ socket.on('usersChange', function(users){
       $("<li><a></a></li>").text(users[Object.keys(users)[i]].name).appendTo('#' + users[Object.keys(users)[i]].channel + "-users");
     }
   }
-})
+});
 
 socket.on("newMessage", function(data){
   if(data.channel_id == currentText){
     getMessages(data.channel_id, {"id": data.message_id});
   }
-})
+});
 
 //start channel joining process
 function joinChannel(channel_id){
-  if(!(serverinfo.users[socket.id].channel == channel_id)){
+  if(!(currentVoice == channel_id)){
     socket.emit('joinChannel', channel_id);
     new_channel = channel_id;
   } else {
@@ -172,23 +182,12 @@ function joinChannel(channel_id){
 
 function leaveChannel(){
   socket.emit('leaveChannel');
+  currentVoice = null;
 };
 
 $( document ).ready(function() {
   $("#overlay").on("click", function (e) {
     if (e.target !== this) return;
-    overlay.hide();
-  });
-
-  if(!isStandalone){ overlay.show('connect')};
-  
-  $( "#connect_form" ).submit(function( event ) {
-    event.preventDefault();
-    var name = $("#name_input").val();
-    socket.emit('userinfo', {
-      type: 'client',
-      name: name
-    });
     overlay.hide();
   });
 
@@ -250,8 +249,7 @@ $( document ).ready(function() {
   $("#load_messages a").click(function(){
     currentPage += 1
     getMessages(currentText, {"page": currentPage})
-  });
-  
+  }); 
   
   $("#voice_channels").on('click', '* .channel', function() {
     joinChannel($(this).attr("id"));

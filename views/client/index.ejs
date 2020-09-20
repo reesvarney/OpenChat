@@ -29,7 +29,7 @@
       <a id="nav-close"><i class="fas fa-times"></i></a>
       <div id="channel_heading">
         <a>Channels</a>
-        <% if(req.isAuthenticated() && req.user.permissions.permission_edit_channels){ %> 
+        <% if(req.user.permissions.permission_edit_channels){ %> 
           <a href="#" id="add_channel_btn"><i class="fas fa-plus"></i></a> 
         <% } %>
       </div>
@@ -54,6 +54,9 @@
     </nav>
 
     <main>
+      
+      <!-- MOVE THIS INTO SEPARATE MESSAGE CONTROLLER -->
+      <!-- START -->
       <div id="channel_info">
         <a id="nav-toggle" style="font-size: 2em;"><i class="fas fa-bars"></i></a>
         <h2 id="channel_name"></h2>
@@ -64,12 +67,13 @@
           <a href="#">Load More</a>
         </div>
 
-        <div style="min-height: 100%; padding-top: 20px;">
+        <div style="min-height: 100%;">
           <ol id="messages">
           
           </ol>
         </div>
       </div>
+
       <div id="new_message" class="notification bottom hidden">
         <a>New Message</a>
         <div style="display: inline;">
@@ -77,10 +81,19 @@
           <a style="cursor: pointer; size: 5px; margin-left: 10px;" id="new_msg_close"><i class="fas fa-times"></i></a>
         </div>
       </div>
+
+      
+      <% if(req.user.permissions.permission_send_message){ %>
       <form id="message_input_area">
         <textarea rows="1" id="message_box" disabled></textarea>
         <button id="message_send" disabled>Send</button>
       </form>
+    <% } else {%>
+      <div id="message_input_area">
+        <p style="color: grey">You do not have permission to send messages.</p>
+      </div>  
+    <%} %>
+    <!-- END -->
     </main>
   </body>
   <audio id="call_out" autoplay></audio>

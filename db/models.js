@@ -22,6 +22,10 @@ module.exports = {
       {
         relation: "belongsTo", 
         model: "Channel"
+      },
+      {
+        relation: "belongsTo", 
+        model: "User"
       }
     ],
   },

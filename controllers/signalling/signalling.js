@@ -19,6 +19,7 @@ function startServer({db, io, config, secret, port, temp_users}) {
                         if( user == null){
                             user = temp_users[socket.request.session.passport.user]
                         } else {
+                            if(user.dataValues.name != data.name){user.update({name: data.name})};
                             user = user.dataValues;
                         };
                         console.log(`User ${socket.id} Connected`);
@@ -72,7 +73,7 @@ function startServer({db, io, config, secret, port, temp_users}) {
 
             } else if (data.type == "server") {
                 if (data.secret == secret) {
-                    console.log('Multipoint Control Unit ✔');
+                    console.log('MCU Client ✔');
                     mcu_id = socket.id;
                     socket.emit("serverInfo", {
                         "peerPort": port

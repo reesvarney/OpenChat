@@ -18,6 +18,7 @@ function initialize(passport, db, temp_users) {
     if(id.startsWith("t::")){
       if (temp_users[id] === undefined) return done(null, false);
       var all_permissions = db.models.Role.rawAttributes;
+      // In future, check for default role
       temp_users[id]["permissions"] = Object.keys(all_permissions).filter( field => field.startsWith('permission')).reduce((obj, key) => {obj[key] = all_permissions[key]['defaultValue']; return obj;}, {});
       temp_users[id]["permissions"].permission_send_message = false;
       return done(null, temp_users[id]);
@@ -59,7 +60,7 @@ function initialize(passport, db, temp_users) {
     "pub_key",
     new LocalStrategy(
       {
-        usernameField: "decrypted",
+        usernameField: "name",
         passwordField: "decrypted",
         passReqToCallback: true,
       },
@@ -76,9 +77,11 @@ function initialize(passport, db, temp_users) {
               pub_key: publicKey,
             },
             defaults: {
+              name: username,
               pub_key: publicKey,
             },
           }).then((result) => {
+            if(result[0].dataValues.name != username) {result[0].update({name: username})}
             return done(null, result[0].dataValues);
           });
         } else {

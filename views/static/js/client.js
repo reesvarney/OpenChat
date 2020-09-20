@@ -115,7 +115,7 @@ if (!isStandalone){
   socket.emit('userInfo', {
     type: "client"
   });
-  
+
   socket.on('serverInfo', function(server_info){
     serverinfo = server_info;
     peer = new Peer(socket.id, {host: window.location.hostname, path: '/rtc', port: server_info.peerPort});
@@ -279,11 +279,16 @@ $( document ).ready(function() {
   $("#message_input_area").submit(function(e) {
     e.preventDefault();
     var contents = $("#message_box").val();
-    socket.emit("sendMessage", {
-      channel: currentText,
-      content: contents
+    $.ajax({
+      async: true,
+      type: 'POST',
+      url: `/messages/${currentText}`,
+      data: {contents: contents},
+      timeout: 10000,
+      success: ( function( result){ 
+        $("#message_box").val("");
+      })
     });
-    $("#message_box").val("");
     scrollController.goToBottom(true);
   });
 

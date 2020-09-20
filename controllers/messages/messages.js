@@ -1,176 +1,210 @@
-const ogs = require('open-graph-scraper');
-var express = require('express');
+const ogs = require("open-graph-scraper");
+var express = require("express");
 var router = express.Router();
 var anchorme = require("anchorme").default;
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-var moment = require('moment');
-const { render } = require('ejs');
+var moment = require("moment");
+const { render } = require("ejs");
+const { User } = require("../../db/models");
 
-function sanitize(str){
-    var document = new JSDOM("<div></div>");
-    document.window.document.querySelector('div').textContent = str;
-    return document.window.document.documentElement.querySelector('div').innerHTML;
+function sanitize(str) {
+  var document = new JSDOM("<div></div>");
+  document.window.document.querySelector("div").textContent = str;
+  return document.window.document.documentElement.querySelector("div")
+    .innerHTML;
 }
 
-module.exports = function({db}){
-    var ogpCache = {};
-    var messageCache = {};
+module.exports = function ({ db, io }) {
+  var ogpCache = {};
+  var messageCache = {};
 
-    //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
-    router.get('/:channel', function(req, res){
-        if(req.query.page == undefined){
-            req.query.page = 0;
-        };
+  //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
+  router.get("/:channel", function (req, res) {
+    if (req.query.page == undefined) {
+      req.query.page = 0;
+    }
 
-        var query;
+    var query;
 
-        if (req.query.id != undefined){
-            query = {
-                where: {
-                    id: req.query.id
+    if (req.query.id != undefined) {
+      query = {
+        where: {
+          id: req.query.id,
+        },
+        include: db.models.User,
+        limit: 1,
+      };
+    } else {
+      query = {
+        where: {
+          ChannelId: req.params.channel,
+        },
+        order: [["createdAt", "DESC"]],
+        limit: 50,
+        include: db.models.User,
+        offset: req.query.page * 50,
+      };
+    }
+
+    db.models.Message.findAll(query).then((messages) => {
+      if (messages.length == 0) {
+        res.render("messages/none");
+      } else {
+        function getMessageData(i) {
+          return new Promise((resolve) => {
+            var currentMessage = messages[i].dataValues;
+            var content_clean = sanitize(currentMessage.content);
+            currentMessage.sender = currentMessage.User.dataValues.name;
+
+            currentMessage.content = anchorme({
+              input: content_clean,
+              options: {
+                attributes: {
+                  class: "found-link",
+                  target: "_blank",
                 },
-                limit: 1
-            }
-        } else {
-            query = {
-                where: {
-                    ChannelId: req.params.channel
-                },
-                order: [['createdAt', 'DESC']],
-                limit: 50,
-                offset: req.query.page * 50
-            }
-        };
-
-        db.models.Message.findAll(query).then((messages)=> {
-            if(messages.length == 0){
-                res.render("messages/none");
-            } else {
-                function getMessageData(i){
-                    return new Promise((resolve) => {
-                        var currentResult = result[i];
-        
-                        var content_clean = sanitize(currentResult.message_content);
-        
-                        currentResult.message_content = anchorme({
-                            input: content_clean,
-                            options : {
-                            attributes: {
-                                class: "found-link",
-                                target: "_blank"
-                            }
-                            }
-                        });
-    
-                        var links = anchorme.list(content_clean);
-    
-                        currentResult.message_date = moment.utc(currentResult.message_date).format('MMMM Do YYYY, h:mm a');
-    
-                        if(links.length != 0){
-                            var linkHandled = false;
-    
-                            var regEx = [
-                                {
-                                    "name": "yt",
-                                    "expression" : /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/gim,
-                                    "function" : function(str){return str.replace("watch", "embed").replace("?v=", "/")}
-                                },
-                                {
-                                    "name" : "twitch",
-                                    "expression" : /^(?:https?:\/\/)?(?:www\.|go\.)?twitch\.tv\/([a-z0-9_]+)($|\?)/g,
-                                    "function" : function(str){return str.replace("twitch.tv/", "player.twitch.tv/?channel=").replace("www.", "").concat("&autoplay=false")}
-                                }
-                            ]
-    
-                            for(x = 0; x < links.length; x++){
-                                for(z = 0; z < regEx.length; z++){
-                                    var currentRegEx = regEx[z];
-                                    if(currentRegEx.expression.test(links[x].string)){
-                                        currentResult[currentRegEx.name] = currentRegEx.function(links[x].string);
-                                        result[i] = currentResult;
-                                        messageCache[currentResult.message_id] = currentResult;
-                                        resolve(i)
-                                        linkHandled = true;
-                                    }
-                                }
-                            };
-                            
-                            if(!linkHandled){
-                                var firstLink = links[0].string;
-                                if(firstLink in ogpCache){
-                                    currentResult["ogp"] = ogpCache[firstLink];
-                                    result[i] = currentResult;
-                                    messageCache[currentResult.message_id] = currentResult;
-                                    resolve(i)
-                                    linkHandled = true;
-                                } else {
-                                    ogs({ url: firstLink }, (error, ogpResult, response) => {
-                                        if ("ogTitle" in ogpResult){
-                                            var ogpData = {}
-            
-                                            ogpData.imageSRC = "";
-                                            if ("ogImage" in ogpResult && "url" in ogpResult.ogImage) {
-                                                ogpData.imageSRC = ogpResult.ogImage.url
-                                            if (ogpResult.ogImage.url.startsWith("/")){
-                                                ogpData.imageSRC = (ogpResult.requestUrl || ogpResult.ogUrl) + ogpResult.ogImage.url;
-                                            }
-                                            }
-            
-                                            ogpData.siteName = "";
-                                            if ("ogSiteName" in ogpResult){
-                                                ogpData.siteName = `${ogpResult.ogSiteName} - `;
-                                            }
-                                            
-                                            ogpData.url = ogpResult.ogUrl || ogpResult.requestUrl;
-                                            ogpData.title = ogpResult.ogTitle;
-                                            ogpData.desc = ogpResult.ogDescription
-            
-                                            ogpCache[firstLink] = ogpData;
-                                            currentResult["ogp"] = ogpData;
-                                            result[i] = currentResult;
-                                            messageCache[currentResult.message_id] = currentResult;
-                                            resolve(i)
-                                            linkHandled = true;
-                                        };
-                                    });
-                                };
-                            }
-                        } else {
-                            result[i] = currentResult;
-                            messageCache[currentResult.message_id] = currentResult;
-                            resolve(i)
-                            linkHandled = true;
-                        };
-                    });
-                }
-    
-                var messageStatuses = [];
-    
-                for(i = 0; i < messages.length; i++){
-                    if(messages[i].id in messageCache){
-                        messages[i] = messageCache[messages[i].id];
-                    } else {
-                        messageStatuses[messages[i].id] = getMessageData(i);
-                    }
-                }
-    
-                Promise.all(messageStatuses).then(function(){
-                    res.render("messages/messages", {data: result});
-                }).catch((e) => { console.log(e) });
-            }
-        });
-    });
-
-    router.post('/:channel', (req, res) => {
-            db.models.Message.create({
-                ChannelId: req.params.channel,
-                content: req.body.content
-            }).then((message) => {
-                
+              },
             });
 
-    })
+            var links = anchorme.list(content_clean);
 
-    return router;
+            currentMessage.date = moment
+              .utc(currentMessage.createdAt)
+              .format("MMMM Do YYYY, h:mm a");
+
+            if (links.length != 0) {
+              var linkHandled = false;
+
+              var regEx = [
+                {
+                  name: "yt",
+                  expression: /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/gim,
+                  function: function (str) {
+                    return str.replace("watch", "embed").replace("?v=", "/");
+                  },
+                },
+                {
+                  name: "twitch",
+                  expression: /^(?:https?:\/\/)?(?:www\.|go\.)?twitch\.tv\/([a-z0-9_]+)($|\?)/g,
+                  function: function (str) {
+                    return str
+                      .replace("twitch.tv/", "player.twitch.tv/?channel=")
+                      .replace("www.", "")
+                      .concat("&autoplay=false");
+                  },
+                },
+              ];
+
+              for (x = 0; x < links.length; x++) {
+                for (z = 0; z < regEx.length; z++) {
+                  var currentRegEx = regEx[z];
+                  if (currentRegEx.expression.test(links[x].string)) {
+                    currentMessage[currentRegEx.name] = currentRegEx.function(
+                      links[x].string
+                    );
+                    messages[i] = currentMessage;
+                    messageCache[currentMessage.id] = currentMessage;
+                    resolve(i);
+                    linkHandled = true;
+                  }
+                }
+              }
+
+              if (!linkHandled) {
+                var firstLink = links[0].string;
+                if (firstLink in ogpCache) {
+                  currentMessage["ogp"] = ogpCache[firstLink];
+                  messages[i] = currentMessage;
+                  messageCache[currentMessage.id] = currentMessage;
+                  resolve(i);
+                  linkHandled = true;
+                } else {
+                  ogs(
+                    {
+                      url: firstLink,
+                    },
+                    (error, ogpResult, response) => {
+                      if ("ogTitle" in ogpResult) {
+                        var ogpData = {};
+
+                        ogpData.imageSRC = "";
+                        if (
+                          "ogImage" in ogpResult &&
+                          "url" in ogpResult.ogImage
+                        ) {
+                          ogpData.imageSRC = ogpResult.ogImage.url;
+                          if (ogpResult.ogImage.url.startsWith("/")) {
+                            ogpData.imageSRC =
+                              (ogpResult.requestUrl || ogpResult.ogUrl) +
+                              ogpResult.ogImage.url;
+                          }
+                        }
+
+                        ogpData.siteName = "";
+                        if ("ogSiteName" in ogpResult) {
+                          ogpData.siteName = `${ogpResult.ogSiteName} - `;
+                        }
+
+                        ogpData.url = ogpResult.ogUrl || ogpResult.requestUrl;
+                        ogpData.title = ogpResult.ogTitle;
+                        ogpData.desc = ogpResult.ogDescription;
+
+                        ogpCache[firstLink] = ogpData;
+                        currentMessage["ogp"] = ogpData;
+                        messages[i] = currentMessage;
+                        messageCache[currentMessage.id] = currentMessage;
+                        resolve(i);
+                        linkHandled = true;
+                      }
+                    }
+                  );
+                }
+              }
+            } else {
+              messages[i] = currentMessage;
+              messageCache[currentMessage.id] = currentMessage;
+              resolve(i);
+              linkHandled = true;
+            }
+          });
+        }
+
+        var messageStatuses = [];
+        for (i = 0; i < messages.length; i++) {
+          if (messages[i].dataValues.id in messageCache) {
+            messages[i] = messageCache[messages[i].dataValues.id];
+          } else {
+            messageStatuses[messages[i].dataValues.id] = getMessageData(i);
+          }
+        }
+
+        Promise.all(messageStatuses)
+          .then(function () {
+            res.render("messages/messages", {
+              data: messages,
+            });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    });
+  });
+
+  router.post("/:channel", (req, res) => {
+    console.log(req.user.id, "=>", req.params.channel, "=", req.body.contents);
+    db.models.Message.create({
+      ChannelId: req.params.channel,
+      UserId: req.user.id,
+      content: req.body.contents,
+    }).then((message) => {
+      io.emit("newMessage", {
+        channel_id: message.dataValues.channelId,
+        message_id: message.dataValues.id,
+      });
+    });
+  });
+
+  return router;
 };

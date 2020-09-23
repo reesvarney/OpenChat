@@ -17,23 +17,15 @@ function checkNotAuth(req, res, next) {
 }
 
 function encrypt(pub_key, data) {
-  return crypto.publicEncrypt(
-    {
-      key: pub_key,
-      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-      oaepHash: "sha256",
-    },
-    Buffer.from(data)
-  );
+  return crypto.publicEncrypt(pub_key, Buffer.from(data, "utf-8"));
 }
 
 module.exports = function ({ passport }) {
   router.get("/pubkey", checkNotAuth, function (req, res) {
-    
     var pub_key = req.query.public_key;
-    req.session.authData = crypto.randomBytes(128);
+    req.session.authData = crypto.randomBytes(64);
     req.session.publicKey = pub_key;
-    var enc_data = encrypt(Buffer.from(pub_key), req.session.authData);
+    var enc_data = encrypt(pub_key, req.session.authData);
     res.send({ encoded_data: enc_data });
   });
 

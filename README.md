@@ -16,6 +16,8 @@
   </p>
 </p>
 
+### I am currently working on the next version of openchat (on v2-rewrite branch) which will come with an electron app for more persistant authentication, this will take a while so it may be some time for the next update. I will be keeping most of the progress on https://trello.com/b/p2K25uED/openchat if you are interested.
+
 ## Overview
 This is a project that seeks to provide a communication service akin to discord or teamspeak completely built in the javascript stack to increase accessibility and ease of use.
 

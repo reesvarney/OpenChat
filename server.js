@@ -55,7 +55,7 @@ try {
     };
   }
 } catch (err) {
-  console.log("\n \n \n \n \n \n KEY/CERT NOT FOUND - PLEASE RUN SETUP OR CREATESSL \n \n \n \n \n \n")
+  console.log("\n \n \n \n \n \n KEY/CERT NOT FOUND \n \n \n \n \n \n")
 };
 
 var server = https.createServer(options, app);

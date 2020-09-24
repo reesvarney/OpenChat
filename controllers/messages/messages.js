@@ -173,6 +173,7 @@ module.exports = function ({ db, io }) {
         var messageStatuses = [];
         for (i = 0; i < messages.length; i++) {
           if (messages[i].dataValues.id in messageCache) {
+            Object.assign(messageCache[messages[i].dataValues.id], {User: messages[i].User, sender: messages[i].User.dataValues.name});
             messages[i] = messageCache[messages[i].dataValues.id];
           } else {
             messageStatuses[messages[i].dataValues.id] = getMessageData(i);

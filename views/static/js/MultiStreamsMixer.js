@@ -525,8 +525,13 @@ function MultiStreamsMixer(arrayOfMediaStreams, elementClass) {
         if (canvas.stream) {
             canvas.stream.stop();
             canvas.stream = null;
-        }
+        };
     };
+
+    this.end = function(){
+        this.releaseStreams();
+        canvas.parentNode.removeChild(canvas);
+    }
 
     this.resetVideoStreams = function(streams) {
         if (streams && !(streams instanceof Array)) {

@@ -1,6 +1,5 @@
 function main() {
   var socket = io("https://localhost");
-  var ee = new EventEmitter();
   var connected_users = {};
 
   const createEmptyAudioTrack = () => {
@@ -62,7 +61,7 @@ function main() {
 
           //TODO STORE MIXER IN USER OBJECT SO IT CAN BE REMOVED
           if ("mixer" in connected_users[currentid]){
-            connected_users[currentid]["mixer"].releaseStreams();
+            connected_users[currentid]["mixer"].end();
           }
           connected_users[currentid]["mixer"] = new MultiStreamsMixer(
             instreams
@@ -72,8 +71,7 @@ function main() {
           audioOut.srcObject = instreams[0];
           connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(mix_track);
         } else {
-          var currentUser =
-            connected_users[peers_filtered[0]]["call"]["peerConnection"];
+          var currentUser = connected_users[peers_filtered[0]]["call"]["peerConnection"];
           var currentStream = currentUser.getRemoteStreams()[0];
           audioOut.srcObject = currentStream;
           connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(currentStream.getAudioTracks()[0]);
@@ -135,6 +133,7 @@ function main() {
     if (data.user in connected_users){
       var old_channel = connected_users[data.user]["channelID"];
       if ("call" in connected_users[data.user]){
+        if("mixer" in connected_users[data.user]){connected_users[data.user].mixer.end()};
         connected_users[data.user].call.close();
       }
       delete connected_users[data.user];

@@ -1,8 +1,8 @@
 var LocalStrategy = require("passport-local").Strategy;
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
-function validateUser(username){
-  if (username !== undefined && username.length >= 3 && username.length <= 32){
+function validateUser(username) {
+  if (username !== undefined && username.length >= 3 && username.length <= 32) {
     return true;
   } else {
     return false;
@@ -15,11 +15,16 @@ function initialize(passport, db, temp_users) {
   });
 
   passport.deserializeUser(function (id, done) {
-    if(id.startsWith("t::")){
+    if (id.startsWith("t::")) {
       if (temp_users[id] === undefined) return done(null, false);
       var all_permissions = db.models.Role.rawAttributes;
       // In future, check for default role
-      temp_users[id]["permissions"] = Object.keys(all_permissions).filter( field => field.startsWith('permission')).reduce((obj, key) => {obj[key] = all_permissions[key]['defaultValue']; return obj;}, {});
+      temp_users[id]["permissions"] = Object.keys(all_permissions)
+        .filter((field) => field.startsWith("permission"))
+        .reduce((obj, key) => {
+          obj[key] = all_permissions[key]["defaultValue"];
+          return obj;
+        }, {});
       temp_users[id]["permissions"].permission_send_message = false;
       return done(null, temp_users[id]);
     } else {
@@ -81,7 +86,11 @@ function initialize(passport, db, temp_users) {
               pub_key: publicKey,
             },
           }).then((result) => {
-            if(result[0].dataValues.name != username) {result[0].update({name: username})}
+            if (result[0].dataValues.name != username) {
+              result[0].update({
+                name: username,
+              });
+            }
             return done(null, result[0].dataValues);
           });
         } else {
@@ -104,9 +113,9 @@ function initialize(passport, db, temp_users) {
         var userID = `t::-${uuidv4()}`;
         var data = {
           id: userID,
-          name: username
+          name: username,
         };
-        if (validateUser(username)){
+        if (validateUser(username)) {
           temp_users[userID] = data;
           return done(null, data);
         } else {

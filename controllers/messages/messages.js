@@ -176,7 +176,7 @@ module.exports = function ({ db, io }) {
             Object.assign(messageCache[messages[i].dataValues.id], {User: messages[i].User, sender: messages[i].User.dataValues.name});
             messages[i] = messageCache[messages[i].dataValues.id];
           } else {
-            messageStatuses[messages[i].dataValues.id] = getMessageData(i);
+            messageStatuses.push(getMessageData(i));
           }
         }
 

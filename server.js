@@ -4,7 +4,13 @@ const dbProm = require('./db/init.js');
 const secret = fs.readFileSync('./secret.txt', 'utf8');
 const port = process.env.PORT || 443; 
 var config = require('./config.json');
+
+//DB Ready
 dbProm.then((db)=> {
+
+//HELPERS
+var expressFunctions = require('./helpers/expressfunctions.js');
+
 //HTTP SERVER
 var https = require('https');
 const express = require('express');
@@ -32,7 +38,6 @@ var sessionMiddleware = session({
 sessionStore.sync();
 
 var app = express();
-
 
 app.disable('view cache');
 app.set('view engine', 'ejs');
@@ -92,7 +97,7 @@ require('./controllers/signalling/signalling.js')({
   config: config,
   port: port,
   secret: secret,
-  temp_users: temp_users
+  temp_users: temp_users,
 });
 
 
@@ -102,7 +107,8 @@ var controllerParams = {
   db: db, 
   passport: passport, 
   config: config,
-  secret: secret
+  secret: secret,
+  expressFunctions: expressFunctions,
 };
 
 var clientController = require('./controllers/client/client.js')(controllerParams);

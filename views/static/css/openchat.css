@@ -70,6 +70,7 @@ nav {
     width: auto;
     margin-top: auto;
     margin-bottom: auto;
+    border-radius: 25%;
 }
 
 #server_title {
@@ -134,6 +135,8 @@ div.center-self {
 }
 
 .channel-group>ul>li {
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
     list-style: none;
     border-radius: 10px;
@@ -146,16 +149,32 @@ div.center-self {
     background: #f5f5f5;
 }
 
-.channel-group>ul>li>a{
-    display: block;
-    width: 100%;
+.channel-name{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.channel{
+    display: inline-block;
     height: 100%;
     box-sizing: border-box;
     padding: 10px;
     position: relative;
+    flex-grow: 2;
+}
+.channel-name>a.edit_channel_btn{
+    display: inline-block;
+    position: relative;
+    padding: 10px;
+    height: 100%;
+    box-sizing: border-box;
+    margin-left: auto;
+    justify-self: flex-end;
+    color: #afafaf;
 }
 
-.channel-group>ul>li>a:hover{
+.channel:hover{
     cursor: pointer;
 }
 
@@ -171,7 +190,7 @@ div.center-self {
     background: none;
 }
 
-#channels .active a:hover {
+#channels .active a.channel:hover {
     cursor: default;
 }
 

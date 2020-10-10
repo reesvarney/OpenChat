@@ -6,29 +6,8 @@ Array.prototype.move = function (from, to) {
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
-module.exports = function ({db, conf}) {
-    function hasPermission(perm){
-        return function(req, res, next){
-            if (req.isAuthenticated()){
-                if(req.user.permissions[perm]){
-                    return next();
-                }
-                res.redirect('/');
-            };
-    
-            res.redirect('/admin/login')
-        }
-    };
-
-    function checkAuth(req, res, next){
-        if (req.isAuthenticated()){
-            return next();
-        };
-
-        res.redirect('/admin/login')
-    }
-
-    router.get("/", checkAuth, function (req, res, next) {
+module.exports = function ({db, conf, expressFunctions}) {
+    router.get("/", expressFunctions.checkAuth, function (req, res, next) {
         db.all("SELECT * FROM iplogs", {}, function(err, result){
             if (err) throw err;
             res.render('admin/index', {
@@ -39,7 +18,7 @@ module.exports = function ({db, conf}) {
 
     });
 
-    router.delete("/channel/:uuid", checkAuth, function(req, res) {
+    router.delete("/channel/:uuid", expressFunctions.checkAuth, function(req, res) {
         var channel = findChannel(req.params.uuid);
         var index = channel.index;
         var type = channel.type;
@@ -56,7 +35,7 @@ module.exports = function ({db, conf}) {
         res.status(200).send();
     });
 
-    router.post("/channel/:uuid/update", checkAuth, function(req,res){
+    router.post("/channel/:uuid/update", expressFunctions.checkAuth, function(req,res){
         var name = req.body.name;
         var description = req.body.description;
         var channel = findChannel(req.params.uuid);
@@ -70,13 +49,13 @@ module.exports = function ({db, conf}) {
         updateConf(res);
     });
 
-    router.post("/users/blacklist", checkAuth, function(req,res){
+    router.post("/users/blacklist", expressFunctions.checkAuth, function(req,res){
         var ip = req.body.ip;
         conf.blacklist.push(ip);
         updateConf(res);
     })
 
-    router.delete("/users/blacklist", checkAuth, function(req,res){
+    router.delete("/users/blacklist", expressFunctions.checkAuth, function(req,res){
         var ip = req.query.ip;
         var index = conf.blacklist.indexOf(ip);
         conf.blacklist.splice(index, 1);
@@ -84,7 +63,7 @@ module.exports = function ({db, conf}) {
         res.status(200).send();
     })
 
-    router.post("/channel/new", hasPermission('permission_edit_channels'), function(req,res){
+    router.post("/channel/new", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function(req,res){
         var name = req.body.name;
         var type = req.body.type;
         db.models.Channel.create({
@@ -95,7 +74,7 @@ module.exports = function ({db, conf}) {
         });
     });
 
-    router.post("/server/update", checkAuth, function(req,res){
+    router.post("/server", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_server'), function(req,res){
         conf.server.name = req.body.name;
         updateConf(res);
     })

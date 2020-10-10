@@ -1,14 +1,3 @@
-var LocalStrategy = require("passport-local").Strategy;
-const { v4: uuidv4 } = require("uuid");
-
-function validateUser(username) {
-  if (username !== undefined && username.length >= 3 && username.length <= 32) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 function initialize(passport, db, temp_users) {
   passport.serializeUser(function (user, done) {
     return done(null, user.id);
@@ -61,68 +50,15 @@ function initialize(passport, db, temp_users) {
     }
   });
 
+  //TODO - LOAD THESE DYNAMICALLY AS MODULES
   passport.use(
-    "pub_key",
-    new LocalStrategy(
-      {
-        usernameField: "name",
-        passwordField: "decrypted",
-        passReqToCallback: true,
-      },
-      function (req, username, password, done) {
-        if (
-          Buffer.from(JSON.parse(password).data).equals(
-            Buffer.from(req.session.authData.data)
-          )
-        ) {
-          var key_raw = req.session.publicKey;
-          var publicKey = key_raw.replace(/(?:\r\n|\r|\n)/g, "");
-          db.models.User.findOrCreate({
-            where: {
-              pub_key: publicKey,
-            },
-            defaults: {
-              name: username,
-              pub_key: publicKey,
-            },
-          }).then((result) => {
-            if (result[0].dataValues.name != username) {
-              result[0].update({
-                name: username,
-              });
-            }
-            return done(null, result[0].dataValues);
-          });
-        } else {
-          return done(null, false);
-        }
-        req.session.authData = null; // I don't think this would actually be needed but I'll put it here just to be safe.
-      }
-    )
+    "pubkey",
+    require('./methods/pubkey.js').strategy({db})
   );
 
   passport.use(
     "anon",
-    new LocalStrategy(
-      {
-        usernameField: "name",
-        passwordField: "name",
-        passReqToCallback: true,
-      },
-      function (req, username, password, done) {
-        var userID = `t::-${uuidv4()}`;
-        var data = {
-          id: userID,
-          name: username,
-        };
-        if (validateUser(username)) {
-          temp_users[userID] = data;
-          return done(null, data);
-        } else {
-          return done(null, false);
-        }
-      }
-    )
+    require('./methods/anon.js').strategy({temp_users})
   );
 }
 

@@ -1,6 +1,11 @@
 <li>
-    <a id="<%= id %>" class="channel">
-    <%= name %>
-    </a>
-    <ul id="<%= id %>-users" class="user-list"></ul>
+    <div class="channel-name">
+        <a id="<%= data.id %>" class="channel">
+            <%= data.name %>
+        </a>
+        <% if(req.user.permissions.permission_edit_channels){ %> 
+            <a href="#" class="edit_channel_btn"><i class="fas fa-cog"></i></a> 
+        <% } %>
+    </div>
+    <ul id="<%= data.id %>-users" class="user-list"></ul>
 </li>

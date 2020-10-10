@@ -39,12 +39,13 @@
             <h4><%= type.toUpperCase() %></h4>
             <ul id="<%= type %>_channels">
               <% type_channels.forEach(data => {%>
-                <%- include(`_${type}_channel`, data) %>
+                <%- include(`_${type}_channel`, {data, req}) %>
               <%}); %>
               </ul>
             </div>
         <%};%>
       </div>
+      <% %>
       <div id="control_area">
         <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
         <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>

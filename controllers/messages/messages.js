@@ -54,8 +54,13 @@ module.exports = function ({ db, io }) {
         function getMessageData(i) {
           return new Promise((resolve) => {
             var currentMessage = messages[i].dataValues;
+            //Just in case message has no user for whatever reason, 
             var content_clean = sanitize(currentMessage.content);
-            currentMessage.sender = currentMessage.User.dataValues.name;
+            if(currentMessage.User === null){
+              currentMessage.sender = "Anonymous";
+            } else {
+              currentMessage.sender = currentMessage.User.dataValues.name;
+            }
 
             currentMessage.content = anchorme({
               input: content_clean,
@@ -173,7 +178,10 @@ module.exports = function ({ db, io }) {
         var messageStatuses = [];
         for (i = 0; i < messages.length; i++) {
           if (messages[i].dataValues.id in messageCache) {
-            Object.assign(messageCache[messages[i].dataValues.id], {User: messages[i].User, sender: messages[i].User.dataValues.name});
+            Object.assign(messageCache[messages[i].dataValues.id], {
+              User: messages[i].User, 
+              sender: (messages[i].User !== null) ? messages[i].User.dataValues.name : "Anonymous"
+            });
             messages[i] = messageCache[messages[i].dataValues.id];
           } else {
             messageStatuses.push(getMessageData(i));

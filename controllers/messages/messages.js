@@ -74,9 +74,7 @@ module.exports = function ({ db, io }) {
 
             var links = anchorme.list(content_clean);
 
-            currentMessage.date = moment
-              .utc(currentMessage.createdAt)
-              .format("MMMM Do YYYY, h:mm a");
+            currentMessage.date = moment(currentMessage.createdAt);
 
             if (links.length != 0) {
               var linkHandled = false;
@@ -202,15 +200,16 @@ module.exports = function ({ db, io }) {
   });
 
   router.post("/:channel", (req, res) => {
-    console.log(req.user.id, "=>", req.params.channel, "=", req.body.contents);
     db.models.Message.create({
       ChannelId: req.params.channel,
       UserId: req.user.id,
       content: req.body.contents,
     }).then((message) => {
+      console.log(req.user.id, "=>", req.params.channel, "=", req.body.contents);
+      res.sendStatus(200);
       io.emit("newMessage", {
-        channel_id: message.dataValues.channelId,
-        message_id: message.dataValues.id,
+        channel_id: message.dataValues.ChannelId,
+        message_id: message.dataValues.id
       });
     });
   });

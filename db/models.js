@@ -54,7 +54,15 @@ module.exports = {
       },
     },
     options: {},
-    relations: [],
+    relations: [
+      {
+        relation: "hasMany",
+        model: "Message",
+        options: {
+          onDelete: 'CASCADE'
+        }
+      }
+    ],
   },
 
   User: {

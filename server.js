@@ -104,7 +104,8 @@ require('./controllers/signalling/signalling.js')({
 // ROUTING //
 // Store routes here
 var controllerParams = {
-  db: db, 
+  db: db,
+  io: io,
   passport: passport, 
   config: config,
   secret: secret,

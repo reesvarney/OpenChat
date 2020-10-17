@@ -22,9 +22,12 @@
 
     <script src="./js/jquery.js"></script>
     <script src="./js/socket.io.js"></script>
-    <script src="./js/peer.js"></script>
+    <script src="./js/peerjs.min.js"></script>
     <script src="./js/smartscroll.js"></script>
     <script src="./js/client.js"></script>
+    <% if(req.user.permissions.permission_edit_channels){%>
+        <script src="./js/client-edit_channels.js"></script>
+    <% } %>
 
     <link type="font/opentype" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100..900&display=swap" rel="stylesheet">
     <link type="font/opentype" href="https://fonts.googleapis.com/css2?family=Muli:wght@100..900&display=swap" rel="stylesheet">

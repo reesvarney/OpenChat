@@ -311,11 +311,11 @@ main {
 }
 
 .message-card {
-    padding: 5px;
-    padding-left: 40px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 30px;
     padding-right: 40px;
     word-wrap: break-word;
-    margin-bottom: 20px;
 }
 
 .message-card:hover{
@@ -325,6 +325,8 @@ main {
 .ogp-card {
     display: flex;
     flex-direction: row;
+    margin-left: 20px;
+    margin-top: 10px;
     background: #f6f6f6;
     padding: 20px;
     align-items: flex-start;
@@ -360,7 +362,7 @@ main {
     width: 100%;
     text-align: center;
     margin-top: auto;
-    padding-top: 0px;
+    padding-top: 30px;
     margin-bottom: 20px;
 }
 
@@ -371,12 +373,11 @@ main {
     border-width: 1px;
     border-radius: 20px;
     padding: 10px;
-    background-color: #f6f6f6;
     color: darkgrey;
 }
 
 #load_messages a:focus:hover {
-    background-color: #dadada;
+    background-color: #f6f6f6;
 }
 
 .yt-container {

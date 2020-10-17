@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('_head') %>
+<%- include('_head', {req}) %>
 
   <body>
     <div id="overlay">
@@ -8,7 +8,7 @@
       <div class="modal" id="add_channel">
         <h2>New Channel</h2>
         <form action="admin/channel/new" method="post" >
-          <!-- Create radios dynamically for each defined channel type -->
+          <!-- TODO - Create radios dynamically for each defined channel type -->
           <input type="radio" id="type_select_voice" name="type" value="voice">
           <label for="type_select_voice">Voice</label>
           <br>
@@ -16,6 +16,15 @@
           <label for="type_select_text">Text</label>
           <input type="text" name="name" placeholder="Channel Name">
           <button>Add</button>
+        </form>
+      </div>
+    <% } %>
+    <% if(req.user.permissions.permission_edit_channels){%>
+      <div class="modal" id="edit_channel">
+        <h2>Edit Channel</h2>
+        <form action="admin/channel//edit" method="post" >
+          <input type="text" name="name" placeholder="Channel Name">
+          <button>Save</button>
         </form>
       </div>
     <% } %>
@@ -95,7 +104,7 @@
       </div>  
     <%} %>
     <!-- END -->
-    </main>
+  </main>
   </body>
   <audio id="call_out" autoplay></audio>
 </html>

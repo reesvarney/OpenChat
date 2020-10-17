@@ -4,7 +4,19 @@ var message = data[i];
     <div id="<%= message.id %>" class="message-card">
         <p>
             <strong><%= message.sender %></strong>
-            <i><%= message.date %></i>
+                <i class="date">
+                <script type="text/javascript">
+                    var date = new Date("<%= message.date %>");
+                    var now = new Date();
+                    var dispDate;
+                    if(Math.floor(Math.abs(now - date) / (1000 * 60 * 60 * 24)) == 0){
+                        dispDate = date.toLocaleTimeString();
+                    } else {
+                        dispDate = date.toLocaleString();
+                    }
+                    $("#<%= message.id %> .date")[0].innerHTML = dispDate;
+                </script>
+                </i>
             <br>
             <%- message.content %>
         </p>

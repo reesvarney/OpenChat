@@ -1,4 +1,5 @@
 navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+
 var soundeffects = {},
   soundfiles = [
     "mute",
@@ -18,7 +19,7 @@ var soundeffects = {},
     hide: function () {
       $("#overlay").hide();
     },
-  };
+};
 
 for(i = 0; i < soundfiles.length; i++){
   soundeffects[soundfiles[i]] = new Audio(`./audio/${soundfiles[i]}.mp3`);
@@ -81,9 +82,10 @@ var client = new class{
       negotiating: null
     };
     this.channels = {};
+    this._init()
   }
 
-  init(){
+  _init(){
     this._initSocket();
     this.call = new call;
     this._initDomListeners();
@@ -135,9 +137,10 @@ var client = new class{
       }
     }.bind(this));
 
-    this.socket.on("newMessage", function(d){
-      if(d.channel_id == currentText){
-        channels[data.channel_id].getMessages({"id": data.message_id});
+    this.socket.on("newMessage", (d)=>{
+      console.log(d, this.textChannel)
+      if(d.channel_id == this.textChannel ){
+        this.channels[d.channel_id].getMessages({"id": d.message_id});
       }
     });
   }
@@ -186,13 +189,11 @@ var client = new class{
   }
 };
 
-// Call functions that require client to be defined
-client.init();
-
 class channel{
   constructor(el){
     this.el = el;
     this.id = $(el).find(".channel")[0].id;
+    this.name = $(el).find(".channel")[0].innerText;
     client.channels[this.id] = this;
   }
 }
@@ -217,7 +218,7 @@ class voiceChannel extends channel{
 
 class textChannel extends channel{
   constructor(el){
-    super(el)
+    super(el);
     $(this.el).on('click', '.channel', ()=> {
       if(this.id != client.textChannel){
         $("#text_channels li").removeClass("active");
@@ -228,6 +229,7 @@ class textChannel extends channel{
           $(this).prop('disabled', false);
         });
         this.getMessages({page: this.page});
+        $("#channel_name").text(this.name)
       }
     });
   };
@@ -277,10 +279,6 @@ $( document ).ready(function() {
     overlay.hide();
   });
 
-  $("#add_channel_btn").click(function () {
-    overlay.show("add_channel");
-  });
-
   $("#nav-toggle").click(function(){
     $("nav").show();
   })
@@ -299,9 +297,10 @@ $( document ).ready(function() {
   })
 
   $("#load_messages a").click(function(){
-    currentPage += 1
-    getMessages(currentText, {"page": currentPage})
-  }); 
+    var channel = client.channels[client.textChannel];
+    channel.page += 1;
+    channel.getMessages({"page": channel.page})
+  });
   
   $("#message_box").keypress(function (evt) {
     if(evt.keyCode == 13 && !evt.shiftKey) {
@@ -316,7 +315,7 @@ $( document ).ready(function() {
     $.ajax({
       async: true,
       type: 'POST',
-      url: `/messages/${currentText}`,
+      url: `/messages/${client.textChannel}`,
       data: {contents: contents},
       timeout: 10000,
       success: ( function( result){ 

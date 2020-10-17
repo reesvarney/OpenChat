@@ -49,7 +49,7 @@ module.exports = function ({
   router.post("/server/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_server'), function (req, res) {
     config.name = req.body.name;
     saveConf();
-    res.sendStatus(200);
+    res.redirect('/');
   })
 
   return router;

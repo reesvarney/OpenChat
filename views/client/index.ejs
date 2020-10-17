@@ -28,12 +28,24 @@
         </form>
       </div>
     <% } %>
+    <% if(req.user.permissions.permission_edit_server){%>
+      <div class="modal" id="edit_server">
+        <h2>Edit Server</h2>
+        <form action="admin/server/edit" method="post" >
+          <input type="text" name="name" placeholder="Server Name">
+          <button>Save</button>
+        </form>
+      </div>
+    <% } %>
   </div>
 
     <nav>
       <div class="brand">
         <img id="oc_image" src="./img/logo.svg">
         <h1 id="server_title"><%= config.name %></h1>
+        <% if(req.user.permissions.permission_edit_server){ %> 
+          <a href="#" class="edit_server_btn"><i class="fas fa-cog"></i></a> 
+        <% } %>
       </div>
       <a id="nav-close"><i class="fas fa-times"></i></a>
       <div id="channel_heading">
@@ -106,5 +118,4 @@
     <!-- END -->
   </main>
   </body>
-  <audio id="call_out" autoplay></audio>
 </html>

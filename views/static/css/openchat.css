@@ -66,8 +66,8 @@ nav {
 }
 
 #oc_image {
-    height: 20px;
-    width: auto;
+    max-height: 40px;
+    max-width: 100%;
     margin-top: auto;
     margin-bottom: auto;
     border-radius: 25%;
@@ -78,6 +78,8 @@ nav {
     font-family: 'Muli', sans-serif;
     font-size: 24px;
     display: inline-block;
+    max-width: 10em;
+    word-wrap: break-word;
     margin: 0px;
 }
 

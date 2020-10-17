@@ -54,6 +54,7 @@ class call{
       $("#disconnect_button").show();
       $('#voice_channels li').removeClass("active");
       $('#voice_channels #' + client.voiceChannel.negotiating).parent().parent().addClass("active");
+      console.log(client)
       client.audioOut.srcObject = remoteStream;
       client.voiceChannel.current = client.voiceChannel.negotiating;
       soundeffects.connect.play();
@@ -147,7 +148,7 @@ var client = new class{
 
   _initDomListeners(){
     $( document ).ready(()=>{
-      this.audioOut = $(document.createElement("audio")).appendTo('body');
+      this.audioOut = ($(Object.assign(document.createElement("audio"), {autoplay: true})).appendTo('body'))[0];
 
       $("#text_channels li").each((i, el)=>{
         new textChannel(el, this);

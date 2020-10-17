@@ -1,11 +1,16 @@
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
 
 module.exports = function ({
   db,
-  conf,
+  config,
   expressFunctions
 }) {
+
+  function saveConf(){
+    fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
+  }
 
   router.delete("/channel/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
     db.models.Channel.destroy({
@@ -41,8 +46,10 @@ module.exports = function ({
     });
   });
 
-  router.post("/server", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_server'), function (req, res) {
-    conf.server.name = req.body.name;
+  router.post("/server/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_server'), function (req, res) {
+    config.name = req.body.name;
+    saveConf();
+    res.sendStatus(200);
   })
 
   return router;

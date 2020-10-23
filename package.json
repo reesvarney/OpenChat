@@ -9,6 +9,10 @@
     "liveDev": "nodemon --ignore 'views/' server",
     "setup": "npm i && node ./scripts/setup && exit 0"
   },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/reesvarney/OpenChat.git"
+  },
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "dependencies": {
@@ -24,7 +28,6 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "peer": "^0.5.3",
-    "pem": "^1.14.4",
     "puppeteer": "^5.2.1",
     "sequelize": "^6.3.3",
     "socket.io": "^2.3.0",

@@ -239,32 +239,35 @@ class textChannel extends channel{
       url: `/messages/${this.id}`,
       data: params,
       timeout: 10000,
-      success: ( function( result){
-        if("page" in params && params.page == 0){
-          $('.message-card').remove();
-          $('#no_messages').remove();
-        }
+      success: ((result)=>{
+        //Check that the channel is still active
+        if(this.id == client.textChannel){
+          if("page" in params && params.page == 0){
+            $('.message-card').remove();
+            $('#no_messages').remove();
+          }
+    
+          this.lastMessage = $("#messages>:last-child");
   
-        this.lastMessage = $("#messages>:last-child");
-
-        if (!("id" in params)){
-          $('#messages').append(result);
-        } else {
-          $('#messages').prepend(result);
-        }
-  
-        if($('#messages').children().length % 50 == 0){
-          $("#load_messages").show();
-        } else if("page" in params){
-          $("#load_messages").hide();
-        }
-  
-        if("page" in params && params.page == 0 || !("page" in params) && scrollController.doesScroll(200)) {
-          scrollController.goToChild($("#messages>:first-child"));
-        }else if("page" in params){
-          scrollController.goToChild(this.lastMessage);
-        } else {
-          $("#new_message").show();
+          if (!("id" in params)){
+            $('#messages').append(result);
+          } else {
+            $('#messages').prepend(result);
+          }
+    
+          if($('#messages').children().length % 50 == 0){
+            $("#load_messages").show();
+          } else if("page" in params){
+            $("#load_messages").hide();
+          }
+    
+          if("page" in params && params.page == 0 || !("page" in params) && scrollController.doesScroll(200)) {
+            scrollController.goToChild($("#messages>:first-child"));
+          }else if("page" in params){
+            scrollController.goToChild(this.lastMessage);
+          } else {
+            $("#new_message").show();
+          }
         }
       })
     });

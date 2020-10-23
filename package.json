@@ -1,13 +1,11 @@
 {
   "name": "openchat",
-  "version": "2.0.0",
+  "version": "1.1.0",
   "description": "Free and open source communication platform",
   "main": "server.js",
   "scripts": {
-    "start": "node --no-warnings server",
+    "start": "node server",
     "showmcu": "node server showmcu",
-    "createSSL": "openssl req -nodes -new -x509 -keyout ./ssl/server.key -out ./ssl/server.cert",
-    "addAdmin": "node ./scripts/setup",
     "liveDev": "nodemon --ignore 'views/' server",
     "setup": "npm i && node ./scripts/setup && exit 0"
   },
@@ -26,9 +24,13 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "peer": "^0.5.3",
+    "pem": "^1.14.4",
     "puppeteer": "^5.2.1",
     "sequelize": "^6.3.3",
     "socket.io": "^2.3.0",
     "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.5"
   }
 }

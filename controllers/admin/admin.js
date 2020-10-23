@@ -12,7 +12,7 @@ module.exports = function ({
     fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
   }
 
-  router.delete("/channel/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
+  router.delete("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
     db.models.Channel.destroy({
       where: {
         id: req.params.uuid
@@ -21,7 +21,7 @@ module.exports = function ({
     res.status(200).send();
   });
 
-  router.post("/channel/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
+  router.post("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
     console.log(req.body, req.params)
     var name = req.body.name;
     var description = req.body.description;

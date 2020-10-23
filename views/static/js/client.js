@@ -54,7 +54,6 @@ class call{
       $("#disconnect_button").show();
       $('#voice_channels li').removeClass("active");
       $('#voice_channels #' + client.voiceChannel.negotiating).parent().parent().addClass("active");
-      console.log(client)
       client.audioOut.srcObject = remoteStream;
       client.voiceChannel.current = client.voiceChannel.negotiating;
       soundeffects.connect.play();
@@ -73,9 +72,9 @@ class call{
 
 }
 
-var client = new class{
+var client = window.client = new class{
   constructor(){
-    this.isStandalone = /electron/i.test(navigator.userAgent);
+    this.isStandalone = window.standalone || false;
     this.socket = io.connect();
     this.textChannel = null;
     this.voiceChannel = {
@@ -139,7 +138,6 @@ var client = new class{
     }.bind(this));
 
     this.socket.on("newMessage", (d)=>{
-      console.log(d, this.textChannel)
       if(d.channel_id == this.textChannel ){
         this.channels[d.channel_id].getMessages({"id": d.message_id});
       }
@@ -158,11 +156,11 @@ var client = new class{
         new voiceChannel(el, this);
       });
 
-      $("#disconnect_button").click(()=>{
+      $("#disconnect_button").on('click',()=>{
         this.call.end();
       });
 
-      $("#mute_microphone").click(()=>{
+      $("#mute_microphone").on('click',()=>{
         if(!this.call.stream.getAudioTracks()[0].enabled){
           $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
           this.call.stream.getAudioTracks()[0].enabled = true;
@@ -174,18 +172,17 @@ var client = new class{
         }
       });
     
-      $("#mute_audio").click(()=>{
-        if(this.audioOut.muted == true){
-          this.audioOut.muted = false;
-          $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
-          soundeffects.unmute.play();
-        } else {
-          this.audioOut.muted = true;
-          $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
-          soundeffects.mute.play();
-        }
-      });
-      
+      $("#mute_audio").on('click',()=>{
+          if(this.audioOut.muted == true){
+            this.audioOut.muted = false;
+            $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
+            soundeffects.unmute.play();
+          } else {
+            this.audioOut.muted = true;
+            $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
+            soundeffects.mute.play();
+          }
+        });
     });
   }
 };
@@ -280,24 +277,24 @@ $( document ).ready(function() {
     overlay.hide();
   });
 
-  $("#nav-toggle").click(function(){
+  $("#nav-toggle").on('click',function(){
     $("nav").show();
   })
 
-  $("#nav-close").click(function(){
+  $("#nav-close").on('click',function(){
     $("nav").hide();
   })
 
-  $("#new_msg_btn").click(function(){
+  $("#new_msg_btn").on('click',function(){
     scrollController.goToBottom(true);
     $("#new_message").toggleClass('hidden');
   })
 
-  $("#new_msg_close").click(function(){
+  $("#new_msg_close").on('click',function(){
     $("#new_message").toggleClass('hidden');
   })
 
-  $("#load_messages a").click(function(){
+  $("#load_messages a").on('click',function(){
     var channel = client.channels[client.textChannel];
     channel.page += 1;
     channel.getMessages({"page": channel.page})

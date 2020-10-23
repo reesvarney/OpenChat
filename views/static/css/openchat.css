@@ -165,7 +165,7 @@ div.center-self {
     position: relative;
     flex-grow: 2;
 }
-.channel-name>a.edit_channel_btn{
+.fa-cog{
     display: inline-block;
     position: relative;
     padding: 10px;

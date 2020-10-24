@@ -1,0 +1,21 @@
+{
+  "name": "openchat",
+  "version": "2.0.0",
+  "description": "Free, Open Source Communication",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "RV",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "electron": "^10.0.0"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.6",
+    "jquery": "^3.5.1",
+    "keypair": "^1.0.1",
+    "peerjs-client": "^0.3.15"
+  }
+}

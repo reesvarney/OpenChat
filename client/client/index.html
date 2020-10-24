@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<head>
+  <title>OpenChat</title>
+  <meta name="description" content="Free and open-source communication" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="./favicon.ico" />
+  <meta charset="UTF-8" />
+
+  <meta property="og:title" content="OpenChat" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" itemprop="name" content="OpenChat" />
+  <meta
+    property="og:description"
+    itemprop="description"
+    content="Open Source Communication"
+  />
+
+  <link rel="stylesheet" href="./css/all.min.css" />
+  <link rel="stylesheet" href="./css/colors.css" />
+  <link rel="stylesheet" href="./css/sizes.css" />
+  <link rel="stylesheet" href="./css/normalize.css" />
+  <link rel="stylesheet" href="./css/openchat.css" />
+
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/client.js"></script>
+
+  <link
+    type="font/opentype"
+    href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100..900&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    type="font/opentype"
+    href="https://fonts.googleapis.com/css2?family=Muli:wght@100..900&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <div id="overlay">
+    <div id="server_type_select" class="modal">
+      <h2>Add a new server</h2>
+      <a class="option" href="#">
+        <div class="icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div>
+          <h3>Host a new server</h3>
+          <p>Create a new server for others to connect to.</p>
+        </div>
+      </a>
+      <a class="option" href="#" id="join_server">
+        <div class="icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div>
+          <h3>Join an existing server</h3>
+          <p>Use a link to connect to someone else's server.</p>
+        </div>
+      </a>
+    </div>
+
+    <div id="connect" class="modal">
+      <h2>Enter server address</h2>
+      <form id="connect_form">
+        <input id="connect_destination" />
+        <button type="submit">Connect</button>
+      </form>
+    </div>
+
+    <div id="settings" class="modal">
+      <h2>User Preferences</h2>
+      <form id="user_form">
+        <label>Display Name</label>
+        <input name="displayName"/>
+        <!-- <label>Input Device</label>
+        <input name="mic"/> -->
+        <!-- <label>Output Device</label>
+        <input name="mic"/> -->
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <nav>
+    <div id="server_container">
+      <div id="server_list"></div>
+      <div>
+        <a class="server-thumbnail" id="add_server" href="#add_server">
+          <i class="fas fa-plus"></i>
+        </a>
+      </div>
+    </div>
+    <div id="settings_container">
+      <a id="settings_button" href="#settings">
+        <i class="fas fa-cog"></i>
+      </a>
+    </div>
+  </nav>
+
+  <audio id="call_out" autoplay></audio>
+</body>
+
+<script id="server-template" type="text/x-handlebars-template">
+  <a class="server-thumbnail" oc_url="{{url}}" href="#" title="{{url}} - No Connection">
+    <img src="{{url}}./img/logo.png" hidden>
+    <i class="fas fa-plug" style="color: red" ></i>
+  </a>
+</script>

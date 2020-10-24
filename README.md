@@ -12,7 +12,6 @@
     <br />
     <a href="https://openchatdemo.tech">View the Demo</a>
     <br />
-    <a> Demo may not be available at this time (for cost saving), please contact me <a href="mailto:reesvarney02@gmail.com?subject=openchat%20demo">here</a> if you require it.</a>
   </p>
 </p>
 
@@ -28,8 +27,6 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 ## Install/ Usage
 Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
 
-### Get public key
-
 ### Local
 1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys) [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 2. Download and unzip the latest release from [https://github.com/reesvarney/OpenChat/releases](https://github.com/reesvarney/OpenChat/releases)
@@ -42,8 +39,7 @@ npm run setup
 ```sh
 npm start
 ```
-6. Open `localhost/admin` in your browser (replace with your IP if accessing from another device) and log in with the previously configured admin credentials. Here you will be able to change the server name and manage the different channels (clients will need to refresh to see these changes).
-7. To access the client go to your IP which should automatically be forwarded to `/client`.
+6. To access the client go to your IP which should automatically be forwarded to `/client`.
 
 If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
 
@@ -91,9 +87,9 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
 ```
 
 ### Further configuration
- - To add more admin accounts, run `npm run addAdmin` in the root of the repository.
+ - To add more admin accounts, run `npm run setup` in the root of the repository, this will also recreate the server secret though this shouldn't cause any issues.
 
- - If you'd like to use a different port, open `conf.json` and change the port value.
+ - If you'd like to use a different port, change the PORT environment variable
 
 ## Plans for the future:
  - Add ability to upload and view files/ media.

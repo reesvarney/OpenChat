@@ -1,0 +1,15 @@
+{
+    "displayName" : "Openchat User",
+    "outputConstraints": {
+        "volume_call" : 1.0,
+        "volume_misc" : 0.5
+    },
+    "inputConstraints": {
+        "sampleRate": 64000,
+        "volume": 1.0,
+        "noiseSuppression": false,
+        "echoCancellation": false,
+        "autoGainControl": true
+    },
+    "servers": []
+}

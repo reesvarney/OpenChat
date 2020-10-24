@@ -1,0 +1,25 @@
+:root {
+    /* COLORS */
+    /* BACKGROUND */
+    --bg-h: 0;
+    --bg-s: 0%;
+    --bg-l: 100%;
+
+    /* ACCENT */
+    --accent-h: 150;
+    --accent-s: 60%;
+    --accent-l: 75%;
+
+    /* CALCULATED VALUES*/
+    --bg: hsl(var(--bg-h), var(--bg-s), var(--bg-l));
+    --bg-darker-5: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .95));
+    --bg-darker-10: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .9));
+    --bg-darker-15: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .85));
+    --bg-darker-20: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .8));
+    --bg-darker-40: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .6));
+    --bg-darker-60: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .4));
+    --bg-darker-80: hsl(var(--bg-h), var(--bg-s), calc(var(--bg-l) * .2));
+
+    --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+    --accent-contrast: hsl(var(--accent-h), calc(var(--accent-s) / 0.8), calc(var(--accent-l) * 0.8));
+}

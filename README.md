@@ -28,10 +28,12 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 ## Install/ Usage
 Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
 
+### Get public key
+
 ### Local
 1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys) [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 2. Download and unzip the latest release from [https://github.com/reesvarney/OpenChat/releases](https://github.com/reesvarney/OpenChat/releases)
-3. In the unzipped folder, run the setup script, which will install prequisite packages, create self-signed SSH keys, add an admin user and configure the server's secret.
+3. In the unzipped folder, run the setup script, which will install prequisite packages, add an admin user and configure the server's secret.
 ```sh
 npm run setup
 ``` 
@@ -78,22 +80,6 @@ You can build OpenChat straight from the repository however it could take severa
 2. Go to the directory that you installed it and build the image
 ```docker
 docker build -t [tag] .
-```
-3. Run the image in a container
-```docker
-docker run --detach -p [port to expose on]:443 --name [container name] [tag]
-```
-4. Start a bash terminal in the container
-```docker
-docker exec -it [container name] /bin/bash
-```
-5. Run the setup script (after secret is successfully set, use `CTRL + C` to exit the script)
-```sh
-npm run setup
-```
-6. Restart the container (make sure to `exit` from the container terminal first)
-```docker
-docker restart [container name]
 ```
 
 #### Implementing letsencrypt SSL keys

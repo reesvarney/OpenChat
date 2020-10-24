@@ -52,7 +52,13 @@ function startServer({ db, io, config, secret, port, temp_users }) {
             } else {
               temp_users[socket.request.session.passport.user].name = data.name;
             }
-            server_info.users[socket.id].name = data.name;
+
+            //If this is sent before the user has been properly created, create user (although it will probably just be overwritten)
+            try{
+              server_info.users[socket.id].name = data.name;
+            } catch(err){
+              server_info.users[socket.id] = {name: data.name}
+            }
             io.emit("usersChange", server_info.users);
           });
         });

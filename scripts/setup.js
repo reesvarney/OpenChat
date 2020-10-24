@@ -22,4 +22,3 @@ require('../db/init.js').then((db)=> {
         if (err) throw err;
     });
 })
-

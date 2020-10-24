@@ -80,8 +80,7 @@ function startServer(){
   //AUTH
   var temp_users = {};
   var passport = require('passport');
-  var initializePassport = require('./controllers/auth/init.js');
-  initializePassport(passport, db, temp_users);
+  require('./controllers/auth/init.js')(passport, db, temp_users);
   app.use(passport.initialize());
   app.use(passport.session());
   

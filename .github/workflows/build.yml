@@ -1,8 +1,47 @@
 name: Build/Release
 
-on: [push, workflow_dispatch]
-
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version to be set with npm
+        required: true
+  create:
+    tags:
+      - '*'
+  
 jobs:
+  # We set the version to the same as the remote to allow for the release to be created by the builder
+  set-versions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Set client version
+        working-directory: client
+        run: npm version ${{GITHUB_REF##*/}}
+
+      - name: Set server version
+        working-directory: server
+        run: npm version ${{GITHUB_REF##*/}}
+
+      - name: Create commit
+        uses: EndBug/add-and-commit@v5
+        with:
+          author_name: Rees 
+          author_email: reesvarney02@gmail.com
+          message: "Sync version"
+          add: "*/package.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-windows:
     runs-on: windows-latest
 
@@ -24,10 +63,11 @@ jobs:
 
       - name: Electron Build
         working-directory: client
-        run: npx electron-builder build
+        run: npx electron-builder build --publish always
       
-      - name: ZIP Unpacked
-        run: powershell Compress-Archive ./client/dist/unpacked portable-windowsx86.zip
+      # Might not need this if above works properly
+      # - name: ZIP Unpacked
+      #   run: powershell Compress-Archive ./client/dist/unpacked portable-windowsx86.zip
       
       - name: ZIP server
         run: powershell Compress-Archive ./server/ server.zip

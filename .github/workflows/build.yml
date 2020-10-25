@@ -22,7 +22,7 @@ jobs:
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
-          package-root: client
+          package_root: client
           github_token: ${{ secrets.github_token }}
 
       - name: List Files

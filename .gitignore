@@ -6,3 +6,4 @@ node_modules/
 *.key
 secret.txt
 config.json
+*/dist

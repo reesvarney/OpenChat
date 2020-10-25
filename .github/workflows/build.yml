@@ -3,12 +3,8 @@ name: Build/Release
 on: [push, workflow_dispatch]
 
 jobs:
-  electron-build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+  build-windows:
+    runs-on: windows-latest
 
     steps:
       - name: Check out Git repository
@@ -19,35 +15,45 @@ jobs:
         with:
           node-version: 10
 
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
+      - name: Install dependencies
+        working-directory: client
+        run: npm i --dev
+
+      - name: Electron Build
+        working-directory: client
+        run: npx electron-builder build
+      
+      - name: ZIP Unpacked
+        uses: montudor/action-zip@v0.1.0
         with:
-          package_root: client
-          github_token: ${{ secrets.github_token }}
-
-      - name: List Files
-        run: ls -la
-
-  zip-server:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v1
-
+          args: zip -qq -r client.zip client/dist/unpacked
+      
       - name: ZIP server
         uses: montudor/action-zip@v0.1.0
         with:
           args: zip -qq -r server.zip server
 
       - name: List Files
-        run: ls -la
+        run: |
+          ls
+          cd client/dist
+          ls
+
+  # zip-server:
+  #   runs-on: ubuntu-latest
+    
+  #   steps:
+  #     - name: Check out Git repository
+  #       uses: actions/checkout@v1
+
+  #     - name: List Files
+  #       run: ls -la
       
       # - name: Upload zip to release
       #   uses: svenstaro/upload-release-action@v2
       #   with:
       #     repo_token: ${{ secrets.GITHUB_TOKEN }}
       #     file: ${{ matrix.file }}
-      #     asset_name: Server Binaries
+      #     asset_name: Server
       #     tag: ${{ github.ref }}
       #     overwrite: false

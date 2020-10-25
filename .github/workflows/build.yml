@@ -13,10 +13,6 @@ on:
     types: [created]
   
 jobs:
-  # We set the version to the same as the remote to allow for the release to be created by the builder
-  set-versions:
-    runs-on: ubuntu-latest
-
   build-windows:
     runs-on: windows-latest
 

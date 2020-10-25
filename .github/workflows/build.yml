@@ -14,10 +14,12 @@ on:
   
 jobs:
   build-windows:
+    name: Electron Build Windows
     runs-on: windows-latest
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EP_PRE_RELEASE: true
 
     steps:
       - name: Check out Git repository
@@ -35,11 +37,7 @@ jobs:
       - name: Electron Build
         working-directory: client
         run: npx electron-builder build --publish always
-      
-      # Might not need this if above works properly
-      # - name: ZIP Unpacked
-      #   run: powershell Compress-Archive ./client/dist/unpacked portable-windowsx86.zip
-      
+
       - name: ZIP server
         run: powershell Compress-Archive ./server/ server.zip
 

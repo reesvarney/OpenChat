@@ -101,6 +101,10 @@ jobs:
       EP_PRE_RELEASE: true
 
     steps:
+
+      - name: Install prequisite packages
+        run: sudo snap install snapcraft --classic
+
       - name: Check out Git repository
         uses: actions/checkout@v1
 

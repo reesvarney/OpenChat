@@ -64,22 +64,55 @@ jobs:
           asset_name: openchat-portable-win.zip
           tag: ${{ github.ref }}
           overwrite: false
+  
+  build-macos:
+    name: Electron Build macOS
 
-  # zip-server:
-  #   runs-on: ubuntu-latest
-    
-  #   steps:
-  #     - name: Check out Git repository
-  #       uses: actions/checkout@v1
+    runs-on: macos-latest
 
-  #     - name: List Files
-  #       run: ls -la
-      
-      # - name: Upload zip to release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: ${{ matrix.file }}
-      #     asset_name: Server
-      #     tag: ${{ github.ref }}
-      #     overwrite: false
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EP_PRE_RELEASE: true
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm i --dev
+
+      - name: Electron Build
+        working-directory: client
+        run: npx electron-builder build --publish always
+
+  build-linux:
+    name: Electron Build Linux
+
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EP_PRE_RELEASE: true
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm i --dev
+
+      - name: Electron Build
+        working-directory: client
+        run: npx electron-builder build --publish always

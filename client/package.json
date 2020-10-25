@@ -1,12 +1,13 @@
 {
   "name": "openchat",
-  "version": "2.0.0",
+  "version": "1.1.0",
   "description": "Free, Open Source Communication",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "https://github.com/reesvarney/OpenChat.git",
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "devDependencies": {

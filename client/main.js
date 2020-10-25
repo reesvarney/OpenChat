@@ -12,7 +12,7 @@ var userPrefs;
 try {
   userPrefs = JSON.parse(fs.readFileSync(prefsPath));
 } catch(error) {
-  userPrefs = JSON.parse(fs.readFileSync('./prefs_default.json'));
+  userPrefs = JSON.parse(fs.readFileSync('./resources/prefs_default.json'));
 }
 
 function savePrefs(){

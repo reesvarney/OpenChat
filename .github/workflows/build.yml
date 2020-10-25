@@ -33,37 +33,7 @@ jobs:
 
       - name: Electron Build
         working-directory: client
-        run: npx electron-builder build --publish always
-
-      - name: ZIP Portable
-        run: powershell Compress-Archive ./client/dist/win-unpacked openchat-portable-win.zip
-
-      - name: ZIP server
-        run: powershell Compress-Archive ./server/ server.zip
-
-      - name: List Files
-        run: |
-          ls
-          cd client/dist
-          ls
-    
-      - name: Upload server zip to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: server.zip
-          asset_name: server.zip
-          tag: ${{ github.ref }}
-          overwrite: false
-
-      - name: Upload portable zip to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: openchat-portable-win.zip
-          asset_name: openchat-portable-win.zip
-          tag: ${{ github.ref }}
-          overwrite: false
+        run: npx electron-builder build --publish always --win nsis portable
   
   build-macos:
     name: Electron Build macOS
@@ -89,7 +59,7 @@ jobs:
 
       - name: Electron Build
         working-directory: client
-        run: npx electron-builder build --publish always
+        run: npx electron-builder build --publish always --macos dmg
 
   build-linux:
     name: Electron Build Linux
@@ -119,4 +89,4 @@ jobs:
 
       - name: Electron Build
         working-directory: client
-        run: npx electron-builder build --publish always
+        run: npx electron-builder build --publish always --linux AppImage

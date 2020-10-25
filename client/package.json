@@ -14,6 +14,17 @@
     "electron": "^10.0.0",
     "electron-builder": "^22.9.1"
   },
+  "build": {
+    "extraResources": [
+      {
+        "from": "./resources/",
+        "to": "resources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
   "dependencies": {
     "electron-updater": "^4.3.5",
     "handlebars": "^4.7.6",

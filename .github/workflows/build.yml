@@ -6,6 +6,9 @@ jobs:
   build-windows:
     runs-on: windows-latest
 
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v1

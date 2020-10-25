@@ -4,11 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: The version to be set with npm
+        description: 'The version to be set with npm'
         required: true
-  create:
-    tags:
-      - '*'
   release:
     types: [created]
   
@@ -55,7 +52,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: server.zip
-          asset_name: Server
+          asset_name: server.zip
           tag: ${{ github.ref }}
           overwrite: false
 
@@ -64,7 +61,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: openchat-portable-win.zip
-          asset_name: Server
+          asset_name: openchat-portable-win.zip
           tag: ${{ github.ref }}
           overwrite: false
 

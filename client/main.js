@@ -9,10 +9,16 @@ app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
 const prefsPath = path.join(app.getPath('userData'), "./prefs.json");
 var userPrefs;
 
+console.log(process.resourcesPath)
+
 try {
   userPrefs = JSON.parse(fs.readFileSync(prefsPath));
 } catch(error) {
-  userPrefs = JSON.parse(fs.readFileSync('./resources/prefs_default.json'));
+  try {
+    userPrefs = JSON.parse(fs.readFileSync('./resources/prefs_default.json'));
+  } catch (err) {
+    userPrefs = JSON.parse(fs.readFileSync(path.join(process.resourcesPath, './prefs_default.json')));
+  }
 }
 
 function savePrefs(){

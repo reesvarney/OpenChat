@@ -26,11 +26,11 @@ jobs:
 
       - name: Set client version
         working-directory: client
-        run: npm version ${{GITHUB_REF##*/}}
+        run: npm version ${GITHUB_REF##*/}
 
       - name: Set server version
         working-directory: server
-        run: npm version ${{GITHUB_REF##*/}}
+        run: npm version ${GITHUB_REF##*/}
 
       - name: Create commit
         uses: EndBug/add-and-commit@v5

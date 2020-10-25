@@ -25,6 +25,9 @@ jobs:
           package-root: client
           github_token: ${{ secrets.github_token }}
 
+      - name: List Files
+        run: ls -la
+
   zip-server:
     runs-on: ubuntu-latest
     
@@ -37,22 +40,14 @@ jobs:
         with:
           args: zip -qq -r server.zip server
 
-  create-release:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        file: [server.zip]
-
-    steps:
       - name: List Files
         run: ls -la
       
-      - name: Upload zip to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ matrix.file }}
-          asset_name: Server Binaries
-          tag: ${{ github.ref }}
-          overwrite: false
+      # - name: Upload zip to release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: ${{ matrix.file }}
+      #     asset_name: Server Binaries
+      #     tag: ${{ github.ref }}
+      #     overwrite: false

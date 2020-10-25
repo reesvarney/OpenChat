@@ -10,9 +10,11 @@
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^10.0.0"
+    "electron": "^10.0.0",
+    "electron-builder": "^22.9.1"
   },
   "dependencies": {
+    "electron-updater": "^4.3.5",
     "handlebars": "^4.7.6",
     "jquery": "^3.5.1",
     "keypair": "^1.0.1",

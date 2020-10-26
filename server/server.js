@@ -1,13 +1,13 @@
 const global_args = process.argv.slice(2);
 require('dotenv').config();
 const fs = require('fs');
-const dbProm = require('./db/init.js');
+const {dbPromise, addTable} = require('./db/init.js');
 const secret = require('./scripts/secret.js')();
 const port = process.env.PORT || 443; 
 var config = require('./scripts/config.js')();
 
 //DB Ready
-dbProm.then((db)=> {
+dbPromise.then((db)=> {
 
 //HELPERS
 var expressFunctions = require('./helpers/expressfunctions.js');
@@ -115,7 +115,8 @@ function startServer(){
   var controllerParams = {
     db: db,
     io: io,
-    passport: passport, 
+    passport: passport,
+    temp_users: temp_users,
     config: config,
     secret: secret,
     expressFunctions: expressFunctions,

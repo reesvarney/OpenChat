@@ -1,5 +1,5 @@
 //CREATE INITIAL ADMIN
-require('../db/init.js').then((db)=> {
+require('../db/init.js').dbPromise.then((db)=> {
     var readline = require('readline');
     const rl = readline.createInterface({
         input: process.stdin,

@@ -1,5 +1,4 @@
 const { Sequelize } = require("sequelize");
-const model_data = require("./models.js");
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db/sqlite/db.sqlite",
@@ -21,23 +20,30 @@ const relations = {
   },
 };
 
-for (const [name, model] of Object.entries(model_data)) {
-  var tmodel = sequelize.define(name, model.attributes, model.options);
-};
-
-for (const [name, model] of Object.entries(model_data)) {
-  if("relations" in model){
-    model.relations.forEach( (relationship) => {
-      if (relationship.options === undefined){ relationship.options = {}}
-      relations[relationship.relation](name, relationship.model, relationship.options);
-    });
+function addTable(model_data){
+  for (const [name, model] of Object.entries(model_data)) {
+    var tmodel = sequelize.define(name, model.attributes, model.options);
   };
-};
+  
+  for (const [name, model] of Object.entries(model_data)) {
+    if("relations" in model){
+      model.relations.forEach( (relationship) => {
+        if (relationship.options === undefined){ relationship.options = {}}
+        relations[relationship.relation](name, relationship.model, relationship.options);
+      });
+    };
+  };
+}
 
-module.exports = new Promise((resolve, reject) => {
-  sequelize.sync({alter: {drop: false}}).then(() => {
-    resolve(sequelize);
-  });
-});
+addTable(require("./models.js"));
+
+module.exports = {
+  dbPromise: new Promise((resolve, reject) => {
+    sequelize.sync({alter: {drop: false}}).then(() => {
+      resolve(sequelize);
+    });
+  }),
+  addTable: addTable
+}
 
 console.log('Database ✔');

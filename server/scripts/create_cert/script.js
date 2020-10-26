@@ -4,6 +4,10 @@ const fs = require('fs');
 module.exports = async()=>{
   console.log('SSL: Generating self signed certificates...')
 
+  if (!fs.existsSync('./ssl')){
+    fs.mkdirSync('./ssl');
+  }
+
   const ca = await mkcert.createCA({
     organization: 'OpenChat',
     countryCode: 'US',

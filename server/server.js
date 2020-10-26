@@ -1,9 +1,9 @@
 const global_args = process.argv.slice(2);
 const fs = require('fs');
 const dbProm = require('./db/init.js');
-const secret = fs.readFileSync('./secret.txt', 'utf8');
+const secret = require('./scripts/secret.js')();
 const port = process.env.PORT || 443; 
-var config = require('./config.json') || {name: "OpenChat Server"};
+var config = require('./scripts/config.js')();
 
 //DB Ready
 dbProm.then((db)=> {

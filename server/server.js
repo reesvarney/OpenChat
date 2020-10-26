@@ -1,4 +1,5 @@
 const global_args = process.argv.slice(2);
+require('dotenv').config();
 const fs = require('fs');
 const dbProm = require('./db/init.js');
 const secret = require('./scripts/secret.js')();
@@ -118,6 +119,7 @@ function startServer(){
     config: config,
     secret: secret,
     expressFunctions: expressFunctions,
+    port: port
   };
   
   var clientController = require('./controllers/client/client.js')(controllerParams);
@@ -136,7 +138,7 @@ function startServer(){
   
   // MCU CLIENT //
   // Configure params for starting the MCU here
-  var mcu_params = {};
+  var mcu_params = {port: port};
   mcu_params.isHeadless = process.argv.includes("showmcu") ? false : true;
   require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 };

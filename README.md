@@ -25,12 +25,12 @@ At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows m
 ![User Interface](https://raw.githubusercontent.com/reesvarney/OpenChat/assets/2020-06-28-01-44-localhost.png)
 
 ## Install/ Usage
-Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
+I hope to have server binaries potentially in the future to make things easier but in the meantime you will have to install node.
 
 ### Local
-1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys) [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
-2. Download and unzip the latest release from [https://github.com/reesvarney/OpenChat/releases](https://github.com/reesvarney/OpenChat/releases)
-3. In the unzipped folder, run the setup script, which will install prequisite packages, add an admin user and configure the server's secret.
+1. Install the latest version of Node/ NPM [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+2. Download and unzip the `server.zip` from the [latest release](https://github.com/reesvarney/OpenChat/releases/latest)
+3. In the unzipped folder, run the setup script, which will install prequisite packages, and add an admin user.
 ```sh
 npm run setup
 ``` 
@@ -41,7 +41,7 @@ npm start
 ```
 6. To access the client go to your IP which should automatically be forwarded to `/client`.
 
-If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
+If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively, otherwise they will be created automatically for you.
 
 ### Using Docker
 The current docker install is slightly 'hacky' however to maintain quick development, I do not want to have to make too many severe changes to the core functionality to facilitate it.
@@ -87,9 +87,9 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
 ```
 
 ### Further configuration
- - To add more admin accounts, run `npm run setup` in the root of the repository, this will also recreate the server secret though this shouldn't cause any issues.
+ - To add more admin accounts, use `npm run setup` in the root of the server.
 
- - If you'd like to use a different port, change the PORT environment variable
+ - If you'd like to use a different port, change the PORT environment variable. To do this you can use the `.env` file by simply setting `PORT=x`.
 
 ## Plans for the future:
  - Add ability to upload and view files/ media.

@@ -1,5 +1,5 @@
 function main() {
-  var socket = io("https://localhost");
+  var socket = io.connect();
   var connected_users = {};
 
   const createEmptyAudioTrack = () => {

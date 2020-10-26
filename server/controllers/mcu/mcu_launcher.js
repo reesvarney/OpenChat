@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 var browser;
 var page;
 
-async function startMCU({isHeadless}) {
+async function startMCU({isHeadless, port}) {
     try {
         browser = await puppeteer.launch(
             {
@@ -12,7 +12,7 @@ async function startMCU({isHeadless}) {
             }
         );
         page = await browser.newPage();
-        await page.goto(`https://localhost/mcu`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
+        await page.goto(`https://localhost:${port}/mcu`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
         await page.click('#button');
     } catch (err) {
         browser.close();

@@ -8,7 +8,8 @@ function encrypt(pub_key, data) {
 }
 
 module.exports = {
-  router: ({expressFunctions, passport})=>{
+  name: "pubkey",
+  router: (name, {expressFunctions, passport})=>{
     router.get("/", expressFunctions.checkNotAuth, function (req, res) {
       var pub_key = req.query.public_key;
       req.session.authData = crypto.randomBytes(64);
@@ -17,7 +18,7 @@ module.exports = {
       res.send({ encoded_data: enc_data });
     });
   
-    router.post("/",  passport.authenticate("pubkey", { failureRedirect: "/auth" }), function (req, res) {
+    router.post("/",  passport.authenticate(name, { failureRedirect: "/auth" }), function (req, res) {
       res.send("success");
     });
 

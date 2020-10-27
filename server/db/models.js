@@ -1,6 +1,19 @@
 const { DataTypes, Sequelize } = require("sequelize");
 
 module.exports = {
+  RoleAssignment: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      }
+    },
+    relations: [],
+    options: {},
+  },
+
   Message: {
     attributes: {
       id: {
@@ -85,7 +98,7 @@ module.exports = {
       relation: "belongsToMany",
       model: "Role",
       options: {
-        through: "RoleAssignment",
+        through: "RoleAssignment"
       },
     },
     ]
@@ -230,11 +243,5 @@ module.exports = {
         model: "User"
       }
     ]
-  },
-
-  RoleAssignment: {
-    attributes: {},
-    relations: [],
-    options: {},
   },
 };

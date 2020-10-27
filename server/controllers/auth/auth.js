@@ -18,7 +18,7 @@ module.exports = function (controllerParams) {
         icon: method.icon
       });
       var methodRouter = method.router(method.name, controllerParams);
-      // methodRouter.use(express.static("./views/static"));
+      methodRouter.use(express.static("./views/static"));
       router.use(`/${method.name}`, methodRouter);
     });
   });

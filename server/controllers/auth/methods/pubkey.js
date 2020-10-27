@@ -61,6 +61,7 @@ module.exports = {
                   return done(null, user.dataValues);
                 });
               } else {
+                console.log(result[0].User.dataValues)
                 return done(null, result[0].User.dataValues);
               }
             }

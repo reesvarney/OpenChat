@@ -89,9 +89,10 @@ module.exports = {
         },
         include: db.models.User
       }).then(function (result) {
+        if (result === null) return done(null, false);
         hash.update(result.dataValues.private_salt);
         var pass_hashed = hash.digest('hex');
-        if (result === null || result.dataValues.pass_hashed != pass_hashed) return done(null, false);
+        if (result.dataValues.pass_hashed != pass_hashed) return done(null, false);
         return done(null, result.User.dataValues);
       })
     })

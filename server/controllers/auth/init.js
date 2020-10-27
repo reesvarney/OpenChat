@@ -24,13 +24,13 @@ function initialize(passport, db, temp_users) {
           where: {
             id: id,
           },
-          include: db.models.Role,
+          include: [db.models.Role],
         }).then(function (result) {
           if (result === null) return done(null, false);
           var user = result.dataValues;
           var permissions = {};
           if(user.Roles.length === 0){
-            result.addRole(defaultPermissions);
+            result.addRole(defaultPermissions[0]).catch(err=>{console.log('Unique constraint exists')})
             for (const [key, value] of Object.entries(defaultPermissions[0].dataValues)) {
               if (~key.indexOf("permission")) {
                 permissions[key] = value ? true : false;

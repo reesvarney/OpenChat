@@ -51,7 +51,6 @@ module.exports = {
           }).then((result) => {
             if( !("User" in result[0]) || result[0].User === null){
               result[0].createUser({name: username}).then((user)=>{
-                console.log(user);
                 return done(null, user.dataValues);
               })
             } else {

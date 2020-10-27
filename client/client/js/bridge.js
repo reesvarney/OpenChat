@@ -46,6 +46,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ipcRenderer.sendToHost('client_event',{event: e, data: d});
   }
 
+  $("#logout_button").hide();
+
   $("#disconnect_button").on('click',()=>{
     sendClientEvent('disconnectCall');
   });
@@ -65,4 +67,17 @@ window.addEventListener('DOMContentLoaded', () => {
       sendClientEvent('muteAllAudio', true);
     }
   });
+
+  var controls = {
+    mic: $("#mute_microphone"),
+    audio: $("#mute_audio"),
+    disconnect: $("#disconnect_button")
+  }
+
+  ipcRenderer.on('client_event', (e, d) => {
+    // d.event, d.data
+    if(d.event === "setState"){
+      $(d.data.selector)
+    }
+  })
 });

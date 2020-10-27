@@ -156,33 +156,49 @@ var client = window.client = new class{
         new voiceChannel(el, this);
       });
 
-      $("#disconnect_button").on('click',()=>{
-        this.call.end();
-      });
-
-      $("#mute_microphone").on('click',()=>{
-        if(!this.call.stream.getAudioTracks()[0].enabled){
-          $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
-          this.call.stream.getAudioTracks()[0].enabled = true;
-          soundeffects.unmute_mic.play();
-        } else {
-          $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
-          this.call.stream.getAudioTracks()[0].enabled = false;
-          soundeffects.mute_mic.play();
-        }
-      });
-    
-      $("#mute_audio").on('click',()=>{
-          if(this.audioOut.muted == true){
-            this.audioOut.muted = false;
-            $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
-            soundeffects.unmute.play();
+      // CALL CONTROLS
+      if(!this.isStandalone){
+        $("#disconnect_button").on('click',()=>{
+          this.call.end();
+        });
+  
+        $("#mute_microphone").on('click',()=>{
+          if(!this.call.stream.getAudioTracks()[0].enabled){
+            $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
+            this.call.stream.getAudioTracks()[0].enabled = true;
+            soundeffects.unmute_mic.play();
           } else {
-            this.audioOut.muted = true;
-            $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
-            soundeffects.mute.play();
+            $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
+            this.call.stream.getAudioTracks()[0].enabled = false;
+            soundeffects.mute_mic.play();
           }
         });
+      
+        $("#mute_audio").on('click',()=>{
+            if(this.audioOut.muted == true){
+              this.audioOut.muted = false;
+              $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
+              soundeffects.unmute.play();
+            } else {
+              this.audioOut.muted = true;
+              $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
+              soundeffects.mute.play();
+            }
+        });
+      } else {
+        $("#disconnect_button").on('click',()=>{
+          
+        });
+  
+        $("#mute_microphone").on('click',()=>{
+
+        });
+      
+        $("#mute_audio").on('click',()=>{
+
+        });
+      }
+
     });
   }
 };

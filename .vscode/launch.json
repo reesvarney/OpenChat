@@ -11,6 +11,9 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
+      "trace": true,
+      "cwd": "${workspaceFolder}\\server",
+      "runtimeArgs": ["--trace-warnings"],
       "program": "${workspaceFolder}\\server\\server.js"
     }
   ]

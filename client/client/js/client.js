@@ -69,7 +69,7 @@ class server {
       async: true,
       type: 'GET',
       url: `${this.url.origin}/auth/pubkey`,
-      data: { "public_key": remote.getGlobal("pub_key")},
+      data: { "public_key": remote.getGlobal("pub_key")}, 
       error: ()=>{
         this.connected.value = false;
       },
@@ -122,6 +122,7 @@ class server {
           }
           break;
         case "client_event":
+          console.log(d)
           break;
         default:
           console.log("Unhandled IPC Message:", e)

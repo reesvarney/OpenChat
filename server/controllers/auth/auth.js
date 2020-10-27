@@ -28,6 +28,11 @@ module.exports = function (controllerParams) {
     res.render('auth/index', {authMethods})
   });
 
+  router.get('/logout', function(req, res){
+    req.logout();
+    res.redirect('/');
+  });
+
   router.use(express.static("./views/static"));
 
   return router;

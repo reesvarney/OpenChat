@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const { Sequelize, DataTypes} = require("sequelize");
 var authMethods = [];
 
 module.exports = function (controllerParams) {
@@ -14,7 +13,9 @@ module.exports = function (controllerParams) {
         controllerParams.addModels(method.models);
       };
       authMethods.push(method.name)
-      router.use(`/${method.name}`, method.router(method.name, controllerParams));
+      var methodRouter =  method.router(method.name, controllerParams);
+      methodRouter.use(express.static("./views/static"));
+      router.use(`/${method.name}`, methodRouter);
     });
   });
 

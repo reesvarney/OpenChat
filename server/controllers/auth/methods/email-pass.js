@@ -4,63 +4,93 @@ var crypto = require("crypto");
 var LocalStrategy = require("passport-local").Strategy;
 
 function encrypt(pub_key, data) {
-    return crypto.publicEncrypt(pub_key, Buffer.from(data, "utf-8"));
+  return crypto.publicEncrypt(pub_key, Buffer.from(data, "utf-8"));
 }
 
 module.exports = {
   name: "email-pass",
-  router: (name, {expressFunctions, passport})=>{
-    router.get('/', expressFunctions.checkNotAuth, function(req,res){
-        if('username' in req.query && req.query.username.length != 0){
-            db.models.User.findOne({
-                where: {
-                    name: req.query.username
-                }
-            }).then(function(result){
-                var salt = (result === null) ? crypto.randomBytes(128).toString('base64') : result.salt;
-                res.render('auth/login', {salt: salt, username: req.query.username, step: 2});
-            });
-        } else {
-            res.render('auth/login', {step: 1, failed: ("failed" in req.query) ? true : false});
-        }
+  router: (name, {
+    expressFunctions,
+    passport,
+    db
+  }) => {
+    router.get('/', expressFunctions.checkNotAuth, function (req, res) {
+      if ('email' in req.query && req.query.email.length != 0) {
+        db.models.EmailPass.findOne({
+          where: {
+            email: req.query.email
+          }
+        }).then(function (result) {
+          var salt = (result === null) ? crypto.randomBytes(128).toString('base64') : result.salt;
+          res.render('auth/email-pass/login', {
+            salt: salt,
+            email: req.query.email,
+            step: 2
+          });
+        });
+      } else {
+        res.render('auth/email-pass/login', {
+          step: 1,
+          failed: ("failed" in req.query) ? true : false
+        });
+      }
     });
 
-    router.post('/', passport.authenticate(name, {failureRedirect: "/auth"}), function(req,res){
-        res.redirect("/");
+    router.post('/', passport.authenticate(name, {
+      failureRedirect: "/auth/email-pass?failed"
+    }), function (req, res) {
+      res.redirect("/");
     });
 
-    router.get('/register', expressFunctions.checkNotAuth, function(req,res){
-        var salt = crypto.randomBytes(128).toString('base64');
-        req.session.salt = salt;
-        res.render('auth/register', {salt: salt});
+    router.get('/register', expressFunctions.checkNotAuth, function (req, res) {
+      var salt = crypto.randomBytes(128).toString('base64');
+      req.session.salt = salt;
+      res.render('auth/email-pass/register', {
+        salt: salt
+      });
     })
 
-    router.post('/register', expressFunctions.checkNotAuth, function(req,res){
-        if( req.session.salt == req.body.salt){
-            var private_salt = crypto.randomBytes(128).toString('base64');
-            var hash = crypto.createHash('sha256');
-            hash.update(req.body.password);
-            hash.update(private_salt);
-            db.models.User.create({name: req.body.username, salt: req.body.salt, private_salt: private_salt, pass_hashed: hash.digest('hex')});
-            res.redirect('/auth/login')
-        };
+    router.post('/register', expressFunctions.checkNotAuth, function (req, res) {
+      if (req.session.salt == req.body.salt) {
+        var private_salt = crypto.randomBytes(128).toString('base64');
+        var hash = crypto.createHash('sha256');
+        hash.update(req.body.password);
+        hash.update(private_salt);
+        var pass_hashed = hash.digest('hex');
+        db.models.EmailPass.create({
+          email: req.body.email,
+          salt: req.body.salt,
+          private_salt: private_salt,
+          pass_hashed: pass_hashed
+        }).then((authMethod) => {
+          authMethod.createUser({
+            name: req.body.username
+          }).then((user) => {
+            res.redirect(`/auth/email-pass?email=${req.body.email}`)
+          })
+        });
+      };
     });
 
     return router;
   },
-  strategy: ({db})=>{
-    return new LocalStrategy(function(username, password, done) {
+  strategy: ({
+    db
+  }) => {
+    return new LocalStrategy(function (username, password, done) {
       var hash = crypto.createHash('sha256');
       hash.update(password);
       db.models.EmailPass.findOne({
-          where: {
-            email: username,
-          }
-      }).then(function(result){
-          hash.update(result.private_salt);
-          if (result === null || result.pass_hashed != hash.digest('hex')) return done(null, false);
-          return done(null, result); 
+        where: {
+          email: username,
+        },
+        include: db.models.User
+      }).then(function (result) {
+        hash.update(result.dataValues.private_salt);
+        var pass_hashed = hash.digest('hex');
+        if (result === null || result.dataValues.pass_hashed != pass_hashed) return done(null, false);
+        return done(null, result.User.dataValues);
       })
-  })
+    })
   },
 }

@@ -23,15 +23,12 @@
   <link rel="stylesheet" type="text/css" href="./css/login.css">
 </head>
 <body>
-  <div style="margin-left: auto; margin-right: auto;">
+  <div class="mb-4" style="margin-left: auto; margin-right: auto;width: 18rem;">
     <div style="text-align: center;">
       <img class="mb-4" src="./img/logo.png" style="margin-left: auto; margin-right: auto; display: block" alt="" width="auto" height="120">
       <h3>Welcome</h3>
       <p>
         Please select a method to login
-        <div style="text-align: center;">
-          <small id="passInfo" class="form-text text-muted">Alternatively, <a href="https://github.com/reesvarney/OpenChat/releases">download the client</a> to use keypair authentication.</small>
-        </div>
       </p>
     </div>
     <ul class="list-group list-group-flush">
@@ -39,8 +36,8 @@
         <a href="/auth/<%= method.path %>" style="margin-bottom: 20px; font-size: 1.3em; color: black; text-decoration: none;"><li class="list-group-item" style="border: none;"><i class="fas fa-<%= method.icon %>" style="margin-right: 15px;"></i><%= method.name %></li></a>
       <% }); %>
     </ul>
+    <div style="text-align: center;box-sizing: content-box;">
+      <small id="passInfo" class="form-text text-muted">Alternatively, <a href="https://github.com/reesvarney/OpenChat/releases">download the client</a> to use keypair authentication, allowing for full access without any passwords.</small>
+    </div>
   </div>
-
-
-
 </body>

@@ -286,6 +286,10 @@ main {
     position: relative;
 }
 
+#channel_info h2 {
+    display: inline-block;
+}
+
 #channel_info::after {
     content:'';
     width:100%;

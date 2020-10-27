@@ -24,7 +24,7 @@ module.exports = {
 
     return router;
   },
-  strategy: ({db})=>{
+  strategy: ({db, addModels})=>{
     return new LocalStrategy(
       {
         usernameField: "name",
@@ -39,21 +39,31 @@ module.exports = {
         ) {
           var key_raw = req.session.publicKey;
           var publicKey = key_raw.replace(/(?:\r\n|\r|\n)/g, "");
-          db.models.User.findOrCreate({
+          db.models.Pubkey.findOrCreate({
             where: {
               pub_key: publicKey,
             },
+            include: db.models.User,
             defaults: {
-              name: username,
               pub_key: publicKey,
             },
           }).then((result) => {
-            if (result[0].dataValues.name != username) {
-              result[0].update({
-                name: username,
-              });
+            if( !("User" in result[0]) || result[0].User === null){
+              result[0].createUser({name: username}).then((user)=>{
+                console.log(user);
+                return done(null, user.dataValues);
+              })
+            } else {
+              if (result[0].dataValues.name != username) {
+                result[0].User.update({
+                  name: username,
+                }).then((user)=>{
+                  return done(null, user.dataValues);
+                });
+              } else {
+                return done(null, result[0].User.dataValues);
+              }
             }
-            return done(null, result[0].dataValues);
           });
         } else {
           return done(null, false);
@@ -61,6 +71,6 @@ module.exports = {
         req.session.authData = null;
       }
     )
-  }
+  },
 }
 

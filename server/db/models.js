@@ -77,12 +77,7 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "New User",
-      },
-      pub_key: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
+      }
     },
     options: {},
     relations: [
@@ -174,6 +169,67 @@ module.exports = {
         },
       },
     ],
+  },
+
+  Pubkey: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      },
+      pub_key: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      }
+    },
+    options: {},
+    relations: [
+      {
+        relation: "belongsTo",
+        model: "User"
+      }
+    ]
+  },
+
+  EmailPass: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: true
+        }
+      },
+      pass_hashed: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      salt: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      private_salt: {
+        type: DataTypes.STRING,
+        allowNull: false
+      }
+    },
+    options: {},
+    relations: [
+      {
+        relation: "belongsTo",
+        model: "User"
+      }
+    ]
   },
 
   RoleAssignment: {

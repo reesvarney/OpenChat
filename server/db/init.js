@@ -1,4 +1,4 @@
-const { Sequelize, Sequelize } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db/sqlite/db.sqlite",
@@ -52,5 +52,3 @@ module.exports = {
   dbPromise: addModels(require("./models.js")),
   addModels
 }
-
-console.log('Database ✔');

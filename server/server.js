@@ -8,6 +8,7 @@ var config = require('./scripts/config.js')();
 
 //DB Ready
 dbPromise.then((db)=> {
+console.log('Database ✔');
 
 //HELPERS
 var expressFunctions = require('./helpers/expressfunctions.js');
@@ -60,7 +61,7 @@ try {
       cert: fs.readFileSync('ssl/server.cert', 'utf8')
     };
   }
-  if("key" in options && "cert" in options) startServer();
+  if("key" in options && "cert" in options && !(options.key == "" || options.cert == "")) startServer();
 } catch (err) {
   //Generate a keypair to be used temporarily
   require("child_process").exec("npm list mkcert || npm i", {cwd: './scripts/create_cert'}, function(error, stdout, stderr) {

@@ -9,6 +9,9 @@ function encrypt(pub_key, data) {
 
 module.exports = {
   name: "email-pass",
+  displayName: "Email/ Password Login",
+  icon: "lock",
+  hidden: false,
   router: (name, {
     expressFunctions,
     passport,

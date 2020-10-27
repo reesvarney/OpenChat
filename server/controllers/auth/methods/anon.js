@@ -12,12 +12,15 @@ function validateName(username){
 
 module.exports = {
   name: "anon",
+  displayName: "Anonymous Login",
+  icon: "user-secret",
+  hidden: false,
   router: (name, {expressFunctions, passport})=>{
     router.get("/", expressFunctions.checkNotAuth, (req, res) => {
-      res.render('auth/anon');
+      res.render('auth/anon/login');
     });
 
-    router.post("/", passport.authenticate(name, { failureRedirect: "/auth/" }), (req, res) => {
+    router.post("/", passport.authenticate(name, { failureRedirect: "/auth/anon?failed" }), (req, res) => {
       res.redirect('/');
     });
 

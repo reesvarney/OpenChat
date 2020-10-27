@@ -4,6 +4,8 @@
     <form action="/auth/email-pass/register" method="post" id="login-form" class="form-signin" >
         <img class="mb-4" src="./img/logo.png" alt="" width="auto" height="120">
         <h1 class="h3 mb-3 font-weight-normal">Create an account</h1>      
+        <small id="passInfo" class="form-text text-muted">For your security, all passwords are hashed both on the client side and server side so that even the server operator will not be able to access it. That being said, please remember to follow standard password security procedures.</small>
+
         <div style="margin-top: 10px">
             <label for="username" class="sr-only">Username</label>
             <input id="username" type="text"  class="form-control" name="username" placeholder="Username" />
@@ -22,7 +24,9 @@
         </div>
         <div style="margin-top: 20px;">
             <p>Already have an account?</p>
-            <a href="/auth/email-pass/login">Log in</a>
+            <a href="/auth/email-pass/">Log in</a>
+            <br>
         </div>
+
     </form>
 </body>

@@ -25,6 +25,7 @@ function initialize(passport, db, temp_users) {
         },
         include: [db.models.Role],
       }).then(function (result) {
+        if (result === null) return done(null, false);
         var user = result.dataValues;
         var permissions = {};
         if(user.Roles.length === 0){
@@ -49,7 +50,6 @@ function initialize(passport, db, temp_users) {
           }
         });
         user.permissions = permissions;
-        if (result === null) return done(null, false);
         return done(null, user);
       });
     }

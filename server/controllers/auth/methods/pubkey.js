@@ -9,6 +9,7 @@ function encrypt(pub_key, data) {
 
 module.exports = {
   name: "pubkey",
+  hidden: true,
   router: (name, {expressFunctions, passport})=>{
     router.get("/", expressFunctions.checkNotAuth, function (req, res) {
       var pub_key = req.query.public_key;

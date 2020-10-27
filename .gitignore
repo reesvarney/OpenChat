@@ -7,3 +7,4 @@ node_modules/
 secret.txt
 config.json
 */dist
+.vscode/

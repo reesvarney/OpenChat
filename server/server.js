@@ -1,7 +1,7 @@
 const global_args = process.argv.slice(2);
 require('dotenv').config();
 const fs = require('fs');
-const {dbPromise, addTable} = require('./db/init.js');
+const {dbPromise, addModels} = require('./db/init.js');
 const secret = require('./scripts/secret.js')();
 const port = process.env.PORT || 443; 
 var config = require('./scripts/config.js')();
@@ -112,15 +112,19 @@ function startServer(){
   
   // ROUTING //
   // Store routes here
+  /**
+   * These are the variables that can be accessed by any controllers/ extensions.
+   */
   var controllerParams = {
-    db: db,
-    io: io,
-    passport: passport,
-    temp_users: temp_users,
-    config: config,
-    secret: secret,
-    expressFunctions: expressFunctions,
-    port: port
+    db,
+    io,
+    passport,
+    temp_users,
+    config,
+    secret,
+    expressFunctions,
+    addModels,
+    port
   };
   
   var clientController = require('./controllers/client/client.js')(controllerParams);

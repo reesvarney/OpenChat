@@ -1,13 +1,16 @@
 {
 	"folders": [
 		{
-			"path": ".."
+			"name": "client",
+			"path": "..\\client"
 		},
 		{
+			"name": "server",
 			"path": "..\\server"
 		},
 		{
-			"path": "..\\client"
+			"name": "OpenChat",
+			"path": ".."
 		}
 	],
 	"settings": {}

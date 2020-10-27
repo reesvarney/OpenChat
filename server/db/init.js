@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, Sequelize } = require("sequelize");
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db/sqlite/db.sqlite",
@@ -20,7 +20,14 @@ const relations = {
   },
 };
 
-function addTable(model_data){
+// TODO: Switch to ts and expand documentation
+/**
+ * Adds a set of models into the database
+ * @param {Object<db_model>} model_data - The database model to be added. There is not currently any documentation but models.js should contain a good enough example
+ * @returns {Promise} Returns a promise which resolves to a sequelize object when the sync has completed. This is the same as `db` so will probably not be needed directly.
+ */
+
+function addModels(model_data){
   for (const [name, model] of Object.entries(model_data)) {
     var tmodel = sequelize.define(name, model.attributes, model.options);
   };
@@ -33,17 +40,17 @@ function addTable(model_data){
       });
     };
   };
-}
 
-addTable(require("./models.js"));
-
-module.exports = {
-  dbPromise: new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     sequelize.sync({alter: {drop: false}}).then(() => {
       resolve(sequelize);
     });
-  }),
-  addTable: addTable
+  })
+};
+
+module.exports = {
+  dbPromise: addModels(require("./models.js")),
+  addModels
 }
 
 console.log('Database ✔');

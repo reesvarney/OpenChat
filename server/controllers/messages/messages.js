@@ -201,23 +201,28 @@ module.exports = function ({ db, io }) {
 
   router.post("/:channel", (req, res) => {
     var error = false;
-    db.models.Message.create({
-      ChannelId: req.params.channel,
-      UserId: req.user.id,
-      content: req.body.contents,
-    }).catch((err)=>{
-      res.status(400).send(err);
-      error = true;
-    }).then((message, err) => {
-      if(!error){
-        console.log(req.user.id, "=>", req.params.channel, "=", req.body.contents);
-        res.sendStatus(200);
-        io.emit("newMessage", {
-          channel_id: message.dataValues.ChannelId,
-          message_id: message.dataValues.id
-        });
-      }
-    });
+    if(req.user !== undefined){
+      db.models.Message.create({
+        ChannelId: req.params.channel,
+        UserId: req.user.id,
+        content: req.body.contents,
+      }).catch((err)=>{
+        res.status(400).send(err);
+        error = true;
+      }).then((message, err) => {
+        if(!error){
+          console.log(req.user.id, "=>", req.params.channel, "=", req.body.contents);
+          res.sendStatus(200);
+          io.emit("newMessage", {
+            channel_id: message.dataValues.ChannelId,
+            message_id: message.dataValues.id
+          });
+        }
+      });
+    } else {
+      res.status(403).send("NO SESSION")
+    }
+
   });
 
   return router;

@@ -69,7 +69,7 @@ function main() {
           var mix_stream = connected_users[currentid]["mixer"].getMixedStream();
           var mix_track = mix_stream.getAudioTracks()[0];
           audioOut.srcObject = instreams[0];
-          connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(mix_track);
+          if(connected_users[peers_filtered[0]]["call"] !== undefined){connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(mix_track)};
         } else {
           if(connected_users[peers_filtered[0]]["call"] !== undefined){
             var currentUser = connected_users[peers_filtered[0]]["call"]["peerConnection"];

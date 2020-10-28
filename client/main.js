@@ -25,6 +25,10 @@ function savePrefs(){
   fs.writeFileSync(prefsPath, JSON.stringify(userPrefs));
 }
 
+function isDev() {
+  return process.argv[2] == '--dev';
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -38,6 +42,7 @@ function createWindow() {
     },
   });
   win.loadFile("./client/index.html");
+  if(!isDev()) win.setMenuBarVisibility(false)
 }
 
 app.whenReady().then(createWindow);

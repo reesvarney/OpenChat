@@ -15,12 +15,11 @@ function sanitize(str) {
     .innerHTML;
 }
 
-module.exports = function ({ db, io }) {
+module.exports = function ({ db, io, expressFunctions }) {
   var ogpCache = {};
   var messageCache = {};
 
-  //TODO: ONLY GET MESSAGES FROM DB WHEN NEW MESSAGES HAVE BEEN SENT
-  router.get("/:channel", function (req, res) {
+  router.get("/:channel", expressFunctions.checkAuth, (req, res) => {
     if (req.query.page == undefined) {
       req.query.page = 0;
     }
@@ -199,7 +198,7 @@ module.exports = function ({ db, io }) {
     });
   });
 
-  router.post("/:channel", (req, res) => {
+  router.post("/:channel", expressFunctions.checkAuth, expressFunctions.hasPermission("send_message"), (req, res) => {
     var error = false;
     if(req.user !== undefined){
       db.models.Message.create({

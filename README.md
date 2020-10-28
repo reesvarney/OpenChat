@@ -30,16 +30,16 @@ I hope to have server binaries potentially in the future to make things easier b
 ### Local
 1. Install the latest version of Node/ NPM [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 2. Download and unzip the `server.zip` from the [latest release](https://github.com/reesvarney/OpenChat/releases/latest)
-3. In the unzipped folder, run the setup script, which will install prequisite packages, and add an admin user.
+3. In the unzipped folder, install the prequisite packages with npm.
 ```sh
-npm run setup
+npm i
 ``` 
-4. Port forward the port `443` in your router software to allow users to connect from outside the local network ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
-5. Start the server
+4. Start the server
 ```sh
 npm start
 ```
-6. To access the client go to your IP which should automatically be forwarded to `/client`.
+5. Connect to the server and authenticate yourself, either using the client or with email/password, as the first user to connect will be given administrative control over the server.
+6. Port forward the port `443` in your router software to allow users to connect from outside the local network ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
 
 If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively, otherwise they will be created automatically for you.
 
@@ -61,14 +61,6 @@ docker run --detach -p [port to expose on]:443 --name [container name] reesvarne
 ```docker
 docker exec -it [container name] /bin/bash
 ```
-4. Run the setup script
-```sh
-npm run setup
-```
-5. Restart the container
-```docker
-docker restart [container name]
-```
 
 #### Build your own image
 You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building (such as sqlite3).
@@ -87,14 +79,11 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
 ```
 
 ### Further configuration
- - To add more admin accounts, use `npm run setup` in the root of the server.
-
  - If you'd like to use a different port, change the PORT environment variable. To do this you can use the `.env` file by simply setting `PORT=x`.
 
 ## Plans for the future:
  - Add ability to upload and view files/ media.
  - Markdown support
- - Add some kind of session tracking or authentication to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
  - Combine signalling into single system with native WebRTC implementation
  - Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would also provide the benefit of providing a less disjointed product as there would be less need for individual versions/forks. It may feature things such as:
    - Bots

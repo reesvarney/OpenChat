@@ -8,7 +8,7 @@ module.exports = ()=>{
     return secret;
   } else {
     secret = crypto.randomBytes(128).toString('hex');
-    fs.writeFileSync('secret.txt', secret, 'utf8');
+    fs.writeFileSync('./secret.txt', secret, 'utf8');
     return secret;
   }
 }

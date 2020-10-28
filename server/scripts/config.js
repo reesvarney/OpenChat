@@ -8,7 +8,7 @@ module.exports = ()=>{
     config = {
       name: "OpenChat Server"
     }
-    fs.writeFile('config.json', JSON.stringify(config), 'utf8', (err) => {
+    fs.writeFile('./config.json', JSON.stringify(config), 'utf8', (err) => {
         if (err) throw err;
     });
   }

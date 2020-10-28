@@ -1,4 +1,5 @@
 function initialize(passport, db, temp_users) {
+  var setup_mode = false;
   db.models.Role.findOrCreate({
     where: {
         name: "default"
@@ -7,6 +8,18 @@ function initialize(passport, db, temp_users) {
         name: "default"
     }
   }).then((defaultPermissions) =>{
+    db.models.Role.findOne({
+      where: {
+        name: "owner"
+      },
+      include: [db.models.User]
+    }).then((result)=>{
+      if(result === null || result.Users.length == 0){
+        console.log('No owners found, entering setup mode - first client to join will be given owner role');
+        setup_mode = true;
+      }
+    })
+
     passport.serializeUser(function (user, done) {
       return done(null, user.id);
     });
@@ -26,6 +39,21 @@ function initialize(passport, db, temp_users) {
           },
           include: [db.models.Role],
         }).then(function (result) {
+          if(setup_mode){
+            db.models.Role.findOrCreate({
+              where: {
+                  name: "owner"
+              },
+              defaults: {
+                  name: "owner",
+                  isAdmin: true
+              }
+            }).then((adminRole)=>{
+              result.addRole(adminRole[0])
+              console.log(`User ${result.id} was assigned to owner role, leaving setup mode`)
+              setup_mode = false;
+            })
+          }
           if (result === null) return done(null, false);
           var user = result.dataValues;
           var permissions = {};

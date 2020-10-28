@@ -122,7 +122,9 @@ class server {
           }
           break;
         case "client_event":
-          console.log(d)
+          for(const [url, server] of Object.entries(servers)){
+            server.wv[0].send("client_event", d)
+          }
           break;
         default:
           console.log("Unhandled IPC Message:", e)
@@ -151,7 +153,6 @@ class server {
     }
     this.wv.addClass("active");
     this.wv[0].shadowRoot.childNodes[1].style.height = "100%";
-    this.socket.emit("test")
   }
 }
 

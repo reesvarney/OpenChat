@@ -38,7 +38,6 @@ class call{
       },
       video: false
     };
-    this.connected = false;
     this.connection = null;
     navigator.getUserMedia(this.constraints, (ls)=>{
       this.stream = ls;
@@ -50,7 +49,10 @@ class call{
   // Allows alternate client objects to be specified. This probably won't be needed though unless somehow a single user should have multiple connections
   start(){
     this.connection = client.peer.call('server', this.stream);
-    this.connection.on('stream', function(remoteStream) {
+    this.connection.on('stream',(remoteStream)=>{
+      if(!this.isStandalone){
+        bridge.startCall()
+      };
       $("#disconnect_button").show();
       $('#voice_channels li').removeClass("active");
       $('#voice_channels #' + client.voiceChannel.negotiating).parent().parent().addClass("active");
@@ -98,7 +100,7 @@ var client = window.client = new class{
       });
     } else {
       //send socket events to client, function provided by bridge
-      registerSocket(this.socket)
+      bridge.registerSocket(this.socket)
     };
 
     //Emit user information, this may be updated with more data in the future.
@@ -163,43 +165,38 @@ var client = window.client = new class{
         });
   
         $("#mute_microphone").on('click',()=>{
-          if(!this.call.stream.getAudioTracks()[0].enabled){
-            $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
-            this.call.stream.getAudioTracks()[0].enabled = true;
-            soundeffects.unmute_mic.play();
-          } else {
-            $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
-            this.call.stream.getAudioTracks()[0].enabled = false;
-            soundeffects.mute_mic.play();
-          }
+            this.muteMic(!this.call.stream.getAudioTracks()[0].enabled);
         });
       
         $("#mute_audio").on('click',()=>{
-            if(this.audioOut.muted == true){
-              this.audioOut.muted = false;
-              $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
-              soundeffects.unmute.play();
-            } else {
-              this.audioOut.muted = true;
-              $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
-              soundeffects.mute.play();
-            }
-        });
-      } else {
-        $("#disconnect_button").on('click',()=>{
-          
-        });
-  
-        $("#mute_microphone").on('click',()=>{
-
-        });
-      
-        $("#mute_audio").on('click',()=>{
-
+            this.mute(!this.audioOut.muted);
         });
       }
-
     });
+  }
+
+  muteAudio(mute){
+    if(mute){
+      this.audioOut.muted = true;
+      $('#mute_audio i').removeClass('fa-volume-up').addClass('fa-volume-mute');
+      soundeffects.mute.play();
+    } else {
+      this.audioOut.muted = false;
+      $('#mute_audio i').removeClass('fa-volume-mute').addClass('fa-volume-up');
+      soundeffects.unmute.play();
+    }
+  };
+
+  muteMic(mute){
+    if(mute){
+      $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
+      this.call.stream.getAudioTracks()[0].enabled = false;
+      soundeffects.mute_mic.play();
+    } else {
+      $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
+      this.call.stream.getAudioTracks()[0].enabled = true;
+      soundeffects.unmute_mic.play();
+    }
   }
 };
 

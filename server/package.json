@@ -5,9 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "showmcu": "node server showmcu",
-    "liveDev": "nodemon --ignore 'views/' server",
-    "setup": "npm i && node ./scripts/setup && exit 0"
+    "showmcu": "node server showmcu"
   },
   "repository": {
     "type": "git",
@@ -33,8 +31,5 @@
     "sequelize": "^6.3.3",
     "socket.io": "^2.3.0",
     "sqlite3": "^5.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.5"
   }
 }

@@ -1,7 +1,7 @@
 ![license](https://img.shields.io/github/license/reesvarney/OpenChat)
-
+![Build/Release](https://github.com/reesvarney/OpenChat/workflows/Build/Release/badge.svg)
 <p align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="./">
     <img src="https://raw.githubusercontent.com/reesvarney/OpenChat/assets/logo.png" alt="Logo" width="auto" height="80">
   </a>
 
@@ -16,11 +16,9 @@
 </p>
 
 ## Overview
-This is a project that seeks to provide a communication service akin to discord or teamspeak completely built in the javascript stack to increase accessibility and ease of use.
+This is a project that seeks to provide a communication service akin to discord or teamspeak completely built in the javascript stack to increase accessibility and ease of use. It features an MCU which means that clients use a more consistent amount of bandwidth compared to peer-to-peer.
 
 This project is currently in its infancy and is functional, however can have issues with stability, especially in terms of signalling. The current signalling system utilises peer.js and socket.io, however in the future should move to a fully socket.io based negotiation system with native WebRTC implementation.
-
-At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows many users to connect without having to establish a connection between each and every peer. It currently utilises a headless browser (using puppeteer) which acts as a proxy-client to receive multiple WebRTC streams and create a single output for each user. Extensive testing for performance and stability has not yet been carried out but the system seems to handle several users quite well without requiring too much power from the CPU (although may be RAM intensive with the natural drawback from using a chromium based headless browser).
 
 ![User Interface](https://raw.githubusercontent.com/reesvarney/OpenChat/assets/2020-06-28-01-44-localhost.png)
 
@@ -61,6 +59,7 @@ docker run --detach -p [port to expose on]:443 --name [container name] reesvarne
 ```docker
 docker exec -it [container name] /bin/bash
 ```
+4. Continue to follow steps 5-6 from the local method above.
 
 #### Build your own image
 You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building (such as sqlite3).

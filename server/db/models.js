@@ -26,7 +26,7 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [3, 32],
+          len: [1, 32],
         },
       },
     },

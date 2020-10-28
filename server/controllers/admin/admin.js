@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 
-module.exports = function ({
+module.exports = function({
   db,
   config,
   expressFunctions

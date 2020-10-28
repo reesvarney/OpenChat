@@ -28,6 +28,7 @@ function startServer({ db, io, config, secret, port, temp_users }) {
               }
               console.log(`User ${socket.id} Connected`);
               currentUser.info = data;
+              server_info.name = config.name;
               socket.emit("serverInfo", server_info);
               server_info.users[socket.id] = {
                 name: user.name,

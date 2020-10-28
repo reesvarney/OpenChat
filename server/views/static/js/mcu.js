@@ -56,7 +56,7 @@ function main() {
 
           for (i = 0; i < peers_filtered.length; i++) {
             var currentUser = connected_users[peers_filtered[i]]["call"];
-            instreams[i] = currentUser["peerConnection"].getRemoteStreams()[0];
+            if(currentUser !== undefined){ instreams[i] = currentUser["peerConnection"].getRemoteStreams()[0]};
           }
 
           //TODO STORE MIXER IN USER OBJECT SO IT CAN BE REMOVED
@@ -71,10 +71,12 @@ function main() {
           audioOut.srcObject = instreams[0];
           connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(mix_track);
         } else {
-          var currentUser = connected_users[peers_filtered[0]]["call"]["peerConnection"];
-          var currentStream = currentUser.getRemoteStreams()[0];
-          audioOut.srcObject = currentStream;
-          connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(currentStream.getAudioTracks()[0]);
+          if(connected_users[peers_filtered[0]]["call"] !== undefined){
+            var currentUser = connected_users[peers_filtered[0]]["call"]["peerConnection"];
+            var currentStream = currentUser.getRemoteStreams()[0];
+            audioOut.srcObject = currentStream;
+            connected_users[currentid]["call"]["peerConnection"].getSenders()[0].replaceTrack(currentStream.getAudioTracks()[0]);
+          }
         }
       }
     }

@@ -143,6 +143,10 @@ function startServer({ db, io, config, secret, port, temp_users }) {
         });
 
         socket.on("disconnect", () => {
+          for(user of Object.values(server_info.users)){
+            user.channel = null;
+          }
+          io.emit("usersChange", server_info.users);
           console.log("MCU LOST CONNECTION");
         });
       }

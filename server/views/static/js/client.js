@@ -50,7 +50,7 @@ class call{
   start(){
     this.connection = client.peer.call('server', this.stream);
     this.connection.on('stream',(remoteStream)=>{
-      if(!this.isStandalone){
+      if(this.isStandalone){
         bridge.startCall()
       };
       $("#disconnect_button").show();
@@ -132,10 +132,19 @@ var client = window.client = new class{
     this.socket.on('usersChange', function(u){
       $('.user-list').empty();
       this.serverinfo.users = u;
-      for(i = 0; i < Object.keys(u).length; i++){
-        if(u[Object.keys(u)[i]].channel != null){
-          $("<li><a></a></li>").text(u[Object.keys(u)[i]].name).appendTo(`#${u[Object.keys(u)[i]].channel}-users`);
+      for(const [userID, user] of Object.entries(u)){
+        if(user.channel !== null){
+          $("<li><a></a></li>").text(user.name).appendTo(`#${user.channel}-users`);
+        } else {
+          if(userID == this.socket.id && this.call.connected){
+            client.voiceChannel.current = client.voiceChannel.negotiating = null;
+            $("#disconnect_button").hide();
+            $('#voice_channels li').removeClass("active");
+            soundeffects.disconnect.play();
+            this.connected = false;
+          }
         }
+
       }
     }.bind(this));
 
@@ -169,7 +178,7 @@ var client = window.client = new class{
         });
       
         $("#mute_audio").on('click',()=>{
-            this.mute(!this.audioOut.muted);
+            this.muteAudio(!this.audioOut.muted);
         });
       }
     });
@@ -189,14 +198,14 @@ var client = window.client = new class{
 
   muteMic(mute){
     if(mute){
-      $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
-      this.call.stream.getAudioTracks()[0].enabled = false;
-      soundeffects.mute_mic.play();
-    } else {
       $('#mute_microphone i').removeClass('fa-microphone-slash').addClass('fa-microphone');
       this.call.stream.getAudioTracks()[0].enabled = true;
       soundeffects.unmute_mic.play();
-    }
+    }else {
+      $('#mute_microphone i').removeClass('fa-microphone').addClass('fa-microphone-slash');
+      this.call.stream.getAudioTracks()[0].enabled = false;
+      soundeffects.mute_mic.play();
+    } 
   }
 };
 

@@ -15,7 +15,7 @@ async function startMCU({isHeadless, port}) {
         await page.goto(`https://localhost:${port}/mcu`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
         await page.click('#button');
     } catch (err) {
-        browser.close();
+        if(browser !== undefined) browser.close();
         console.log(err)
         startMCU({isHeadless});
     }

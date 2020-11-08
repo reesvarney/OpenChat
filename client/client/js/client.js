@@ -179,10 +179,6 @@ $(window).on('load', function (e) {
   });
 
   $("#add_server").on( 'click', function () {
-    overlay.show("server_type_select");
-  });
-
-  $("#join_server").on( 'click', function () {
     overlay.show("connect");
   });
 
@@ -208,6 +204,9 @@ $(window).on('load', function (e) {
     $(this).serializeArray().forEach((pref)=>{
       userPrefs[pref.name] = pref.value;
     })
+    $("#user_form .device-select select").each((i, el)=>{
+      userPrefs[el.id] = $(el).val();
+    })
     ipcRenderer.send("setPrefs", userPrefs);
     Object.values(servers).forEach((server) => {
       server.socket.emit("updateInfo", {
@@ -219,5 +218,23 @@ $(window).on('load', function (e) {
   
   userPrefs.servers.forEach(function(url){
     new server(url);
+  });
+
+  navigator.mediaDevices.enumerateDevices().then((devices)=>{
+    devices.forEach((device)=>{
+      var option = document.createElement('option');
+      option.value = device.label;
+      option.text = device.label;
+      switch(device.kind){
+        case "audiooutput":
+          $(option).appendTo(`#user_form #audioOutput`)
+          break;
+        case "audioinput":
+          $(option).appendTo(`#user_form #audioSource`)
+          break;
+        default:
+          break;
+      }
+    })
   });
 });

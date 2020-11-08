@@ -20,7 +20,13 @@ module.exports = function ({ config, db, expressFunctions }) {
             channels[type].push(channel.dataValues);
           });
         };
-        res.render("client/index", { config, db, req, channels });
+        var viewData = { config, db, req, channels };
+        if(req.user.permissions.permission_edit_roles){
+          viewData["roles"] = await db.models.Role.findAll();
+        } else {
+          viewData["roles"] = {};
+        }
+        res.render("client/index", viewData);
       })();
     });
   });

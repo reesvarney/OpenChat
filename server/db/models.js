@@ -171,6 +171,10 @@ module.exports = {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      permission_edit_roles: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     options: {},
     relations: [

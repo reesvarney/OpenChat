@@ -38,6 +38,27 @@
         </form>
       </div>
     <% } %>
+    <% if(req.user.permissions.permission_edit_roles && roles !== undefined){%>
+      <div class="modal" id="edit_role">
+        <h2>Edit Roles</h2>
+          <% roles.forEach(role => { %>
+            <% var permissions = Object.keys(role.dataValues).filter(function(k) {
+                return k.indexOf('permission') == 0;
+              }).reduce(function(newData, k) {
+                newData[k] = role.dataValues[k];
+                return newData;
+              }, {}) %>
+            <form action="admin/role/<%=role.id%>/edit" method="post">
+              <% for( const [name, value] of Object.entries(permissions)){ %>
+                <label><%= name %></label>
+                <input type="checkbox" name="<%=name%>" value="<%=value%>">
+              <% }; %>
+              <button>Save</button>
+            </form>
+            
+          <% }); %>
+      </div>
+    <% } %>
   </div>
 
     <nav>

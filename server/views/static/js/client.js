@@ -28,16 +28,20 @@ for(i = 0; i < soundfiles.length; i++){
 
 class call{
   constructor(){
-    this.constraints = {
-      audio: {
-          sampleRate: 64000,
-          volume: 1.0,
-          noiseSuppression: false,
-          echoCancellation: false,
-          autoGainControl: true
-      },
-      video: false
-    };
+    if(window.standalone || false){
+      this.constraints = bridge.constraints;
+    } else {
+      this.constraints = {
+        audio: {
+            sampleRate: 64000,
+            volume: 1.0,
+            noiseSuppression: false,
+            echoCancellation: false,
+            autoGainControl: true
+        },
+        video: false
+      };
+    }
     this.connection = null;
     navigator.getUserMedia(this.constraints, (ls)=>{
       this.stream = ls;
@@ -158,7 +162,9 @@ var client = window.client = new class{
   _initDomListeners(){
     $( document ).ready(()=>{
       this.audioOut = ($(Object.assign(document.createElement("audio"), {autoplay: true})).appendTo('body'))[0];
-
+      if(client.isStandalone && "outputDevice" in bridge){
+        this.audioOut.setSinkId(bridge.outputDevice);
+      }
       $("#text_channels li").each((i, el)=>{
         new textChannel(el, this);
       });

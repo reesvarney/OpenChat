@@ -139,6 +139,8 @@ function startServer(){
   app.use("/", clientController);
   app.use("/messages", messageController);
   app.use('/mcu', mcuController);
+
+  app.get('/coffee',(req, res)=>{res.sendStatus(418)}); // Why not?
   
   console.log("Controllers ✔")
   

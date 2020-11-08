@@ -37,28 +37,6 @@
 </head>
 <body>
   <div id="overlay">
-    <div id="server_type_select" class="modal">
-      <h2>Add a new server</h2>
-      <a class="option" href="#">
-        <div class="icon">
-          <i class="fas fa-user-plus"></i>
-        </div>
-        <div>
-          <h3>Host a new server</h3>
-          <p>Create a new server for others to connect to.</p>
-        </div>
-      </a>
-      <a class="option" href="#" id="join_server">
-        <div class="icon">
-          <i class="fas fa-users"></i>
-        </div>
-        <div>
-          <h3>Join an existing server</h3>
-          <p>Use a link to connect to someone else's server.</p>
-        </div>
-      </a>
-    </div>
-
     <div id="connect" class="modal">
       <h2>Enter server address</h2>
       <form id="connect_form">
@@ -72,10 +50,18 @@
       <form id="user_form">
         <label>Display Name</label>
         <input name="displayName"/>
-        <!-- <label>Input Device</label>
-        <input name="mic"/> -->
-        <!-- <label>Output Device</label>
-        <input name="mic"/> -->
+        <div class="device-select">
+          <label for="audioSource">Audio input source: </label>
+          <select id="audioSource">
+            
+          </select>
+        </div>
+        <div class="device-select">
+            <label for="audioOutput">Audio output destination: </label>
+            <select id="audioOutput">
+
+            </select>
+        </div>
         <button type="submit">Save</button>
       </form>
     </div>

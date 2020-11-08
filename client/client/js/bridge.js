@@ -1,54 +1,76 @@
-const {
-  ipcRenderer,
-  remote
-} = require("electron");
-const {
-  URL
-} = require('url');
+const {ipcRenderer,remote} = require("electron");
+const { resolve } = require("path");
+const {URL} = require('url');
 var url = new URL(window.location.href);
+var userPrefs = ipcRenderer.sendSync("getUserPrefs");
 
 //passthrough for socket events
 global.standalone = true;
-
-global.bridge = {
-  registerSocket: (socket) => {
-    var onevent = socket.onevent;
-  
-    function sendSocketEvent(e, d) {
-      ipcRenderer.sendToHost('socket_event', {
-        event: e,
-        data: d
-      });
-    }
-  
-    ipcRenderer.on('socket_event', (e, d) => {
-      socket.emit(d.event, d.data)
-    })
-  
-    socket.onevent = function (packet) {
-      var args = packet.data || [];
-      onevent.call(this, packet); // original call
-      packet.data = ["*"].concat(args);
-      onevent.call(this, packet); // additional call to catch-all
-    };
-  
-    socket.on('connect', (d) => {
-      sendSocketEvent('connect', d);
-    });
-  
-    socket.on('disconnect', (d) => {
-      sendSocketEvent('disconnect', d);
-    });
-  
-    socket.on("*", function (event, data) {
-      sendSocketEvent(event, data);
-    });
-  
-    socket.emit('updateInfo', {
-      name: ipcRenderer.sendSync("getUserPrefs").name,
-    })
+async function findDevice(label){
+  var devices = await navigator.mediaDevices.enumerateDevices();
+  var found = devices.find(device => device.label == label);
+  console.log(found)
+  if(found !== undefined){
+    return found.deviceId;
+  } else {
+    return 'default'
   }
 }
+
+(async()=>{
+  global.bridge = {
+    registerSocket: (socket) => {
+      var onevent = socket.onevent;
+    
+      function sendSocketEvent(e, d) {
+        ipcRenderer.sendToHost('socket_event', {
+          event: e,
+          data: d
+        });
+      }
+    
+      ipcRenderer.on('socket_event', (e, d) => {
+        socket.emit(d.event, d.data)
+      })
+    
+      socket.onevent = function (packet) {
+        var args = packet.data || [];
+        onevent.call(this, packet); // original call
+        packet.data = ["*"].concat(args);
+        onevent.call(this, packet); // additional call to catch-all
+      };
+    
+      socket.on('connect', (d) => {
+        sendSocketEvent('connect', d);
+      });
+    
+      socket.on('disconnect', (d) => {
+        sendSocketEvent('disconnect', d);
+      });
+    
+      socket.on("*", function (event, data) {
+        sendSocketEvent(event, data);
+      });
+    
+      socket.emit('updateInfo', {
+        name: ipcRenderer.sendSync("getUserPrefs").name,
+      })
+    },
+    outputDevice: await findDevice(userPrefs.audioOutput),
+    constraints:{
+      audio: {
+        sampleRate: 64000,
+        volume: 1.0,
+        noiseSuppression: false,
+        echoCancellation: false,
+        autoGainControl: true,
+        deviceId: {exact: await findDevice(userPrefs.audioSource)}
+      },
+      video: false
+    }
+  }
+})()
+
 
 window.addEventListener('DOMContentLoaded', () => {
   const $ = require("jquery");
@@ -71,7 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   $("#mute_microphone").on('click', () => {
-    if (!client.call.stream.getAudioTracks()[0].enabled) {
+    if (client.call.stream.getAudioTracks()[0].enabled) {
       sendClientEvent('muteAllMic', false);
     } else {
       sendClientEvent('muteAllMic', true);
@@ -94,6 +116,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         break;
       case "muteAllMic":
+        console.log(d.data)
         client.muteMic(d.data);
         break;
       case "muteAllAudio":

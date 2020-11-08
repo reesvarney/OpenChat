@@ -3,7 +3,7 @@ var router = express.Router();
 var LocalStrategy = require("passport-local").Strategy;
 const { v4: uuidv4 } = require("uuid");
 function validateName(username){
-  if (username !== undefined && username.length >= 3 && username.length <= 32) {
+  if (username !== undefined && username.length >= 2 && username.length <= 32) {
       return true;
   } else {
       return false;

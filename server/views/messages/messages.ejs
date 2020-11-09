@@ -1,5 +1,6 @@
 <% for(i = 0; i < data.length; i++){ 
 var message = data[i];
+console.log(message)
 %>
     <div id="<%= message.id %>" class="message-card">
         <p>
@@ -22,8 +23,15 @@ var message = data[i];
         </p>
         
         <% if("ogp" in message){ %>
-            <% var ogp = message.ogp; %>
-            <%- include('_ogp', {ogp: ogp}) %>
+            <%- include('_ogp', {ogp: message.ogp}) %>
+        <% } %>
+
+        <% if("yt" in message){ %>
+            <%- include('_yt_embed', {id: message.id, url: message.yt}) %>
+        <% } %>
+
+        <% if("twitch" in message){ %>
+            <%- include('_twitch_embed', {id: message.id, url: message.twitch}) %>
         <% } %>
     </div>
 <% } %>

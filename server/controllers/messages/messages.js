@@ -198,7 +198,7 @@ module.exports = function ({ db, io, expressFunctions }) {
     });
   });
 
-  router.post("/:channel", expressFunctions.checkAuth, expressFunctions.hasPermission("send_message"), (req, res) => {
+  router.post("/:channel", expressFunctions.checkAuth, expressFunctions.hasPermission("permission_send_message"), (req, res) => {
     var error = false;
     if(req.user !== undefined){
       db.models.Message.create({

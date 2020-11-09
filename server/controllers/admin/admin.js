@@ -22,12 +22,10 @@ module.exports = function({
   });
 
   router.post("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
-    console.log(req.body, req.params)
     var name = req.body.name;
     var description = req.body.description;
 
     db.models.Channel.findByPk(req.params.uuid).then((channel) => {
-      console.log(channel)
       channel.update({
         name: name
       });
@@ -51,6 +49,10 @@ module.exports = function({
     saveConf();
     res.redirect('/');
   })
+
+  router.post("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_roles'), function(req,res){
+
+  });
 
   return router;
 };

@@ -10,6 +10,8 @@ $( document ).ready(function() {
       var pass = $('#password').val();
       var salt = $('#salt').val();
       $('#password').val(hash(salt, pass));
+      $('#logo').hide();
+      $('#loading_spinner').show();
       return true;
   });
 });

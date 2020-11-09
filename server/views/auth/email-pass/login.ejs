@@ -4,7 +4,8 @@
     <div style="position: fixed; width: 100%; height: 100%; background-image: url('./img/logo-white-bg.png'); background-repeat: space; background-size: 200px; opacity: 0.02;"></div>
     <div class="uk-card uk-card-body uk-card-default uk-width-auto uk-position-center uk-text-center uk-padding-large">
         <div class="uk-card-media-top" style="height: 100px; margin-bottom: 20px;">
-            <img src="./img/logo.png" style="height: 100%" alt="">
+            <img id="logo" src="./img/logo.png" style="height: 100%" alt="">
+            <div id="loading_spinner" style="display: none" uk-spinner="ratio: 5"></div>
           </div>
         <% if (step == 2){ %>
             <form action="/auth/email-pass/" method="post" id="login-form" class="form-signin" >

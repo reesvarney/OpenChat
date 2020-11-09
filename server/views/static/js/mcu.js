@@ -31,11 +31,7 @@ function main() {
     var channelUsers = [];
 
     for (a = 0; a < Object.keys(connected_users).length; a++) {
-      if (
-        connected_users[Object.keys(connected_users)[a]]["channelID"] ==
-        currentChannel &&
-        connected_users[Object.keys(connected_users)[a]]["channelID"] != null
-      ) {
+      if (connected_users[Object.keys(connected_users)[a]]["channelID"] ==currentChannel && connected_users[Object.keys(connected_users)[a]]["channelID"] != null) {
         channelUsers.push(Object.keys(connected_users)[a]);
       }
     }

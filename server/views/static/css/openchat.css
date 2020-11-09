@@ -25,7 +25,6 @@
 }
 
 html {
-    font-family: 'Public Sans', sans-serif;
     height: 100vh;
     width: 100vw;
     height: -webkit-fill-available;
@@ -56,8 +55,8 @@ nav {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    background: #f2f2f2;
     min-width: 270px;
+    background-color: #f5f5f5;
 }
 
 .brand {
@@ -109,16 +108,10 @@ div.center-self {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding-right: 20px;
 }
 
-#channel_heading a {
-    font-weight: 300;
-    font-size: 20px;
-    font-family: 'Muli', sans-serif;
-    color: #161616;
-    justify-self: flex-start;
-    margin-top: 0px;
+#add_channel_btn {
+    color: #bbbbbb;
 }
 
 .channel-group {
@@ -127,7 +120,6 @@ div.center-self {
 
 .channel-group>h4 {
     font-weight: 500;
-    font-family: 'Muli', sans-serif;
     margin-top: 5px;
     color: darkgrey;
 }
@@ -141,8 +133,7 @@ div.center-self {
     flex-direction: column;
     text-decoration: none;
     list-style: none;
-    border-radius: 10px;
-    background: #fafafa;
+    background: #ffffff;
     margin-right: 20px;
     margin-bottom: 10px;
 }
@@ -164,20 +155,32 @@ div.center-self {
     padding: 10px;
     position: relative;
     flex-grow: 2;
+    color: black;
 }
-.fa-cog{
+
+.edit_channel_btn{
+    align-self: stretch;
+    height: auto;
+    padding: 0px 5px;
+}
+
+.edit_channel_btn *{
     display: inline-block;
     position: relative;
-    padding: 10px;
-    height: 100%;
-    box-sizing: border-box;
-    margin-left: auto;
+    color: #a1a1a1;
+}
+
+.edit_server_btn *{
+    display: inline-block;
+    position: relative;
     justify-self: flex-end;
-    color: #afafaf;
+    color: #a1a1a1;
 }
 
 .channel:hover{
     cursor: pointer;
+    color: black;
+    text-decoration: none;
 }
 
 #channels .active {
@@ -200,8 +203,7 @@ div.center-self {
     position: relative;
     list-style: none;
     height: auto;
-    padding: 1px;
-    padding-left: 10px;
+    padding: 0px;
 }
 
 .user-list li{
@@ -236,6 +238,7 @@ div.center-self {
 .control-button {
     padding: 10px;
     margin: 10px;
+    color: black
 }
 
 .control-button i {
@@ -245,6 +248,7 @@ div.center-self {
 
 .control-button:hover {
     cursor: pointer;
+    color: black;
 }
 
 /* NOTIFICATION */
@@ -472,74 +476,6 @@ main {
 
 #message_send:focus:hover {
     background: #d1d1d1;
-}
-
-/* OVERLAY */
-#overlay {
-    position: absolute;
-    height: 100vh;
-    width: 100vw;
-    backdrop-filter: blur(5px);
-    background: rgba(0,0,0, 0.2);
-    z-index: 100;
-    display: none;
-}
-
-.modal {
-    border-radius: 3%;
-    background: var(--bg-darker-5);
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    min-height: 30%;
-    min-width: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 20px;
-    padding: 20px;
-}
-
-.modal * {
-    margin: 10px;
-}
-
-.modal input {
-    display: block;
-    background-color: var(--bg);
-    outline: none;
-    border-color: var(--bg-darker-5);
-    border-radius: 5px;
-    border-style: solid;
-    padding: 10px;
-    box-sizing: border-box;
-
-}
-
-.modal input.large {
-    width: 100%;
-}
-
-.modal input[type=radio] {
-    display: inline;
-}
-
-.modal label {
-    display: inline;
-}
-
-.modal button {
-    display: block;
-    color: var(--accent-contrast);
-    border-color: var(--accent-contrast);
-    border-style: solid;
-    border-radius: 10px;
-    font-size: 20px;
-    padding: 10px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.modal button:hover:focus{
-    background-color: var(--accent);
 }
 
 /* detect sub 700 wide displays */

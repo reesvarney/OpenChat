@@ -12,12 +12,10 @@ var soundeffects = {},
   scrollController,
   overlay = {
     show: function (div) {
-      $("#overlay").show();
-      $(`#overlay>*`).hide();
-      $(`#overlay>#${div}`).show();
+      UIkit.modal($(`#overlay>#${div}`), {container: false}).show();
     },
     hide: function () {
-      $("#overlay").hide();
+      UIkit.modal($(`#overlay>#${div}`)).hide();
     },
 };
 
@@ -303,11 +301,6 @@ class textChannel extends channel{
 }
 
 $( document ).ready(function() {
-  $("#overlay").on("click", function (e) {
-    if (e.target !== this) return;
-    overlay.hide();
-  });
-
   $("#nav-toggle").on('click',function(){
     $("nav").show();
   })
@@ -349,10 +342,18 @@ $( document ).ready(function() {
       timeout: 10000,
       success: ( function( result){ 
         $("#message_box").val("");
-      })
+      }),
+      error: function (xhr, ajaxOptions, thrownError) {
+        console.log(xhr, thrownError)
+      }
     });
     scrollController.goToBottom(true);
   });
+  
+  $(".edit_server_btn").on('click', function(){
+    overlay.show('edit_server');
+    $('#edit_server>form input[name="name"]').val(client.serverinfo.name);
+  })
 
   scrollController = new smartScroll($('#message_scroll'));
 });

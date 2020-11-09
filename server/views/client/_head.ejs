@@ -17,8 +17,10 @@
     <meta property="og:description" itemprop="description" content="Open Source Communication" />
 
     <link rel="stylesheet" href="./css/all.min.css" />
-    <link rel="stylesheet" href="./css/normalize.css" />
+    <link rel="stylesheet" href="./css/uikit.min.css" />
     <link rel="stylesheet" href="./css/openchat.css" />
+    <script src="./js/uikit.min.js"></script>
+    <script src="./js/uikit-icons.min.js"></script>
 
     <script src="./js/jquery.js"></script>
     <script src="./js/socket.io.js"></script>
@@ -28,7 +30,4 @@
     <% if(req.user.permissions.permission_edit_channels){%>
         <script src="./js/client-edit_channels.js"></script>
     <% } %>
-
-    <link type="font/opentype" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100..900&display=swap" rel="stylesheet">
-    <link type="font/opentype" href="https://fonts.googleapis.com/css2?family=Muli:wght@100..900&display=swap" rel="stylesheet">
 </head>

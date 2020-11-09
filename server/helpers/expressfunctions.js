@@ -16,13 +16,13 @@ module.exports = {
   hasPermission: (perm)=>{
     return function(req, res, next){
         if (req.isAuthenticated()){
-            if(req.user.permissions[perm]){
+            if(req.user.permissions[perm] === true){
                 return next();
             }
             res.redirect('/');
+        } else {
+          res.redirect('/admin/login')
         };
-
-        res.redirect('/admin/login')
     }
   }
 };

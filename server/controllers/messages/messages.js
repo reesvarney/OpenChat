@@ -91,8 +91,9 @@ module.exports = function ({ db, io, expressFunctions }) {
                   expression: /^(?:https?:\/\/)?(?:www\.|go\.)?twitch\.tv\/([a-z0-9_]+)($|\?)/g,
                   function: function (str) {
                     return str
-                      .split("twitch.tv/")[1]
-                      .split('?')[0]
+                    .replace("twitch.tv/", "player.twitch.tv/?channel=")
+                    .replace("www.", "")
+                    .concat("&autoplay=false");
                   },
                 },
               ];

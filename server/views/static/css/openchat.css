@@ -232,19 +232,23 @@ div.center-self {
 
 /* CONTROLS */
 #control_area {
-    justify-self: space-between;
-    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 100%;
 }
 
 .control-button {
     padding: 10px;
-    margin: 10px;
-    color: black
+    margin: 1px;
+    color: black;
+    flex-basis: 10%;
+
 }
 
 .control-button i {
-    height: 0;
-    width: 0;
+    height: 0px;
+    width: 0px;
 }
 
 .control-button:hover {

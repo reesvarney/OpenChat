@@ -301,12 +301,15 @@ class textChannel extends channel{
 }
 
 $( document ).ready(function() {
-  DarkReader.auto({
-      brightness: 100,
-      contrast: 90,
-      sepia: 10
-  });
-
+  var dark = false;
+  $("#toggleDark").on('click', function(){
+    if(!dark){
+      DarkReader.enable();
+    } else {
+      DarkReader.disable();
+    }
+    dark = !dark;
+  })
   $("#nav-toggle").on('click',function(){
     $("nav").show();
   })

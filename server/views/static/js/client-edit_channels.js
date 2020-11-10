@@ -39,7 +39,6 @@ $( document ).ready(function() {
         data: data,
         timeout: 10000,
         success: ((result)=>{
-          console.log('Channel Deleted');
           window.location.reload();
         })
       });

@@ -34,6 +34,7 @@ body {
     display: flex;
     flex-direction: row;
     height: 100%;
+    width: 100%;
 }
 
 ol {
@@ -57,6 +58,7 @@ nav {
     padding: 10px;
     min-width: 270px;
     background-color: #f5f5f5;
+    box-sizing: border-box;
 }
 
 .brand {
@@ -288,6 +290,8 @@ main {
 #channel_info {
     padding-left: 20px;
     position: relative;
+    display: flex;
+    flex-direction: row;
 }
 
 #channel_info h2 {
@@ -481,6 +485,11 @@ main {
 /* detect sub 700 wide displays */
 #nav-toggle, #nav-close {
     display: none;
+    color: #444444;
+}
+
+#nav-toggle * {
+    color: #444444;
 }
 
 @media screen and ( max-width: 700px ) {

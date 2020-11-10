@@ -1,7 +1,12 @@
 <div class="ogp-card">
     <div class="yt-container">
         <div class="yt-player" >
-        <iframe type="text/html" src="<%= url %>" id="<%= id %>" frameborder="0" width="560" height="349" allowfullscreen="allowfullscreen" onload="if(!this.src.includes(`&parent=${window.location.hostname}`)){this.src = this.src.concat(`&parent=${window.location.hostname}`); fixed = true; console.log('Query parent is fixed, ignore Twitch error');}"></iframe>
-        </div>
+        <iframe type="text/html" src="<%= url %>" id="twitch-<%= id %>" frameborder="0" width="560" height="349" allowfullscreen="allowfullscreen" onload="if(!this.src.includes(`&parent=${window.location.hostname}`)){this.src = this.src.concat(`&parent=${window.location.hostname}`); fixed = true;}"></iframe>
+        <script>
+            if(!window.location.hostname.match(/[a-z]/i)){
+                $("#twitch-<%= id %>").parentsUntil('.ogp-card').parent().remove();
+            }
+        </script>
+    </div>
     </div>
 </div>

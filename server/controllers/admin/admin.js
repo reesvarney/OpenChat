@@ -51,7 +51,24 @@ module.exports = function({
   })
 
   router.post("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_roles'), function(req,res){
-
+    (async()=>{
+      var role = await db.models.Role.findByPk(req.params.uuid);
+      if(role === null){
+        res.status(400).send('ERROR: Role does not exist');
+      } else {
+        Object.keys(req.body).forEach((perm)=>{
+          if(!(perm in role.dataValues)){
+            res.status(400).send('ERROR: Invalid Key')
+            return false;
+          }
+        });
+        await role.update(req.body).catch(err =>{
+          res.status(400).send('ERROR: Sequelize error', err)
+          return false;
+        });
+        res.status(200).send('SUCCESS');
+      }
+    })()
   });
 
   return router;

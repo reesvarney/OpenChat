@@ -172,9 +172,13 @@
     <!-- MOVE THIS INTO SEPARATE MESSAGE CONTROLLER -->
     <!-- START -->
     <div id="channel_info">
-      <a id="nav-toggle" style="font-size: 2em;"><i class="fas fa-bars"></i></a>
-      <h2 id="channel_name"></h2>
-      <p id="channel_description"></p>
+      <div id="nav-toggle">
+        <a  style="font-size: 2em;"><i class="fas fa-bars"></i></a>
+      </div>
+      <div>
+        <h2 id="channel_name"></h2>
+        <p id="channel_description"></p>
+      </div>
     </div>
     <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll;" id="message_scroll">
       <div id="load_messages" style="width: 100%; text-align: center; margin-top: auto; display: none;">

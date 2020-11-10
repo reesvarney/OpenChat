@@ -301,25 +301,39 @@ class textChannel extends channel{
 }
 
 $( document ).ready(function() {
-  var dark = false;
+  // Quick script to store/ detect dark mode preferences
+  var dark = (localStorage.dark === "true") ? true : false;
   var darkScript = false;
-  $("#toggleDark").on('click', function(){
+
+  function toggleDark(){
     if(darkScript === false){
       var script = document.createElement('script');
       script.src = './js/darkreader.js';
       darkScript = document.head.appendChild(script);
       darkScript.onload = ()=>{
         DarkReader.enable()
+        dark = true;
+        localStorage.dark = dark;
       }
     } else {
-      if(!dark){
+      if(dark === false){
         DarkReader.enable();
       } else {
         DarkReader.disable();
       }
+      dark = !dark;
+      localStorage.dark = dark;
     }
-    dark = !dark;
-  })
+  };
+
+  if(dark === true){
+    toggleDark()
+  }
+
+  $("#toggleDark").on('click', function(){
+    toggleDark();
+  });
+
   $("#nav-toggle").on('click',function(){
     $("nav").show();
   })

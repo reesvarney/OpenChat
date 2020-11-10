@@ -302,11 +302,21 @@ class textChannel extends channel{
 
 $( document ).ready(function() {
   var dark = false;
+  var darkScript = false;
   $("#toggleDark").on('click', function(){
-    if(!dark){
-      DarkReader.enable();
+    if(darkScript === false){
+      var script = document.createElement('script');
+      script.src = './js/darkreader.js';
+      darkScript = document.head.appendChild(script);
+      darkScript.onload = ()=>{
+        DarkReader.enable()
+      }
     } else {
-      DarkReader.disable();
+      if(!dark){
+        DarkReader.enable();
+      } else {
+        DarkReader.disable();
+      }
     }
     dark = !dark;
   })

@@ -234,7 +234,6 @@ div.center-self {
 #control_area {
     justify-self: space-between;
     padding: 10px;
-    margin-top: 10px;
 }
 
 .control-button {
@@ -434,28 +433,13 @@ main {
 #message_box {
     flex-grow: 1;
     width:100%;
-    color: grey;
-    border-radius: 28px 0px 0px 28px;
-    background: #ededed;
-    border: none;
-    padding: 10px;
-    padding-left: 15px;
-    font-size: 1.3em;
     width: 100%;
     box-sizing: border-box;
     resize: none;
     overflow-y: auto;
 }
 
-#message_box:focus {
-    outline: none;
-}
-
-#message_box::-webkit-scrollbar {
-    display: none;
-}
-
-#message_send {
+/* #message_send {
     border-radius: 0px 32px 32px 0px;
     background: #fdfdfd;
     outline: none;
@@ -464,23 +448,8 @@ main {
     border-color: #fafafa;
     padding-left: 10px;
     padding-right: 20px;
-}
+} */
 
-#message_send:focus {
-    outline: none;
-}
-
-#message_send:disabled:hover {
-    cursor: default;
-}
-
-#message_send:hover {
-    cursor: pointer;
-}
-
-#message_send:focus:hover {
-    background: #d1d1d1;
-}
 
 /* detect sub 700 wide displays */
 #nav-toggle, #nav-close {

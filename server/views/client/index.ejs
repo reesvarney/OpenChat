@@ -159,12 +159,15 @@
       </div>
       <%};%>
     </div>
+    <div class="uk-card uk-card-default">
       <div id="control_area">
         <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
         <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>
         <a id="disconnect_button" class="control-button" style="display: none;"><i class="fas fa-phone-slash fa-lg"></i></a>
         <a id="logout_button" class="control-button" href="/auth/logout" style="color: black;" title="Sign Out"><i class="fas fa-sign-out-alt fa-lg"></i></a>
       </div>
+    </div>
+
   </nav>
 
   <main>
@@ -176,7 +179,7 @@
         <a  style="font-size: 2em;"><i class="fas fa-bars"></i></a>
       </div>
       <div>
-        <h2 id="channel_name"></h2>
+        <p id="channel_name"  class="uk-heading-small uk-text-lighter" style="font-size: 36px"></p>
         <p id="channel_description"></p>
       </div>
     </div>
@@ -203,8 +206,8 @@
     
     <% if(req.user.permissions.permission_send_message){ %>
     <form id="message_input_area">
-      <textarea rows="1" id="message_box" disabled></textarea>
-      <button id="message_send" disabled>Send</button>
+        <textarea rows="2" id="message_box" class="uk-textarea"></textarea>
+        <button id="message_send" class="uk-button uk-button-default" disabled>Send</button>
     </form>
     <% } else {%>
     <div id="message_input_area">

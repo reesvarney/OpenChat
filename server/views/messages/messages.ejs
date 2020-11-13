@@ -32,5 +32,9 @@ var message = data[i];
         <% if("twitch" in message){ %>
             <%- include('_twitch_embed', {id: message.id, url: message.twitch}) %>
         <% } %>
+        
+        <% if("spotify" in message){ %>
+            <%- include('_spotify_embed', {id: message.id, url: message.spotify}) %>
+        <% } %>
     </div>
 <% } %>

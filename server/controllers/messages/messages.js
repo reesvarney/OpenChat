@@ -96,6 +96,13 @@ module.exports = function ({ db, io, expressFunctions }) {
                     .concat("&autoplay=false");
                   },
                 },
+                {
+                  name: "spotify",
+                  expression: /\.spotify\.com/,
+                  function: function (str) {
+                    return `https://open.spotify.com/embed/${str.split("spotify.com/").pop()}`
+                  },
+                },
               ];
 
               for (x = 0; x < links.length; x++) {

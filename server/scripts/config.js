@@ -3,8 +3,9 @@ var fs = require('fs');
 module.exports = ()=>{
   var config;
   try{
-    config =  require('./config.json');
+    config =  require('../config.json');
   } catch(err){
+    console.log('Creating Config...')
     config = {
       name: "OpenChat Server"
     }

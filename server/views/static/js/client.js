@@ -287,7 +287,7 @@ class textChannel extends channel{
             $("#load_messages").hide();
           }
     
-          if("page" in params && params.page == 0 || !("page" in params) && scrollController.doesScroll(200)) {
+          if("page" in params && params.page == 0 || (!("page" in params) && scrollController.doesScroll(200))) {
             scrollController.goToChild($("#messages>:first-child"));
           }else if("page" in params){
             scrollController.goToChild(this.lastMessage);
@@ -344,11 +344,11 @@ $( document ).ready(function() {
 
   $("#new_msg_btn").on('click',function(){
     scrollController.goToBottom(true);
-    $("#new_message").toggleClass('hidden');
+    $("#new_message").hide();
   })
 
   $("#new_msg_close").on('click',function(){
-    $("#new_message").toggleClass('hidden');
+    $("#new_message").hide();
   })
 
   $("#load_messages a").on('click',function(){
@@ -373,14 +373,14 @@ $( document ).ready(function() {
       url: `/messages/${client.textChannel}`,
       data: {contents: contents},
       timeout: 10000,
-      success: ( function( result){ 
+      success: ( function( result){
+        scrollController.goToBottom(true); 
         $("#message_box").val("");
       }),
       error: function (xhr, ajaxOptions, thrownError) {
         console.log(xhr, thrownError)
       }
     });
-    scrollController.goToBottom(true);
   });
   
   $(".edit_server_btn").on('click', function(){

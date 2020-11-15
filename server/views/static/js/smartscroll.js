@@ -1,12 +1,14 @@
 class smartScroll{
     constructor(element){
         this.element = element;
+        this.scrolling = false;
+        this.scrollDestination;
     }
 
     //returns whether user is near bottom of element
     doesScroll(range){
-        console.log()
-        if(($(this.element).prop('scrollHeight') - ($(this.element).scrollTop() + $(this.element).height())) < range + 100 ) {
+        var source = (this.scrolling) ? this.scrollDestination : $(this.element).scrollTop();
+        if(($(this.element).prop('scrollHeight') - (source + $(this.element).height())) < range + 100 ) {
             return true;
         } else {
             return false;
@@ -14,18 +16,21 @@ class smartScroll{
     };
 
     goToChild(child){
-        var scrollTop = child.offset().top;
-        this.element.scrollTop(scrollTop);
+        this.scrollDestination = child.offset().top;
+        this.element.scrollTop(this.scrollDestination);
     }
 
-    goToBottom(smooth){
-        var scrollTop = this.element[0].scrollHeight;
+    goToBottom(smooth=true){
+        this.scrollDestination = this.element[0].scrollHeight;
         if(smooth){
+            this.scrolling = true;
             this.element.animate({
-                scrollTop: scrollTop
-            }, 500);
+                scrollTop: this.scrollDestination
+            }, 500, ()=>{
+                this.scrolling = false;
+            });
         } else {
-            this.element.scrollTop(scrollTop);
+            this.element.scrollTop(this.scrollDestination);
         }
     }
 

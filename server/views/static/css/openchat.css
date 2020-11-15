@@ -398,12 +398,17 @@ main {
   background-color: #f6f6f6;
 }
 
+#new_message>.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .yt-container {
   width: 100%;
   height: 100%;
   max-width: 520px;
   max-height: 292.5px;
-  margin-bottom: 20px;
 }
 
 .yt-player {
@@ -452,18 +457,6 @@ main {
   resize: none;
   overflow-y: auto;
 }
-
-/* #message_send {
-    border-radius: 0px 32px 32px 0px;
-    background: #fdfdfd;
-    outline: none;
-    border-width: 1px;
-    border-style: solid;
-    border-color: #fafafa;
-    padding-left: 10px;
-    padding-right: 20px;
-} */
-
 
 /* detect sub 700 wide displays */
 #nav-toggle,

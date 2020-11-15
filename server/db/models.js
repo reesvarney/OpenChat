@@ -65,6 +65,12 @@ module.exports = {
           len: [3, 32],
         },
       },
+      position: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        defaultValue: 0
+      }
     },
     options: {},
     relations: [

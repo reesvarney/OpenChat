@@ -15,6 +15,9 @@ module.exports = function ({ config, db, expressFunctions }) {
             where: {
               type: type,
             },
+            order: [
+              ['position', 'ASC']
+            ]
           });
           channelArray.forEach(function (channel) {
             channels[type].push(channel.dataValues);

@@ -138,7 +138,7 @@ var client = window.client = new class{
         if(user.channel !== null){
           $("<li><a></a></li>").text(user.name).appendTo(`#${user.channel}-users`);
         } else {
-          if(userID == this.socket.id && this.call.connected){
+          if(userID == this.socket.id && this.call.connected && client.voiceChannel.negotiating === null){
             client.voiceChannel.current = client.voiceChannel.negotiating = null;
             $("#disconnect_button").hide();
             $('#voice_channels li').removeClass("active");
@@ -232,8 +232,8 @@ class voiceChannel extends channel{
 
   joinChannel(){
     if(!(client.voiceChannel.current == this.id)){
-      client.socket.emit('joinChannel', this.id);
       client.voiceChannel.negotiating = this.id;
+      client.socket.emit('joinChannel', this.id);
     } else {
       console.log('ALREADY CONNECTED');
     }

@@ -1,4 +1,25 @@
 $( document ).ready(function() { 
+  $('.channel-group>ul').each((group, el)=>{
+    var type = $(el).attr('group-type');
+    if(el.children.length > 0){
+      new Sortable(el, {
+        animation: 150,
+        onUpdate: (evt)=>{
+          $.ajax({
+            async: true,
+            type: 'POST',
+            url: `/admin/channel/move/${$(evt.item).find('.channel')[0].id}`,
+            data: {index: evt.newIndex, type: type},
+            timeout: 10000,
+            error: ((err)=>{
+              console.log(err)
+            })
+          })
+        }
+      });
+    }
+  })
+
     $("#add_channel_btn").click(function () {
       overlay.show("add_channel");
     });

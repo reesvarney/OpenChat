@@ -68,7 +68,6 @@ module.exports = {
       position: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        autoIncrement: true,
         defaultValue: 0
       }
     },

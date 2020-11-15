@@ -148,10 +148,21 @@
       <% } %>
     </div>
     <div id="channels">
-      <% for (const [type, type_channels] of Object.entries(channels)) { %>
+      <!-- Make this dynamic again in the future, just need to add categories and category positions-->
+      <% var type = 'voice'; type_channels = channels['voice']; { %>
       <div class="channel-group">
         <h4><%= type.toUpperCase() %></h4>
-        <ul id="<%= type %>_channels">
+        <ul id="<%= type %>_channels" group-type="<%= type %>">
+          <% type_channels.forEach(data => {%>
+            <%- include(`_${type}_channel`, {data, req}) %>
+          <%}); %>
+        </ul>
+      </div>
+      <%};%>
+      <% var type = 'text'; type_channels = channels['text']; { %>
+      <div class="channel-group">
+        <h4><%= type.toUpperCase() %></h4>
+        <ul id="<%= type %>_channels" group-type="<%= type %>">
           <% type_channels.forEach(data => {%>
             <%- include(`_${type}_channel`, {data, req}) %>
           <%}); %>

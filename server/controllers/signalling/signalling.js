@@ -34,7 +34,7 @@ function startServer({ db, io, config, secret, port, temp_users }) {
                 name: user.name,
                 channel: null,
                 status: "online",
-                id: socket.request.session.passport.user,
+                id: user.id,
               };
               io.emit("usersChange", server_info.users);
             });

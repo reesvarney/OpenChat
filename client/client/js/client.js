@@ -221,20 +221,30 @@ $(window).on('load', function (e) {
   });
 
   navigator.mediaDevices.enumerateDevices().then((devices)=>{
+    var selected = {}
     devices.forEach((device)=>{
       var option = document.createElement('option');
       option.value = device.label;
       option.text = device.label;
+      console.log(device.label == userPrefs.audioOutput,device.label == userPrefs.audioSource)
       switch(device.kind){
         case "audiooutput":
+          if (option.value == userPrefs.audioOutput){
+            selected.output = option.value;
+          }
           $(option).appendTo(`#user_form #audioOutput`)
           break;
         case "audioinput":
+          if (option.value == userPrefs.audioSource){
+            selected.source = option.value;
+          }
           $(option).appendTo(`#user_form #audioSource`)
           break;
         default:
           break;
       }
     })
+    if("output" in selected){$('#user_form #audioOutput').val(selected.output)};
+    if("source" in selected){$('#user_form #audioSource').val(selected.source)}
   });
 });

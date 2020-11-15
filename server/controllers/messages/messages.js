@@ -5,6 +5,19 @@ var anchorme = require("anchorme").default;
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 var moment = require("moment");
+const rateLimit = require("express-rate-limit");
+const autoLimit = rateLimit({
+  windowMs: 1 * 1000,
+  max: 2
+});
+const spamLimit = rateLimit({
+  windowMs: 15 * 1000,
+  max: 15
+});
+const spamLimit2 = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30
+});
 const { render } = require("ejs");
 const { User } = require("../../db/models");
 
@@ -205,7 +218,7 @@ module.exports = function ({ db, io, expressFunctions }) {
     });
   });
 
-  router.post("/:channel", expressFunctions.checkAuth, expressFunctions.hasPermission("permission_send_message"), (req, res) => {
+  router.post("/:channel", autoLimit, spamLimit, spamLimit2, expressFunctions.checkAuth, expressFunctions.hasPermission("permission_send_message"), (req, res) => {
     var error = false;
     if(req.user !== undefined){
       db.models.Message.create({

@@ -160,9 +160,10 @@ var client = window.client = new class{
   _initDomListeners(){
     $( document ).ready(()=>{
       this.audioOut = ($(Object.assign(document.createElement("audio"), {autoplay: true})).appendTo('body'))[0];
-      if(client.isStandalone && "outputDevice" in bridge){
+      if(this.isStandalone && "outputDevice" in bridge){
         this.audioOut.setSinkId(bridge.outputDevice);
       }
+
       $("#text_channels li").each((i, el)=>{
         new textChannel(el, this);
       });
@@ -301,37 +302,54 @@ class textChannel extends channel{
 }
 
 $( document ).ready(function() {
-  // Quick script to store/ detect dark mode preferences
-  var dark = (localStorage.dark === "true") ? true : false;
-  var darkScript = false;
+  client.darkMode = new class{
+    constructor(){
+      this.dark = false;
+      this.darkScript = false;
 
-  function toggleDark(){
-    if(darkScript === false){
+      if(client.isStandalone){
+        $('#toggleDark').hide();
+        if(bridge.getDark()){
+          this.setDark(true)
+        }
+      } else {
+        this.dark = (localStorage.dark === "true") ? true : false;
+        this.setDark(this.dark)
+      }
+    }
+  
+    loadDarkScript(val){
       var script = document.createElement('script');
       script.src = './js/darkreader.js';
-      darkScript = document.head.appendChild(script);
-      darkScript.onload = ()=>{
-        DarkReader.enable()
-        dark = true;
-        localStorage.dark = dark;
+      this.darkScript = document.head.appendChild(script);
+      this.darkScript.onload = ()=>{
+        if(val === 'toggle'){
+          val = !this.dark;
+        }
+        this.setDark(val)
       }
-    } else {
-      if(dark === false){
-        DarkReader.enable();
-      } else {
-        DarkReader.disable();
-      }
-      dark = !dark;
-      localStorage.dark = dark;
     }
-  };
-
-  if(dark === true){
-    toggleDark()
+  
+    setDark(val){
+      if(this.darkScript === false){
+        this.loadDarkScript(val)
+      } else {
+        if(val === 'toggle'){
+          val = !this.dark;
+        }
+        if(val === true){
+          DarkReader.enable();
+        }else if(val === false && this.darkScript !== false){
+          DarkReader.disable();
+        }
+      }
+      this.dark = val;
+      if(!client.isStandalone){localStorage.dark = this.dark};
+    }
   }
 
   $("#toggleDark").on('click', function(){
-    toggleDark();
+    client.darkMode.setDark('toggle');
   });
 
   $("#nav-toggle").on('click',function(){

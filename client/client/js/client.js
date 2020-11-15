@@ -169,6 +169,17 @@ var overlay = {
 
 $(window).on('load', function (e) {
   templates.serverIcon = Handlebars.compile($("#server-template").html());
+  var darkMode = {
+    true: "30%",
+    false: "100%"
+  }
+
+  function setDark(val){
+    document.documentElement.style.setProperty('--bg-l', darkMode[val]);
+    $("body").toggleClass("dark", val);
+  }
+
+  setDark(userPrefs.darkMode);
   $("#overlay").on("click", function (e) {
     if (e.target !== this) return;
     overlay.hide();
@@ -195,24 +206,33 @@ $(window).on('load', function (e) {
     }
   });
 
-  $("#user_form input").each(function(){
+  $("#user_form input[type='text']").each(function(){
     $(this).val(userPrefs[$(this).attr('name')]);
+  });
+
+  $("#user_form input[type='checkbox']").each(function(){
+    $(this)[0].checked = userPrefs[$ (this).attr('id')];
   });
 
   $("#user_form").on( 'submit', function (e) {
     e.preventDefault();
     $(this).serializeArray().forEach((pref)=>{
-      userPrefs[pref.name] = pref.value;
-    })
+      if(name.length !== 0){userPrefs[pref.name] = pref.value;}
+    });
     $("#user_form .device-select select").each((i, el)=>{
       userPrefs[el.id] = $(el).val();
+    });
+    $("#user_form input[type='checkbox']").each((i, el)=>{
+      userPrefs[el.id] = $(el)[0].checked;
     })
     ipcRenderer.send("setPrefs", userPrefs);
     Object.values(servers).forEach((server) => {
       server.socket.emit("updateInfo", {
         name: userPrefs.displayName
-      })
+      });
+      server.wv[0].send("client_event", {event: "setDark", data: userPrefs.darkMode})
     });
+    setDark(userPrefs.darkMode)
     overlay.hide();
   });
   
@@ -226,7 +246,6 @@ $(window).on('load', function (e) {
       var option = document.createElement('option');
       option.value = device.label;
       option.text = device.label;
-      console.log(device.label == userPrefs.audioOutput,device.label == userPrefs.audioSource)
       switch(device.kind){
         case "audiooutput":
           if (option.value == userPrefs.audioOutput){
@@ -245,6 +264,6 @@ $(window).on('load', function (e) {
       }
     })
     if("output" in selected){$('#user_form #audioOutput').val(selected.output)};
-    if("source" in selected){$('#user_form #audioSource').val(selected.source)}
+    if("source" in selected){$('#user_form #audioSource').val(selected.source)};
   });
 });

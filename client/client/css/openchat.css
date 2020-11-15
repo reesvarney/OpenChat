@@ -209,7 +209,21 @@ form>* {
     margin: 10px;
 }
 
-form>input {
+form>div{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+form label {
+    display: inline-block;
+    margin-right: auto
+}
+
+form input, form select {
+    min-height: 20px;
+    display: inline-block;
     background-color: var(--bg);
     outline: none;
     border-color: var(--bg-darker-5);
@@ -217,12 +231,19 @@ form>input {
     border-style: solid;
     padding: 10px;
     width: 30em;
-    max-width: 70%;
+    max-width: 80%;
+}
+
+form input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 10px;
 }
 
 button {
     color: var(--accent-contrast);
     border-color: var(--accent-contrast);
+    background-color: var(--bg-darker-5);
     border-style: solid;
     border-radius: 10px;
     font-size: 20px;

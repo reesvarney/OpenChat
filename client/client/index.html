@@ -48,8 +48,16 @@
     <div id="settings" class="modal">
       <h2>User Preferences</h2>
       <form id="user_form">
-        <label>Display Name</label>
-        <input name="displayName"/>
+        <div>
+          <label>Display Name</label>
+          <input type="text" name="displayName"/>
+        </div>
+
+        <div>
+          <label>Dark Mode</label>
+          <input type="checkbox" id="darkMode"/>
+        </div>
+
         <div class="device-select">
           <label for="audioSource">Audio input source: </label>
           <select id="audioSource" value="">

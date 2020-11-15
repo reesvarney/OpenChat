@@ -19,6 +19,9 @@ async function findDevice(label){
 
 (async()=>{
   global.bridge = {
+    getDark: ()=>{
+      return ipcRenderer.sendSync("getUserPrefs").darkMode;
+    },
     registerSocket: (socket) => {
       var onevent = socket.onevent;
     
@@ -116,7 +119,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         break;
       case "muteAllMic":
-        console.log(d.data)
         client.muteMic(d.data);
         break;
       case "muteAllAudio":
@@ -130,6 +132,9 @@ window.addEventListener('DOMContentLoaded', () => {
           $("#disconnect_call").show();
         }
         break;
+      case "setDark":
+        client.darkMode.setDark(d.data);
+        break
       default:
         console.log("Unhandled client event:", d)
     }

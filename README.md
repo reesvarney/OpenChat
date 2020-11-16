@@ -12,6 +12,8 @@
     <br />
     <a href="https://openchatdemo.tech">View the Demo</a>
     <br />
+    <a href="https://trello.com/b/p2K25uED/openchat">Follow the progress</a>
+    <br />
   </p>
 </p>
 

@@ -123,7 +123,7 @@ class server {
           break;
         case "client_event":
           for(const [url, server] of Object.entries(servers)){
-            server.wv[0].send("client_event", d)
+            if(server.wv !== undefined){server.wv[0].send("client_event", d)}
           }
           break;
         default:
@@ -147,7 +147,6 @@ class server {
   showWebView(){
     var active = $("webview.active");
     if(active.length > 0 && active[0].src !== this.url.href){
-      console.log(active[0].src, this.url.href)
       active[0].style.display = "none";
       active.removeClass("active");
     }

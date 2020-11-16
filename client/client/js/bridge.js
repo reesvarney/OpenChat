@@ -126,7 +126,7 @@ window.addEventListener('DOMContentLoaded', () => {
         break;
       case "startCall":
         if(d.data.source !== url.href){
-          if (client.call.connected) {
+          if (client.call.connected){
             client.call.end();
           }
           $("#disconnect_call").show();

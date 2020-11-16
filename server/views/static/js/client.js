@@ -41,6 +41,7 @@ class call{
       };
     }
     this.connection = null;
+    this.connected = false;
     navigator.getUserMedia(this.constraints, (ls)=>{
       this.stream = ls;
     }, function(err) {
@@ -52,7 +53,8 @@ class call{
   start(){
     this.connection = client.peer.call('server', this.stream);
     this.connection.on('stream',(remoteStream)=>{
-      if(this.isStandalone){
+      this.connected = true;
+      if(client.isStandalone){
         bridge.startCall()
       };
       $("#disconnect_button").show();
@@ -61,7 +63,6 @@ class call{
       client.audioOut.srcObject = remoteStream;
       client.voiceChannel.current = client.voiceChannel.negotiating;
       soundeffects.connect.play();
-      this.connected = true;
     });
   }
 

@@ -149,7 +149,8 @@
     </div>
     <div id="channels">
       <!-- Make this dynamic again in the future, just need to add categories and category positions-->
-      <% var type = 'voice'; type_channels = channels['voice']; { %>
+      <% if("voice" in channels){%>
+        <% var type = 'voice'; type_channels = channels['voice']; { %>
       <div class="channel-group">
         <h4><%= type.toUpperCase() %></h4>
         <ul id="<%= type %>_channels" group-type="<%= type %>">
@@ -159,6 +160,8 @@
         </ul>
       </div>
       <%};%>
+      <% } %>
+      <% if ("text" in channels){ %>
       <% var type = 'text'; type_channels = channels['text']; { %>
       <div class="channel-group">
         <h4><%= type.toUpperCase() %></h4>
@@ -169,6 +172,8 @@
         </ul>
       </div>
       <%};%>
+      <%} %>
+
     </div>
     <div class="uk-card uk-card-default">
       <div id="control_area">

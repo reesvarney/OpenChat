@@ -230,7 +230,7 @@ $(window).on('load', function (e) {
       server.socket.emit("updateInfo", {
         name: userPrefs.displayName
       });
-      server.wv[0].send("client_event", {event: "setDark", data: userPrefs.darkMode})
+      if(server.wv !== undefined){server.wv[0].send("client_event", {event: "setDark", data: userPrefs.darkMode})};
     });
     setDark(userPrefs.darkMode)
     overlay.hide();

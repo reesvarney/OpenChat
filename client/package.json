@@ -11,7 +11,7 @@
   "author": "RV",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^10.0.0",
+    "electron": "^10.1.2",
     "electron-builder": "^22.9.1"
   },
   "build": {

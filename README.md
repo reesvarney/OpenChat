@@ -2,7 +2,7 @@
 ![Build/Release](https://github.com/reesvarney/OpenChat/workflows/Build/Release/badge.svg)
 <p align="center">
   <a href="./">
-    <img src="https://raw.githubusercontent.com/reesvarney/OpenChat/assets/logo.png" alt="Logo" width="auto" height="80">
+    <img src="https://github.com/reesvarney/OpenChat/raw/master/assets/logo.png" alt="Logo" width="auto" height="80">
   </a>
 
   <h3 align="center">OpenChat</h3>

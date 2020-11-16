@@ -152,6 +152,7 @@ class server {
       active.removeClass("active");
     }
     this.wv.addClass("active");
+    this.wv[0].style.display = "block";
     this.wv[0].shadowRoot.childNodes[1].style.height = "100%";
   }
 }

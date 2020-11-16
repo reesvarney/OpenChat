@@ -2,10 +2,6 @@ name: Build/Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'The version to be set with npm'
-        required: true
   release:
     types: [created]
   

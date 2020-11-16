@@ -1,0 +1,92 @@
+name: Build/Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version to be set with npm'
+        required: true
+  release:
+    types: [created]
+  
+jobs:
+  build-windows:
+    name: Electron Build Windows
+    runs-on: windows-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EP_PRE_RELEASE: true
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm i --dev
+
+      - name: Electron Build
+        working-directory: client
+        run: npx electron-builder build --publish always --win nsis portable
+  
+  build-macos:
+    name: Electron Build macOS
+
+    runs-on: macos-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EP_PRE_RELEASE: true
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm i --dev
+
+      - name: Electron Build
+        working-directory: client
+        run: npx electron-builder build --publish always --macos dmg
+
+  build-linux:
+    name: Electron Build Linux
+
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EP_PRE_RELEASE: true
+
+    steps:
+
+      - name: Install prequisite packages
+        run: sudo snap install snapcraft --classic
+
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm i --dev
+
+      - name: Electron Build
+        working-directory: client
+        run: npx electron-builder build --publish always --linux AppImage

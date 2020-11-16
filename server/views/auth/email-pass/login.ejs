@@ -1,0 +1,55 @@
+<%- include('_head') %>
+
+<body style="background-color: #414449;">
+    <div style="position: fixed; width: 100%; height: 100%; background-image: url('./img/logo-white-bg.png'); background-repeat: space; background-size: 200px; opacity: 0.02;"></div>
+    <div class="uk-card uk-card-body uk-card-default uk-width-auto uk-position-center uk-text-center uk-padding-large">
+        <div class="uk-card-media-top" style="height: 100px; margin-bottom: 20px;">
+            <img id="logo" src="./img/logo.png" style="height: 100%" alt="">
+            <div id="loading_spinner" style="display: none" uk-spinner="ratio: 5"></div>
+          </div>
+        <% if (step == 2){ %>
+            <form action="/auth/email-pass/" method="post" id="login-form" class="form-signin" >
+                <h3 class="uk-card-title">Sign In</h3>
+                <div class="uk-margin uk-inline">
+                    <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                    <input id="username" type="email"  class="uk-input" name="username" readonly value="<%= email %>" />
+                </div>
+                <input type="hidden" name="salt" id="salt" value="<%=salt%>" />
+                <div class="uk-margin">
+                    <div class="uk-inline">
+                        <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                        <input id="password" type="password" class="uk-input" name="password" placeholder="Password" />
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <button type="submit" class="uk-button uk-button-secondary">Log In</button>
+                </div>
+            </form>
+        <% } else { %>
+            <form action="/auth/email-pass/" method="get" class="form-signin" >
+                <h3 class="uk-card-title">Sign In</h3>
+                <% if (failed){ %>
+                    <p class="uk-text-danger">Username/ Password Incorrect</p>
+                <% } %>
+                <div class="uk-margin uk-inline">
+                    <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                    <input id="email" type="email"  class="uk-input" name="email" placeholder="JSmith@example.com"/>
+                </div>
+                <div>
+                    <button type="submit" class="uk-button uk-button-secondary" style="width: 50%;">Next</button>
+                </div>
+                <hr class="uk-divider-icon">
+                <div class="uk-margin">
+                    <span class="uk-text-lighter" >Don't have a login?</span>
+                    <br>
+                    <a href="/auth/email-pass/register">Register a new account</a>
+
+                    <p class="uk-heading-line"><span>OR</span></p>
+       
+                    <a href="/auth/">Select a different method</a>
+                </div>
+            </form>
+            
+        <% } %>
+    </div>
+  </body>

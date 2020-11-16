@@ -1,0 +1,59 @@
+<%- include('_head') %>
+
+<body style="background-color: #414449;">
+    <div style="position: fixed; width: 100%; height: 100%; background-image: url('./img/logo-white-bg.png'); background-repeat: space; background-size: 200px; opacity: 0.02;"></div>
+    <div class="uk-card uk-card-body uk-card-default uk-width-auto uk-position-center uk-text-center">
+        <div class="uk-card-media-top" style="height: 100px; margin-bottom: 20px;">
+            <img src="./img/logo.png" style="height: 100%" alt="">
+          </div>
+        <form action="/auth/email-pass/register" method="post" id="login-form" class="form-signin uk-margin" >
+            <h3 class="uk-card-title">Create an account</h3>
+
+            <div>
+                <div class="uk-inline">
+                    <button class="uk-button uk-button-text uk-width-1-1" type="button"><span uk-icon="info"></span></button>
+                    <div uk-dropdown="pos: right-center">
+                        <span class="uk-text-meta">
+                            For your security, all passwords are hashed both on the client side and server side so that even the server operator will not be able to access it.
+                            That being said, please remember to follow standard password security procedures.
+                        </span>    
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="uk-margin">
+                <div class="uk-inline">
+                    <span class="uk-form-icon" uk-icon="icon: user"></span>
+                    <label for="username" class="sr-only">Username</label>
+                    <input id="username" type="text"  class="uk-input" name="username" placeholder="Username" />
+                </div>
+            </div>
+            <div class="uk-margin">
+                <div class="uk-inline">
+                    <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                    <label for="email" class="sr-only">Email</label>
+                    <input id="email" type="email"  class="uk-input" name="email" placeholder="JSmith@example.com" />
+                </div>
+            </div>
+            <input type="hidden" name="salt" id="salt" value="<%=salt%>" />
+            <div class="uk-margin">
+                <div class="uk-inline">
+                    <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" type="password"  class="uk-input" name="password" placeholder="Password" />
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <button type="submit" class="uk-button uk-button-secondary">Sign Up</button>
+            </div>
+            <hr class="uk-divider-icon">
+            <div style="margin-top: 20px;">
+                <p class="uk-text-lighter">Already have an account?</p>
+                <a href="/auth/email-pass/">Log in</a>
+                <br>
+            </div>
+
+        </form>
+    </div>
+</body>

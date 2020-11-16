@@ -1,0 +1,40 @@
+<% for(i = 0; i < data.length; i++){ 
+var message = data[i];
+%>
+    <div id="<%= message.id %>" class="message-card">
+        <p>
+            <strong><%= message.sender %></strong>
+                <i class="date">
+                <script type="text/javascript">
+                    var date = new Date("<%= message.date %>");
+                    var now = new Date();
+                    var dispDate;
+                    if(Math.floor(Math.abs(now - date) / (1000 * 60 * 60 * 24)) == 0){
+                        dispDate = date.toLocaleTimeString();
+                    } else {
+                        dispDate = date.toLocaleString();
+                    }
+                    $("#<%= message.id %> .date")[0].innerHTML = dispDate;
+                </script>
+                </i>
+            <br>
+            <%- message.content %>
+        </p>
+        
+        <% if("ogp" in message){ %>
+            <%- include('_ogp', {ogp: message.ogp}) %>
+        <% } %>
+
+        <% if("yt" in message){ %>
+            <%- include('_yt_embed', {id: message.id, url: message.yt}) %>
+        <% } %>
+
+        <% if("twitch" in message){ %>
+            <%- include('_twitch_embed', {id: message.id, url: message.twitch}) %>
+        <% } %>
+        
+        <% if("spotify" in message){ %>
+            <%- include('_spotify_embed', {id: message.id, url: message.spotify}) %>
+        <% } %>
+    </div>
+<% } %>

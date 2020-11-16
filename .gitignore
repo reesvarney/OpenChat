@@ -1,4 +1,10 @@
+*.db
+*.sqlite
+*.sqlite-journal
 node_modules/
-db/openchat.db
-ssl/*.key
-ssl/*.cert
+*.cert
+*.key
+secret.txt
+config.json
+*/dist
+.vscode/

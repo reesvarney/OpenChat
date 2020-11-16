@@ -1,0 +1,11 @@
+<li>
+    <div class="channel-name">
+        <% if(req.user.permissions.permission_edit_channels){ %> 
+            <button href="#" class="uk-button uk-button-secondary edit_channel_btn"><span uk-icon="cog"></span></button> 
+        <% } %>
+        <a id="<%= data.id %>" class="channel">
+            <%= data.name %>
+        </a>
+    </div>
+    <ul id="<%= data.id %>-users" class="user-list"></ul>
+</li>

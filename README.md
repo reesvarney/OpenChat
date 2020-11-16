@@ -1,7 +1,7 @@
 ![license](https://img.shields.io/github/license/reesvarney/OpenChat)
-
+![Build/Release](https://github.com/reesvarney/OpenChat/workflows/Build/Release/badge.svg)
 <p align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="./">
     <img src="https://raw.githubusercontent.com/reesvarney/OpenChat/assets/logo.png" alt="Logo" width="auto" height="80">
   </a>
 
@@ -12,40 +12,36 @@
     <br />
     <a href="https://openchatdemo.tech">View the Demo</a>
     <br />
-    <a> Demo may not be available at this time (for cost saving), please contact me <a href="mailto:reesvarney02@gmail.com?subject=openchat%20demo">here</a> if you require it.</a>
   </p>
 </p>
 
 ### I am currently working on the next version of openchat (on v2-rewrite branch) which will come with an electron app for more persistant authentication, this will take a while so it may be some time for the next update. I will be keeping most of the progress on https://trello.com/b/p2K25uED/openchat if you are interested.
 
 ## Overview
-This is a project that seeks to provide a communication service akin to discord or teamspeak completely built in the javascript stack to increase accessibility and ease of use.
+This is a project that seeks to provide a communication service akin to discord or teamspeak completely built in the javascript stack to increase accessibility and ease of use. It features an MCU which means that clients use a more consistent amount of bandwidth compared to peer-to-peer.
 
 This project is currently in its infancy and is functional, however can have issues with stability, especially in terms of signalling. The current signalling system utilises peer.js and socket.io, however in the future should move to a fully socket.io based negotiation system with native WebRTC implementation.
-
-At the core of OpenChat is its MCU (Multipoint Conferencing Unit) which allows many users to connect without having to establish a connection between each and every peer. It currently utilises a headless browser (using puppeteer) which acts as a proxy-client to receive multiple WebRTC streams and create a single output for each user. Extensive testing for performance and stability has not yet been carried out but the system seems to handle several users quite well without requiring too much power from the CPU (although may be RAM intensive with the natural drawback from using a chromium based headless browser).
 
 ![User Interface](https://raw.githubusercontent.com/reesvarney/OpenChat/assets/2020-06-28-01-44-localhost.png)
 
 ## Install/ Usage
-Support for deployment methods such as heroku will be added in the future, however the current method of storing the config in a .json file won't work in a non-persistant environment.
+I hope to have server binaries potentially in the future to make things easier but in the meantime you will have to install node.
 
 ### Local
-1. Install the latest version of Node/ NPM and openssl (if you don't already have SSL keys) [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
-2. Download and unzip the latest release from [https://github.com/reesvarney/OpenChat/releases](https://github.com/reesvarney/OpenChat/releases)
-3. In the unzipped folder, run the setup script, which will install prequisite packages, create self-signed SSH keys, add an admin user and configure the server's secret.
+1. Install the latest version of Node/ NPM [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+2. Download and unzip the `server.zip` from the [latest release](https://github.com/reesvarney/OpenChat/releases/latest)
+3. In the unzipped folder, install the prequisite packages with npm.
 ```sh
-npm run setup
+npm i
 ``` 
-4. Port forward the port `443` in your router software to allow users to connect from outside the local network ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
-5. Start the server
+4. Start the server
 ```sh
 npm start
 ```
-6. Open `localhost/admin` in your browser (replace with your IP if accessing from another device) and log in with the previously configured admin credentials. Here you will be able to change the server name and manage the different channels (clients will need to refresh to see these changes).
-7. To access the client go to your IP which should automatically be forwarded to `/client`.
+5. Connect to the server and authenticate yourself, either using the client or with email/password, as the first user to connect will be given administrative control over the server.
+6. Port forward the port `443` in your router software to allow users to connect from outside the local network ([guide](https://www.noip.com/support/knowledgebase/general-port-forwarding-guide/))
 
-If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively.
+If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively, otherwise they will be created automatically for you.
 
 ### Using Docker
 The current docker install is slightly 'hacky' however to maintain quick development, I do not want to have to make too many severe changes to the core functionality to facilitate it.
@@ -65,14 +61,7 @@ docker run --detach -p [port to expose on]:443 --name [container name] reesvarne
 ```docker
 docker exec -it [container name] /bin/bash
 ```
-4. Run the setup script
-```sh
-npm run setup
-```
-5. Restart the container
-```docker
-docker restart [container name]
-```
+4. Continue to follow steps 5-6 from the local method above.
 
 #### Build your own image
 You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building (such as sqlite3).
@@ -80,22 +69,6 @@ You can build OpenChat straight from the repository however it could take severa
 2. Go to the directory that you installed it and build the image
 ```docker
 docker build -t [tag] .
-```
-3. Run the image in a container
-```docker
-docker run --detach -p [port to expose on]:443 --name [container name] [tag]
-```
-4. Start a bash terminal in the container
-```docker
-docker exec -it [container name] /bin/bash
-```
-5. Run the setup script (after secret is successfully set, use `CTRL + C` to exit the script)
-```sh
-npm run setup
-```
-6. Restart the container (make sure to `exit` from the container terminal first)
-```docker
-docker restart [container name]
 ```
 
 #### Implementing letsencrypt SSL keys
@@ -107,14 +80,11 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
 ```
 
 ### Further configuration
- - To add more admin accounts, run `npm run addAdmin` in the root of the repository.
-
- - If you'd like to use a different port, open `conf.json` and change the port value.
+ - If you'd like to use a different port, change the PORT environment variable. To do this you can use the `.env` file by simply setting `PORT=x`.
 
 ## Plans for the future:
  - Add ability to upload and view files/ media.
  - Markdown support
- - Add some kind of session tracking or authentication to allow for more persistence between different sessions, whilst still maintaining the option for user anonymity
  - Combine signalling into single system with native WebRTC implementation
  - Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would also provide the benefit of providing a less disjointed product as there would be less need for individual versions/forks. It may feature things such as:
    - Bots

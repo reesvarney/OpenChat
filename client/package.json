@@ -1,0 +1,35 @@
+{
+  "name": "openchat",
+  "version": "1.1.0",
+  "description": "Free, Open Source Communication",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "https://github.com/reesvarney/OpenChat.git",
+  "author": "RV",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "electron": "^10.0.0",
+    "electron-builder": "^22.9.1"
+  },
+  "build": {
+    "extraResources": [
+      {
+        "from": "./resources/",
+        "to": "./",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^4.3.5",
+    "handlebars": "^4.7.6",
+    "jquery": "^3.5.1",
+    "keypair": "^1.0.1",
+    "peerjs-client": "^0.3.15"
+  }
+}

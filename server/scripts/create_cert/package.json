@@ -1,0 +1,11 @@
+{
+  "name": "create_cert",
+  "version": "1.0.0",
+  "description": "Script to create certificate using forge",
+  "main": "script.js",
+  "author": "RV",
+  "license": "ISC",
+  "dependencies": {
+    "mkcert": "^1.4.0"
+  }
+}

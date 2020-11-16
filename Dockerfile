@@ -1,9 +1,9 @@
 FROM node:latest
 WORKDIR /usr/src/openchat
 
-COPY package*.json ./
+COPY server/package*.json ./
 
-COPY . .
+COPY server/ .
 
 RUN  apt-get update \
      && apt-get install -y wget gnupg ca-certificates \

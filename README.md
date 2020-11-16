@@ -22,7 +22,7 @@ This is a project that seeks to provide a communication service akin to discord 
 
 This project is currently in its infancy and is functional, however can have issues with stability, especially in terms of signalling. The current signalling system utilises peer.js and socket.io, however in the future should move to a fully socket.io based negotiation system with native WebRTC implementation.
 
-![User Interface](https://raw.githubusercontent.com/reesvarney/OpenChat/assets/2020-06-28-01-44-localhost.png)
+![User Interface](https://github.com/reesvarney/OpenChat/raw/master/assets/client-light.png)
 
 ## Install/ Usage
 I hope to have server binaries potentially in the future to make things easier but in the meantime you will have to install node.

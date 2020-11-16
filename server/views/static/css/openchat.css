@@ -476,9 +476,10 @@ main {
     overflow-x: auto;
     position: fixed;
     z-index: 99;
-    display: none;
+    display: flex;
     width: 100vw;
     height: 100vh;
+    overflow-y: auto;
   }
 
   main {
@@ -512,13 +513,9 @@ main {
     padding: 5px;
   }
 
-  #channels {
-    min-height: 20vh;
-    height: auto;
-  }
-
   #nav-toggle {
     display: inline-block;
+    padding-right: 30px;
   }
 
   #nav-close {

@@ -4,6 +4,8 @@ var userPrefs = ipcRenderer.sendSync("getUserPrefs");
 const Handlebars = require("handlebars");
 const $ = require("jquery");
 const liveVar = require("./js/livevar.js");
+require('electron-titlebar')
+
 var templates = {}
 var servers = {};
 

@@ -42,8 +42,10 @@ nav {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 10px;
-    background: var(--bg-darker-5);
+    padding: 5px;
+    box-sizing: content-box;
+    min-height: 45px;
+    background: #f5f5f5;
     overflow-x: auto;
     box-sizing: border-box;
 }
@@ -60,6 +62,9 @@ h4 {
     display: flex;
     flex-direction: row;
     justify-content: start;
+        min-height: var(--nav-thumb-size);
+    margin-left: 20px;
+
 }
 
 #server_list {
@@ -72,6 +77,8 @@ h4 {
     border-radius: 25%;
     font-size: var(--nav-thumb-size);
     background-color: var(--bg-darker-10);
+    min-height: var(--nav-thumb-size);
+    min-width: var(--nav-thumb-size);
     overflow: hidden;
     box-sizing: content-box;
     margin-right: 10px;
@@ -254,4 +261,54 @@ button {
 
 button:hover:focus{
     background-color: var(--accent);
+}
+
+/* Title Bar */
+#electron-titlebar{
+   height : 10px;
+}
+
+#titlebar {
+    height: 30px;
+    min-height: 30px;
+    background-color: var(--bg-darker-20);
+}
+
+#titlebar .title {
+    font-size: 14px;
+    margin-left: 10px;
+    line-height: 30px;
+    color: #515151;
+    font-weight: bold;
+}
+
+/* Dark Mode */
+.dark #titlebar .title {
+    font-size: 14px;
+    margin-left: 10px;
+    line-height: 30px;
+    color: var(--accent-contrast);
+    font-weight: bold;
+}
+
+.dark #titlebar {
+    background-color: rgb(24, 26, 27);
+}
+
+.dark nav {
+    background-color: rgb(30, 32, 33);
+}
+
+.dark #settings_button i{
+    color: #a1a1a1;
+}
+.dark #settings label, .dark #settings input, .dark #settings select{
+    color: #aaaaaa
+} 
+.dark #settings h2{
+    color: #9a9a9a
+} 
+
+.dark #electron-titlebar img{
+    filter: invert(1);
 }

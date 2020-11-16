@@ -38,6 +38,8 @@ function createWindow() {
       webviewTag: true,
       enableRemoteModule: true
     },
+    titleBarStyle: 'hidden',
+    frame: (!isDev())? false : true
   });
   win.loadFile("./client/index.html");
   if(!isDev()) win.setMenuBarVisibility(false)

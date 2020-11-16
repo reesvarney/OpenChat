@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron . --dev",
+    "nodev": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/reesvarney/OpenChat.git",
@@ -26,6 +27,7 @@
     ]
   },
   "dependencies": {
+    "electron-titlebar": "0.0.3",
     "electron-updater": "^4.3.5",
     "handlebars": "^4.7.6",
     "jquery": "^3.5.1",

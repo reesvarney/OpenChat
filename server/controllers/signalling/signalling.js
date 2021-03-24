@@ -1,158 +1,328 @@
-var mcu_id = null;
-
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
+const { v4: uuidv4 } = require('uuid');
+
 function startServer({ db, io, config, secret, port, temp_users }) {
-  var server_info = {
-    name: config.name,
-    channels: [],
-    users: {},
-    peerPort: port,
+
+  // User Object
+  class user{
+    constructor(socket, data){
+
+      // "Public" properties
+      this.id = socket.request.session.passport.user;
+      this.socket = socket;
+      this.name = null;
+      this.channel = null;
+      this.data = {};
+      this.temp = false;
+
+      // "Private" properties
+      this._status = "online"
+
+      // Getters/ setters
+      this.publicData;
+      this.status;
+
+      // Get user data
+      (async()=>{
+        var db_user = await db.models.User.findOne({where: { id: this.id }});
+        if (db_user !== null || socket.request.session.passport.user in temp_users) {
+          // console.log(`User ${socket.id} Connected`);
+          if(db_user !== null){
+            if (db_user.name !== data.name && ![null, undefined].includes(data.name)) db_user.update({ name: data.name });
+            this.temp = false;
+          } else {
+            db_user = temp_users[socket.request.session.passport.user];
+            this.temp = true;
+          };
+          this.name = db_user.name;
+          this.data = db_user;
+          this.initSockets();
+          server.sendUpdate();
+        } else {
+          this.socket.disconnect(true);
+          server.deleteUser(this.id);
+        };
+      })();
+    };
+
+    get publicData(){
+      return {
+        name: this.name,
+        channel: this.channel,
+        status: this.status,
+        temp: this.temp,
+        socketID: this.socket.id
+      }
+    };
+
+    set status(status){
+      var status = status.toLowerCase();
+      switch (status){
+        case "online":
+          this._status = "online";
+          this.channel = null;
+          break;
+        case "offline":
+          // console.log(`User ${this.id} Disconnected`);
+          this._status = "offline";
+          this.channel = null;
+          break;
+        default:
+          console.log("Error: Invalid status");
+      }
+      server.sendUpdate();
+      if(this.channel !== null) this.leaveChannel();
+    };
+
+    get status(){
+      return this._status;
+    }
+
+    initSockets(){
+      this.socket.emit("serverInfo", server.publicData);
+
+      this.socket.on('updateInfo', (data)=>{
+        db.models.User.findOne({
+          where: { id: this.id },
+        }).then((db_user) => {
+          if (db_user !== null) {
+            if (db_user.dataValues.name !== data.name) {
+              db_user.update({ name: data.name });
+            }
+          } else {
+            temp_users[this.id].name = data.name;
+          }
+          server.sendUpdate();
+        });
+      });
+
+      //INITIATE CHANNEL JOIN PROCESS
+      this.socket.on("joinChannel", (id) => {
+        this.joinChannel(id);
+      });
+
+      this.socket.on("leaveChannel", ()=>{
+        this.leaveChannel();
+      });
+
+      this.socket.on("disconnect", (reason)=>{
+        // console.log("Disconnect:", reason)
+        this.status = "offline";
+      });
+    }
+
+    reconnect(socket, data){
+      this.socket = socket;
+      if(this.name !== data.name && ![null, undefined].includes(data.name)) {
+        (this.temp === false) ? this.data.update({ name: data.name }) : this.data.name = data.name;
+        this.name = data.name;
+      };
+      this.initSockets();
+      this.status = "online";
+    }
+
+    async joinChannel(id){
+      var channel = await db.models.Channel.findOne({where: {id}});
+      if (channel !== undefined) {
+        // console.log(`User ${this.id} changing to channel ${channel.id}`);
+        server.mcu.emit("setChannel", {
+          user: this.id,
+          channel: channel.id
+        });
+        this.channel = channel;
+      } else {
+        this.socket.emit("ocerror", "Channel is not valid");
+      }
+    }
+
+    leaveChannel(){
+      server.mcu.emit("closeCall", {user: this.id});
+    };
+
   };
 
-  io.on("connection", function (socket) {
-    var currentUser = {};
-    //USER DATA/ INFORMATION
-    socket.on("userInfo", function (data) {
+  class mcu{
+    constructor(){
+      this.status = "offline";
+      this.id = null;
+      this.socket = null;
+    }
+
+    initSockets(){
+      this.socket.emit("serverInfo", server.publicData);
+
+      this.socket.on("peerReady", (id)=>{
+        server.users[id].socket.emit("canJoin", true);
+      });
+
+      this.socket.on("peerConnected", (data)=>{
+        server.users[data.user].channel = data.channel;
+        server.sendUpdate();
+        // console.log(`User ${data.user} has successfully joined channel ${server.users[data.user].channel}`);
+      });
+
+      this.socket.on("mcu_error", (data)=>{
+        console.log(data)
+      })
+
+      this.socket.on("callClosed", (userId)=>{
+        if (server.users[userId] !== undefined) {
+          // console.log(`User ${user} has been disconnected from ${server.users[user].channel}`);
+          server.users[userId].channel = null;
+          server.sendUpdate('users');
+        };
+      });
+
+      this.socket.on("disconnect", () => {
+        for(const temp_user of Object.values(server.users)){
+          temp_user.channel = null;
+        }
+        this.status = "offline";
+        server.sendUpdate(['users']);
+        console.log("MCU LOST CONNECTION");
+        this.socket.disconnect(); //Just to make sure its completely disconnected
+      });
+    }
+
+    connect(socket){
+      this.socket = socket;
+      this.id = socket.id;
+      this.status = "online";
+      this.initSockets();
+    }
+
+    emit(type, data){
+      if(this.socket !== null){
+        this.socket.emit(type, data)
+      }
+    }
+  }
+
+  // Server Object
+  var server = new class{
+    constructor(){
+      this.name = config.name;
+      this.users = {};
+      this.mcu = new mcu();
+      this.peerPort = port;
+      this.publicData;
+      this.updateChannels();
+    };
+
+    get publicData(){
+      var data = {
+        name: this.name,
+        users: {},
+        channels: this.channels
+      };
+
+      for (const [id, temp_user] of Object.entries(this.users)) {
+        data.users[id] = temp_user.publicData;
+      };
+
+      return data
+    };
+
+    async updateChannels(){
+      var channels = {};
+      var result = await db.models.Channel.aggregate("type", "DISTINCT", { plain: false });
+      for(const typeObj of result){
+        var type = typeObj.DISTINCT;
+        channels[type] = [];
+
+        var typeChannels = await db.models.Channel.findAll({
+          where: {
+            type: type,
+          },
+          order: [
+            ['position', 'ASC']
+          ]
+        });
+
+        for(const channel of typeChannels){
+          channels[type].push(channel);
+        };
+      };
+
+      this.channels = channels;
+
+      this.sendUpdate("channels");
+    }
+
+    addUser(socket, data){
+      this.users[socket.request.session.passport.user] = new user(socket, data);
+      this.sendUpdate();
+    };
+
+    removeUser(id){
+      this.users[id].remove();
+      this.sendUpdate();
+    };
+
+    deleteUser(id){
+      delete this.users[id];
+      this.sendUpdate();
+    }
+
+    sendUpdate(props){
+      var publicData = this.publicData;
+      var data = {};
+
+      if(props === undefined || props === "all"){
+        data.updateData = Object.keys(publicData);
+      } else if(typeof props === "string"){
+        data.updateData = [props];
+      } else if(Array.isArray(props)){
+        data.updateData = props;
+      }
+
+      for(const prop of data.updateData){
+        data[prop] = publicData[prop]
+      };
+
+      io.emit("serverUpdate", data);
+    }
+  };
+
+  // Initialize user objects
+  io.on("connection",(socket)=>{
+    socket.on("clientInfo", (data)=>{
       if (data.type == "client") {
-          if (mcu_id !== null) {
-            db.models.User.findOne({
-              where: { id: socket.request.session.passport.user },
-            }).then((user) => {
-              if (user == null) {
-                user = temp_users[socket.request.session.passport.user];
+          if (server.mcu.status !== "offline") {
+            // MCU is working, allow connections
+            if(server.users[socket.request.session.passport.user] === undefined){
+              // Add a new user
+              server.addUser(socket, data);
+            } else {
+              // Set existing user to be online
+              if(server.users[socket.request.session.passport.user].status === "online"){
+                socket.disconnect(true);
               } else {
-                if (user.dataValues.name != data.name) {
-                  user.update({ name: data.name });
-                }
-                user = user.dataValues;
+                server.users[socket.request.session.passport.user].reconnect(socket, data);
               }
-              console.log(`User ${socket.id} Connected`);
-              currentUser.info = data;
-              server_info.name = config.name;
-              socket.emit("serverInfo", server_info);
-              server_info.users[socket.id] = {
-                name: user.name,
-                channel: null,
-                status: "online",
-                id: user.id,
-              };
-              io.emit("usersChange", server_info.users);
-            });
+            };
           } else {
+            // Disconnect as MCU is down
             socket.disconnect(true);
           }
-
-        socket.on('updateInfo', (data)=>{
-          db.models.User.findOne({
-            where: { id: socket.request.session.passport.user },
-          }).then((user) => {
-            if (user !== null) {
-              if (user.dataValues.name != data.name) {
-                user.update({ name: data.name });
-              }
-            } else {
-              temp_users[socket.request.session.passport.user].name = data.name;
-            }
-
-            //If this is sent before the user has been properly created, create user (although it will probably just be overwritten)
-            try{
-              server_info.users[socket.id].name = data.name;
-            } catch(err){
-              server_info.users[socket.id] = {name: data.name}
-            }
-            io.emit("usersChange", server_info.users);
-          });
-        });
-
-        //INITIATE CHANNEL JOIN PROCESS
-        socket.on("joinChannel", (channel) => {
-          db.models.Channel.findOne({
-            where: {
-              id: channel,
-            },
-          }).then((result) => {
-            if (result !== undefined) {
-              console.log(
-                `User ${socket.id} changing to channel ${result.dataValues.id}`
-              );
-              io.to(mcu_id).emit("setChannel", {
-                user: socket.id,
-                channel: channel,
-              });
-              server_info.users[socket.id].channel = channel;
-            } else {
-              socket.emit("ocerror", "Channel is not valid");
-            }
-          });
-        });
-
-        socket.on("leaveChannel", function () {
-          console.log(
-            `User ${socket.id} leaving channel ${
-              server_info.users[socket.id].channel
-            }`
-          );
-          io.to(mcu_id).emit("closeCall", {
-            user: socket.id,
-          });
-        });
-
-        socket.on("disconnect", function () {
-          console.log(`User ${socket.id} Disconnected`);
-          io.to(mcu_id).emit("closeCall", {
-            user: socket.id,
-          });
-          delete server_info.users[socket.id];
-          socket.broadcast.emit("usersChange", server_info.users);
-        });
-      } else if (data.type == "server") {
+      } else if (data.type == "mcu") {
         if (data.secret == secret) {
+          // MCU has connected with the correct secret token
           console.log("MCU Client ✔");
-          mcu_id = socket.id;
-          socket.emit("serverInfo", {
-            peerPort: port,
-          });
+          server.mcu.connect(socket);
         } else {
+          // There has been an error or somebody has connected trying to impersonate the MCU
           console.log("MCU WITH WRONG SECRET HAS TRIED TO CONNECT");
         }
-
-        socket.on("peerReady", function (user) {
-          io.to(user).emit("canJoin", true);
-        });
-
-        socket.on("peerConnected", function (data) {
-          server_info.users[data.user].channel = data.channel;
-          io.emit("usersChange", server_info.users);
-          console.log(
-            `User ${data.user} has successfully joined channel ${
-              server_info.users[data.user].channel
-            }`
-          );
-        });
-
-        socket.on("callClosed", function (user) {
-          var temp_channel;
-          if (server_info.users[user] != undefined) {
-            temp_channel = server_info.users[user].channel;
-            server_info.users[user].channel = null;
-            io.emit("usersChange", server_info.users);
-          }
-          console.log(
-            `User ${user} has been disconnected from ${temp_channel}`
-          );
-        });
-
-        socket.on("disconnect", () => {
-          for(user of Object.values(server_info.users)){
-            user.channel = null;
-          }
-          io.emit("usersChange", server_info.users);
-          console.log("MCU LOST CONNECTION");
-        });
+      } else {
+        console.log('Unknown client type');
       }
     });
   });
+
   console.log("Signalling ✔");
+
+  return server;
 }
 
 module.exports = startServer;

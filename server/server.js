@@ -95,20 +95,16 @@ function startServer(){
   app.use('/rtc', peerServer);
   
   //SIGNALLING
-  var io = require('socket.io')(server);
+  var io = require('socket.io')(server, {
+    pingTimeout: 0, // Removed timeout, it seemed to be causing issues
+    pingInterval: 15000
+  });
   
   io.use(function(socket, next){
     sessionMiddleware(socket.request, {}, next);
   });
   
-  require('./controllers/signalling/signalling.js')({
-    db: db,
-    io: io,
-    config: config,
-    port: port,
-    secret: secret,
-    temp_users: temp_users,
-  });
+  var signallingServer = require('./controllers/signalling/signalling.js')({db, io, config, port, secret, temp_users });
   
   
   // ROUTING //
@@ -125,7 +121,8 @@ function startServer(){
     secret,
     expressFunctions,
     addModels,
-    port
+    port,
+    signallingServer
   };
   
   var clientController = require('./controllers/client/client.js')(controllerParams);
@@ -139,7 +136,6 @@ function startServer(){
   app.use("/", clientController);
   app.use("/messages", messageController);
   app.use('/mcu', mcuController);
-
   app.get('/coffee',(req, res)=>{res.sendStatus(418)}); // Why not?
   
   console.log("Controllers ✔")

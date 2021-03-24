@@ -41,7 +41,6 @@
             <label class="uk-form-label">Name</label>
             <input type="text" name="name" class="uk-input uk-form-width-medium" placeholder="Channel Name">
           </div>
-
         </form>
         <div class="uk-inline uk-margin " id="edit_channel_actions">
           <button id="channel_save_btn" class="uk-button uk-button-secondary">Save</button>
@@ -148,31 +147,7 @@
       <% } %>
     </div>
     <div id="channels">
-      <!-- Make this dynamic again in the future, just need to add categories and category positions-->
-      <% if("voice" in channels){%>
-        <% var type = 'voice'; type_channels = channels['voice']; { %>
-      <div class="channel-group">
-        <h4><%= type.toUpperCase() %></h4>
-        <ul id="<%= type %>_channels" group-type="<%= type %>">
-          <% type_channels.forEach(data => {%>
-            <%- include(`_${type}_channel`, {data, req}) %>
-          <%}); %>
-        </ul>
-      </div>
-      <%};%>
-      <% } %>
-      <% if ("text" in channels){ %>
-      <% var type = 'text'; type_channels = channels['text']; { %>
-      <div class="channel-group">
-        <h4><%= type.toUpperCase() %></h4>
-        <ul id="<%= type %>_channels" group-type="<%= type %>">
-          <% type_channels.forEach(data => {%>
-            <%- include(`_${type}_channel`, {data, req}) %>
-          <%}); %>
-        </ul>
-      </div>
-      <%};%>
-      <%} %>
+
 
     </div>
     <div class="uk-card uk-card-default">
@@ -238,5 +213,9 @@
     <!-- END -->
   </main>
 </body>
+
+<template>
+  
+</template>
 
 </html>

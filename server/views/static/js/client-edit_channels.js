@@ -1,30 +1,9 @@
-$( document ).ready(function() { 
-  $('.channel-group>ul').each((group, el)=>{
-    var type = $(el).attr('group-type');
-    if(el.children.length > 0){
-      new Sortable(el, {
-        animation: 150,
-        onUpdate: (evt)=>{
-          $.ajax({
-            async: true,
-            type: 'POST',
-            url: `/admin/channel/move/${$(evt.item).find('.channel')[0].id}`,
-            data: {index: evt.newIndex, type: type},
-            timeout: 10000,
-            error: ((err)=>{
-              console.log(err)
-            })
-          })
-        }
-      });
-    }
-  })
-
+$( document ).ready(()=>{
     $("#add_channel_btn").click(function () {
       overlay.show("add_channel");
     });
 
-    $(".edit_channel_btn").on('click', function(){
+    $("#channels").on('click', '.edit_channel_btn',function(){
       overlay.show('edit_channel');
       $('#edit_channel form').attr('action', `admin/channel/edit/${$(this).parent().find('.channel')[0].id}`)
       $('#edit_channel form input[name="name"]').val($(this).parent().find('.channel')[0].innerText)
@@ -39,8 +18,7 @@ $( document ).ready(function() {
         data: {},
         timeout: 10000,
         success: ((result)=>{
-          console.log('Channel Deleted');
-          window.location.reload();
+          overlay.hide()
         })
       });
     })
@@ -60,12 +38,40 @@ $( document ).ready(function() {
         data: data,
         timeout: 10000,
         success: ((result)=>{
-          window.location.reload();
+        })
+      });
+    });
+
+    $("#edit_channel form").on( 'submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        async: true,
+        type: 'POST',
+        url: this.action,
+        data:  $(this).serialize(),
+        timeout: 10000,
+        success: ((result)=>{
+          console.log(result)
+          overlay.hide();
+        })
+      });
+    });
+
+    $("#add_channel form").on( 'submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        async: true,
+        type: 'POST',
+        url: this.action,
+        data:  $(this).serialize(),
+        timeout: 10000,
+        success: ((result)=>{
+          overlay.hide()
         })
       });
     });
     
     $("#edit_channel_actions>#channel_save_btn").on('click', function(){
-      $('#edit_channel form').submit()
+      $('#edit_channel form').submit();
     })
 });  

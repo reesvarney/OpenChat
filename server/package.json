@@ -1,6 +1,6 @@
 {
   "name": "openchat",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Free and open source communication platform",
   "main": "server.js",
   "scripts": {
@@ -30,7 +30,8 @@
     "peer": "^0.5.3",
     "puppeteer": "^5.2.1",
     "sequelize": "^6.3.3",
-    "socket.io": "^2.3.0",
-    "sqlite3": "^5.0.0"
+    "socket.io": "^2.4.1",
+    "sqlite3": "^5.0.0",
+    "uuid": "^8.3.2"
   }
 }

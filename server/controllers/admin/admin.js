@@ -6,7 +6,8 @@ var {Op} = require('sequelize');
 module.exports = function({
   db,
   config,
-  expressFunctions
+  expressFunctions,
+  signallingServer
 }) {
 
   function saveConf(){
@@ -14,23 +15,15 @@ module.exports = function({
   }
 
   // TODO: EXTEND THE RECORD PROTOTPYE
-  /**
-   * 
-   * @param {object} Parameters Function Parameters
-   * @param {string} Parameters.model Name of the model to use
-   * @param {string} Parameters.id ID of the record to move
-   * @param {string} Parameters.before ID of the record to move it before
-   * @param {string} Parameters.id ID of the record to move it before
-   * @param {object} Parameters.params Additional parameters
-   * @param {object} Parameters.params.where Additional filters to add to the sequelize where object
-   */
   async function insertBefore({model, id, index, params}){
     if(![undefined, null].includes(db.models[model].rawAttributes.position)){
       var item = await db.models[model].findByPk(id);
       var records = await db.models[model].findAll({ where: ("where" in params) ? params.where : {}});
+
       if(index > records.length || index < 0 || index == item.position){
-        return false;
+        return {success: false, error: "Invalid index"};
       }
+
       var newPos = index;
       var oldPos = item.position;
 
@@ -70,10 +63,10 @@ module.exports = function({
         });
       }
 
-      await item.update({
+      var result = await item.update({
         position: newPos
       });
-      return true;
+      return {success: true, record: result};
     }
   }
 
@@ -82,8 +75,12 @@ module.exports = function({
       where: {
         id: req.params.uuid
       }
-    });
-    res.status(200).send();
+    }).catch(err =>{
+      res.status(400).send('ERROR: Sequelize error', err)
+      return false;
+    });;
+    res.sendStatus(200);
+    signallingServer.updateChannels();
   });
 
   router.post("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
@@ -94,7 +91,8 @@ module.exports = function({
       channel.update({
         name: name
       });
-      res.redirect('/');
+      res.sendStatus(200);
+      signallingServer.sendUpdate();
     });
   });
 
@@ -103,10 +101,12 @@ module.exports = function({
     var index = req.body.index;
     (async()=>{
       var channel = await db.models.Channel.findByPk(id);
-      if(await insertBefore({model: "Channel", id: id, index: index, params: {where: {type: channel.type}}})){
-        res.status(200).send('success');
-      }else{
-        res.status(400).send('Error')
+      var query = await insertBefore({model: "Channel", id: id, index: index, params: {where: {type: channel.type}}})
+      if(query.success){
+        res.status(200).send('success')
+        signallingServer.updateChannels();
+      } else {
+        res.status(400).send(query.error)
       };
     })()
   });
@@ -128,7 +128,8 @@ module.exports = function({
       })
       // TODO: Use socketio to update dynamically without redirect and disconnect users if voice channel
       if(!isError){
-        res.redirect('/')
+        signallingServer.updateChannels();
+        res.sendStatus(200);
       };
     })()
 

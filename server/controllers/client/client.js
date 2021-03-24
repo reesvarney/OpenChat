@@ -4,34 +4,28 @@ var router = express.Router();
 module.exports = function ({ config, db, expressFunctions }) {
   router.use(express.static("./views/static"));
 
-  router.get("/", expressFunctions.checkAuth, function (req, res) {
-    var channels = {};
-    db.models.Channel.aggregate("type", "DISTINCT", { plain: false }).then((result) => {
-      (async () => {
-        for(const type_obj of result){
-          var type = type_obj.DISTINCT;
-          channels[type] = [];
-          var channelArray = await db.models.Channel.findAll({
-            where: {
-              type: type,
-            },
-            order: [
-              ['position', 'ASC']
-            ]
-          });
-          channelArray.forEach(function (channel) {
-            channels[type].push(channel.dataValues);
-          });
-        };
-        var viewData = { config, db, req, channels };
-        if(req.user.permissions.permission_edit_roles){
-          viewData["roles"] = await db.models.Role.findAll();
-        } else {
-          viewData["roles"] = {};
-        }
-        res.render("client/index", viewData);
-      })();
-    });
+  router.get("/", expressFunctions.checkAuth, async(req, res)=>{
+    var viewData = { config, db, req };
+
+    // Customise data according to permissions
+    if(req.user.permissions.permission_edit_roles){
+      viewData["roles"] = await db.models.Role.findAll();
+    } else {
+      viewData["roles"] = {};
+    };
+
+    // Render the view
+    res.render("client/index", viewData);
+  });
+
+  router.get("/channels/:id", expressFunctions.checkAuth, async(req, res)=>{
+    var channel = await db.models.Channel.findByPk(req.params.id);
+    if(channel === null){
+      res.status(400).send("Channel does not exist");
+    } else {
+      var viewData = { req, data: channel};
+      res.render(`client/_${channel.type}_channel`, viewData);
+    }
   });
 
   return router;

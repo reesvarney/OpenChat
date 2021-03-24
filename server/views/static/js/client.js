@@ -1,7 +1,6 @@
 navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 
-var soundeffects = {},
-  soundfiles = [
+var soundfiles = [
     "mute",
     "unmute",
     "connect",
@@ -15,14 +14,17 @@ var soundeffects = {},
       UIkit.modal($(`#overlay>#${div}`), {container: false}).show();
     },
     hide: function () {
-      UIkit.modal($(`#overlay>#${div}`)).hide();
+      UIkit.modal($(`#overlay>*`), {container: false}).hide();
     },
 };
 
-for(i = 0; i < soundfiles.length; i++){
-  soundeffects[soundfiles[i]] = new Audio(`./audio/${soundfiles[i]}.mp3`);
-  soundeffects[soundfiles[i]].loop = false;
-};
+var soundeffects = new Proxy(soundfiles, {
+  get(target, filename) {
+    var audio = new Audio(`./audio/${filename}.mp3`);
+    audio.loop = false;
+    return audio
+  }
+})
 
 class call{
   constructor(){
@@ -49,7 +51,6 @@ class call{
     });
   }
 
-  // Allows alternate client objects to be specified. This probably won't be needed though unless somehow a single user should have multiple connections
   start(){
     this.connection = client.peer.call('server', this.stream);
     this.connection.on('stream',(remoteStream)=>{
@@ -62,6 +63,7 @@ class call{
       $('#voice_channels #' + client.voiceChannel.negotiating).parent().parent().addClass("active");
       client.audioOut.srcObject = remoteStream;
       client.voiceChannel.current = client.voiceChannel.negotiating;
+      client.voiceChannel.negotiating = null;
       soundeffects.connect.play();
     });
   }
@@ -80,83 +82,224 @@ class call{
 var client = window.client = new class{
   constructor(){
     this.isStandalone = window.standalone || false;
-    this.socket = io.connect();
+    this.socket = null;
     this.textChannel = null;
     this.voiceChannel = {
       current: null,
       negotiating: null
     };
+    // channels stores the channel objects including DOM whilst serverinfo.channels is the raw data that was last received
     this.channels = {};
-    this._init()
-  }
-
-  _init(){
-    this._initSocket();
-    this.call = new call;
+    this.serverinfo = null;
+    this.call = new call();
     this._initDomListeners();
+    this._initSocket();
   }
 
   _initSocket(){
-    if (!this.isStandalone){
-      this.socket.on('disconnect', function(){
-        window.location.reload();
-      });
-    } else {
-      //send socket events to client, function provided by bridge
-      bridge.registerSocket(this.socket)
-    };
-
-    //Emit user information, this may be updated with more data in the future.
-    this.socket.emit('userInfo', {
-      type: "client"
-    });
-
-    //When the server information has been sent
-    this.socket.on('serverInfo', function(d){
-      this.serverinfo = d;
-      this.peer = new Peer(this.socket.id, {host: window.location.hostname, path: '/rtc', port: d.peerPort});
-    }.bind(this));
-
-    //Permission to join has been received
-    this.socket.on('canJoin', function(d){
-      if(d === true){
-        this.call.start();
+    // I'll put this in the window as well as it seems to be throttled when I put it into the class, hopefully that'll fix it
+    window.socket = this.socket = io.connect();
+    this.socket.on("connect", ()=>{
+      if (!this.isStandalone){
+        this.socket.on('disconnect', function(){
+          window.location.reload();
+        });
       } else {
-        console.log("NEGOTIATION ERROR");
-      }
-    }.bind(this));
-
-    //openchat related errors
-    this.socket.on("ocerror", function(d){
-      console.log("OPENCHAT ERROR: " + d);
-    }.bind(this));
-
-    //Change in users
-    this.socket.on('usersChange', function(u){
-      $('.user-list').empty();
-      this.serverinfo.users = u;
-      for(const [userID, user] of Object.entries(u)){
-        if(user.channel !== null){
-          $("<li><a></a></li>").text(user.name).appendTo(`#${user.channel}-users`);
+        //send socket events to client, function provided by bridge
+        bridge.registerSocket(this.socket)
+      };
+  
+      //Emit user information, this may be updated with more data in the future.
+      this.socket.emit('clientInfo', {
+        type: "client"
+      });
+  
+      //When the server information has been sent
+      this.socket.on('serverInfo',(d)=>{
+        this.serverinfo = d;
+        this.peer = new Peer(this.socket.id, {host: window.location.hostname, path: '/rtc'});
+        (async()=>{
+          await this._populateChannels(d);
+          this._populateUsers(d);
+        })()
+      });
+  
+      //Permission to join has been received
+      this.socket.on('canJoin', (d)=>{
+        if(d === true){
+          this.call.start();
         } else {
-          if(userID == this.socket.id && this.call.connected && client.voiceChannel.negotiating === null){
-            client.voiceChannel.current = client.voiceChannel.negotiating = null;
-            $("#disconnect_button").hide();
-            $('#voice_channels li').removeClass("active");
-            soundeffects.disconnect.play();
-            this.connected = false;
+          console.log("NEGOTIATION ERROR");
+        }
+      });
+  
+      //openchat related errors
+      this.socket.on("ocerror", (d)=>{
+        console.log("OPENCHAT ERROR: " + d);
+      });
+  
+      //Change in users
+      this.socket.on('serverUpdate', (d)=>{
+        if(this.serverinfo !== null){
+          (async()=>{
+            if(d.updateData.includes("channels")){
+              await this._populateChannels(d);
+            }
+            if(d.updateData.includes("users")){
+              this._populateUsers(d);
+            }
+            if(d.updateData.includes("name")){
+              // change server name
+            }
+          })()
+        };
+      });
+  
+      this.socket.on("newMessage", (d)=>{
+        if(d.channel_id == this.textChannel ){
+          this.channels[d.channel_id].getMessages({"id": d.message_id});
+        }
+      });
+    })
+  };
+
+  _populateUsers(d){
+    $('.user-list').empty();
+    this.serverinfo.users = d.users;
+    for(const [userID, user] of Object.entries(d.users)){
+      if(user.channel !== null){
+        $("<li><a></a></li>").text(user.name).appendTo(`#${user.channel}-users`);
+        if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
+          // Play external join sound
+        }
+      } else {
+        if(user.socketID == this.socket.id && this.call.connected && this.voiceChannel.negotiating === null){
+          this.voiceChannel.current = this.voiceChannel.negotiating = null;
+          $("#disconnect_button").hide();
+          $('#voice_channels li').removeClass("active");
+          soundeffects.disconnect.play();
+          this.call.connected = false;
+        }
+      }
+    }
+  }
+
+  _createCategory(channel_type){
+    var category = $(`<div class="channel-group"><h4>${channel_type.toUpperCase()}</h4></div>`).appendTo('#channels');
+    var categoryList = $(`<ul id="${channel_type}_channels" group-type="${channel_type}"></ul>`).appendTo(category);
+
+    // Create sortable - this needs to be put into edit_channels file
+    var type = categoryList.attr('group-type');
+    if(categoryList.children.length > 0){
+      new Sortable($(categoryList)[0], {
+        animation: 150,
+        onUpdate: (evt)=>{
+          $.ajax({
+            async: true,
+            type: 'POST',
+            url: `/admin/channel/move/${$(evt.item).find('.channel')[0].id}`,
+            data: {index: evt.newIndex, type: type},
+            timeout: 10000,
+            error: ((err)=>{
+              console.log(err)
+            }),
+            success: (()=>{
+              evt.item.setAttribute("position", evt.newIndex);
+            })
+          })
+        }
+      });
+    };
+    return {category, categoryList}
+  }
+
+  async _populateChannels(d){
+    if(this.serverinfo.channels !== d.channels){
+      // Use to remove any channel categories that don't exist remotely
+      for(const channel_type of Object.keys(this.serverinfo.channels)){
+        if(d.channels[channel_type] === undefined){
+          var localChannels = Object.values(this.channels).filter(({type}) => type === channel_type);
+          for(const temp_channel of localChannels){
+            $(temp_channel.el).remove();
+            delete this.channels[temp_channel.id];
+          };
+          if($(`#${channel_type}_channels`) !== null){
+            $(`#${channel_type}_channels`).parent(".channel-group").remove()
+          };
+        }
+      }
+
+      for(const [channel_type, channels] of Object.entries(d.channels)){        
+        var localChannels = Object.values(this.channels).filter(({type}) => type === channel_type);
+
+        if(Object.keys(this.channels).length === 0 || localChannels.length === 0 ){
+          // No channels exist for this category, create it
+
+          // Just in case theres the remnants from a category being deleted
+          if($(`#${channel_type}_channels`) !== null){ $(`#${channel_type}_channels`).parent(".channel-group").remove()}
+
+          // Create category elements
+          var {categoryList} = this._createCategory(channel_type);
+
+          // create the type if it doesn't exist
+          if(this.serverinfo.channels[channel_type] === undefined){
+            this.serverinfo.channels[channel_type] = [];
+          };
+
+          // Create channels for category
+          for(const chnl of channels){
+            if(!(chnl.id in this.serverinfo.channels[channel_type])){
+              await this.addChannel(chnl, categoryList);
+            };
+          };
+
+        } else {
+          if(channels.length !== localChannels.length){
+            // Need to add or remove channels from this category
+            var localIds = localChannels.map(a => a.id);
+            var remoteIds = channels.map(a => a.id);
+
+            for(const localId of localIds){
+              if(!remoteIds.includes(localId)){
+                $(this.channels[localId].el).remove();
+                delete this.channels[localId];
+              };
+            };
+
+            for( const remoteId of remoteIds){
+              if(!localIds.includes(remoteId)){
+                var toAdd = channels.find(a => {return a.id === remoteId});
+                var categoryList = $(`#${toAdd.type}_channels`);
+                this.addChannel(toAdd, categoryList);
+              };
+            }; 
+          }
+          
+          if(channels.sort((a, b) => (a.position > b.position) ? 1 : -1).map((a) => a.id) !== localChannels.sort((a, b) => (a.position > b.position) ? 1 : -1).map((a) => a.id) ){
+            // Move channels         
+            
+          }
+          
+          if(channels.sort().map((a) => a.name).join(',') !== localChannels.sort().map((a) => a.name).join(',')){
+            // Check channel names
           }
         }
-
       }
-    }.bind(this));
+    };
+  };
 
-    this.socket.on("newMessage", (d)=>{
-      if(d.channel_id == this.textChannel ){
-        this.channels[d.channel_id].getMessages({"id": d.message_id});
-      }
+  async addChannel(d, categoryList){
+    await $.ajax({
+      async: true,
+      type: 'GET',
+      url: `/channels/${d.id}`,
+      timeout: 10000,
+      success: ((result)=>{
+        var channel_el = $(result).appendTo(categoryList);
+        new channelTypes[d.type](channel_el);
+      })
     });
-  }
+  };
 
   _initDomListeners(){
     $( document ).ready(()=>{
@@ -164,14 +307,6 @@ var client = window.client = new class{
       if(this.isStandalone && "outputDevice" in bridge){
         this.audioOut.setSinkId(bridge.outputDevice);
       }
-
-      $("#text_channels li").each((i, el)=>{
-        new textChannel(el, this);
-      });
-
-      $("#voice_channels li").each((i, el)=>{
-        new voiceChannel(el, this);
-      });
 
       // CALL CONTROLS
       if(!this.isStandalone){
@@ -220,13 +355,16 @@ class channel{
     this.el = el;
     this.id = $(el).find(".channel")[0].id;
     this.name = $(el).find(".channel")[0].innerText;
+    this.type = null;
     client.channels[this.id] = this;
+    this.position = $(el).index();
   }
 }
 
 class voiceChannel extends channel{
   constructor(el){
-    super(el)
+    super(el);
+    this.type = "voice";
     $(this.el).on('click', '.channel', ()=> {
       this.joinChannel()
     });
@@ -245,6 +383,7 @@ class voiceChannel extends channel{
 class textChannel extends channel{
   constructor(el){
     super(el);
+    this.type = "text";
     $(this.el).on('click', '.channel', ()=> {
       if(this.id != client.textChannel){
         $("#text_channels li").removeClass("active");
@@ -300,6 +439,11 @@ class textChannel extends channel{
       })
     });
   };
+}
+
+var channelTypes = {
+  voice: voiceChannel,
+  text: textChannel
 }
 
 $( document ).ready(function() {

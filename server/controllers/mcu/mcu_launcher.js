@@ -12,12 +12,13 @@ async function startMCU({isHeadless, port}) {
             }
         );
         page = await browser.newPage();
+        await page.setDefaultNavigationTimeout(0); 
         await page.goto(`https://localhost:${port}/mcu`, {"waitUntil" : "networkidle0"}); //load local page with JS for MCU
         await page.click('#button');
     } catch (err) {
         if(browser !== undefined) browser.close();
         console.log(err)
-        startMCU({isHeadless});
+        startMCU({isHeadless, port});
     }
 };
 

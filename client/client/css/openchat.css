@@ -265,7 +265,7 @@ button:hover:focus{
 
 /* Title Bar */
 #electron-titlebar{
-   height : 10px;
+   height : 30px !important;
 }
 
 #titlebar {
@@ -284,15 +284,15 @@ button:hover:focus{
 
 /* Dark Mode */
 .dark #titlebar .title {
-    font-size: 14px;
-    margin-left: 10px;
-    line-height: 30px;
     color: var(--accent-contrast);
-    font-weight: bold;
 }
 
 .dark #titlebar {
     background-color: rgb(24, 26, 27);
+}
+
+.dark {
+    background-color: #313131;
 }
 
 .dark nav {

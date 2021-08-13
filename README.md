@@ -10,8 +10,6 @@
   <p align="center">
     A free, open-source communications platform. Built to be modified.
     <br />
-    <a href="https://openchatdemo.tech">View the Demo</a>
-    <br />
     <a href="https://trello.com/b/p2K25uED/openchat">Follow the progress</a>
     <br />
   </p>
@@ -44,8 +42,7 @@ npm start
 If you already have a SSL key and certificate, you can place them in the `/ssl` directory, naming them `server.key` and `server.cert` respectively, otherwise they will be created automatically for you.
 
 ### Using Docker
-The current docker install is slightly 'hacky' however to maintain quick development, I do not want to have to make too many severe changes to the core functionality to facilitate it.
-
+Docker is an easy way to quickly install OpenChat onto a server without having to manage dependencies, you can find out more about it [here](https://www.docker.com/).
 #### Premade Images
 These are created with every release which should be reasonably stable.
 
@@ -64,7 +61,7 @@ docker exec -it [container name] /bin/bash
 4. Continue to follow steps 5-6 from the local method above.
 
 #### Build your own image
-You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building (such as sqlite3).
+You can build OpenChat straight from the repository however it could take several minutes (depending on hardware) as some packages require building.
 1. Clone/Download the repository
 2. Go to the directory that you installed it and build the image
 ```docker
@@ -86,7 +83,7 @@ docker run -v /etc/letsencrypt/live/[URL_HERE]/:/etc/letsencrypt/live/[URL_HERE]
  - Add ability to upload and view files/ media.
  - Markdown support
  - Combine signalling into single system with native WebRTC implementation
- - Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would also provide the benefit of providing a less disjointed product as there would be less need for individual versions/forks. It may feature things such as:
+ - Create a repository-based extension system to allow for easy server-level customisation for even those with little technical knowledge. This would mean that instead of needing to create a separate fork to be maintained, developers will be able to add more niche features that can be added as a user sees fit. It may feature things such as:
    - Bots
    - Front-end appearance modification
    - Completely additional functionality

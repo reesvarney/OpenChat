@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "showmcu": "node server showmcu"
+    "showmcu": "node server showmcu",
+    "autoRestart": "nodemon --ignore ./views/ server"
   },
   "repository": {
     "type": "git",

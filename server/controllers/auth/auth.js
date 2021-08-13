@@ -29,6 +29,10 @@ module.exports = function (controllerParams) {
   });
 
   router.get('/logout', function(req, res){
+    if(req.session.passport.user in controllerParams.temp_users){
+      controllerParams.signallingServer.deleteUser(req.session.passport.user);
+      delete controllerParams.temp_users[req.session.passport.user];
+    }
     req.logout();
     res.redirect('/');
   });

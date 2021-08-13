@@ -1,0 +1,124 @@
+<% if(req.user.permissions.global.edit_channels){%>
+  <div uk-modal id="edit_channel">
+    <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
+      <h3 class="uk-card-title">Edit Channel</h3>
+      <form action="admin/channel//edit" method="post" class="uk-form-horizontal">
+        <div class="uk-margin">
+          <label class="uk-form-label">Name</label>
+          <input type="text" name="name" class="uk-input uk-form-width-medium" placeholder="Channel Name">
+        </div>
+      </form>
+      <div class="uk-inline uk-margin " id="edit_channel_actions">
+        <button id="channel_save_btn" class="uk-button uk-button-secondary">Save</button>
+        <button id="channel_delete_btn" class="uk-button uk-button-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if(req.user.permissions.global.edit_channels){%>
+  <div uk-modal id="add_channel">
+    <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
+      <h3 class="uk-card-title">New Channel</h3>
+      <form action="admin/channel/new" method="post">
+        <!-- TODO - Create radios dynamically for each defined channel type -->
+        <div class="uk-margin">
+          <label>Name</label>
+          <input type="text" name="name" class="uk-input" placeholder="Channel Name">
+        </div>
+
+        <label>Type</label>
+        <div class="uk-margin">
+          <input type="radio" id="type_select_voice" name="type" class="uk-radio" value="voice">
+          <label for="type_select_voice">Voice</label>
+
+          <input type="radio" id="type_select_text" name="type" value="text" class="uk-radio" checked>
+          <label for="type_select_text">Text</label>
+        </div>
+
+        <button class="uk-button uk-button-secondary uk-margin">Add</button>
+      </form>
+    </div>
+  </div>
+<% } %>
+
+    
+    <% if(req.user.permissions.global.edit_server || req.user.permissions.global.edit_roles){%>
+      <div uk-modal id="edit_server">
+        <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
+          <h3 class="uk-card-title">Server Settings</h3>
+          <hr class="uk-divider-small">
+  
+          <% if(req.user.permissions.global.edit_server){%>
+          <form action="admin/server/edit" method="post" class="uk-form-horizontal">
+            <h4>Details</h4>
+            <div class="uk-margin">
+              <label class="uk-form-label">Server Name</label>
+              <input type="text" name="name" class="uk-input uk-form-width-medium" placeholder="" value="<%= config.name %>">
+            </div>
+            
+            <div class="uk-margin">
+              <label class="uk-form-label">Allow anonymous users</label>
+              <input type="hidden" name="allowAnon" value="false">
+              <input class="uk-checkbox" type="checkbox" name="allowAnon" <% if(config.allowAnon){ %> checked <% } %> value="true">
+            </div>
+
+            <button class="uk-button uk-button-secondary">Save</button>
+          </form>
+          <hr class="uk-divider-icon">
+        <% } %>
+  
+          <% if(req.user.permissions.global.edit_roles && roles !== undefined){%>
+          <div id="edit_roles" class="uk-margin">
+            <h4>Roles</h4>
+            <ul uk-accordion="multiple: true">
+              <% roles.forEach(role => { %>
+              <% if(role.name !== "owner"){%>
+                <li>
+                  <a class="uk-accordion-title" href="#"><%=role.name%></a>
+                  <div class="uk-accordion-content">
+                    <form action="admin/role/<%=role.id%>/edit" method="post" class="uk-form-horizontal role_edit_form">
+                      <% if(role.name !== "all"){ %>
+                        <div class="uk-margin">
+                          <label class="uk-form-label">Role Name</label>
+                          <div class="uk-form-controls">
+                            <input type="text" class="uk-input uk-form-width-medium" name="name" value="<%=role.name%>"></input>
+                          </div>
+                        </div>
+                      <% } %>
+  
+                      <label class="uk-legend">Permissions</label>
+                      <div class="uk-margin">
+  
+                        <% for( const {value, Permission} of role.PermissionSet.PermissionValues){ %>
+                          <div class="uk-margin">
+                            <label class="uk-form-label"><%=Permission.name%></label>
+                            <input type="hidden" name="<%=Permission.id%>" value="false">
+                            <input class="uk-checkbox" type="checkbox" name="<%=Permission.id%>" <% if(value){ %> checked <% } %>
+                              <% var roleIsAdmin = role.PermissionSet.PermissionValues.find(el => el.PermissionId === 'isAdmin') %>
+                              <% if(roleIsAdmin !== undefined && roleIsAdmin.value === true && Permission.name !== 'isAdmin'){ %> disabled <%} %> value="true">
+                          </div>
+                        <% }; %>
+  
+                        <div class="edit_role_actions">
+                          <button class="uk-button uk-button-secondary">Save</button>
+                          <% if(role.name !== "all"){ %>
+                            <button class="uk-button uk-button-danger role_delete_btn">Delete</button>
+                          <% } %>
+                        </div>
+
+                        </div>
+  
+                    </form>
+                  </div>
+  
+                </li>
+              <% }%>
+              <% }); %>
+            </ul>
+            <button class="uk-button uk-button-default" id="new_role_button">New</button>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>

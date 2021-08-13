@@ -1,48 +1,81 @@
 //WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
 const { v4: uuidv4 } = require('uuid');
 
-function startServer({ db, io, config, secret, port, temp_users }) {
+function startServer({ db, io, config, secret, port, temp_users, expressFunctions }) {
+
+    // constructor(socket, data){
+    //   // "Public" properties
+    //   this.id = socket.request.session.passport.user;
+    //   this.socket = socket;
+    //   this.name = null;
+    //   this.channel = null;
+    //   this.data = {};
+    //   this.temp = false;
+
+    //   // "Private" properties
+    //   this._status = "online"
+
+    //   // Getters/ setters
+    //   this.publicData;
+    //   this.status;
+
+    //   // Get user data
+    //   (async()=>{
+    //     var db_user = await db.models.User.findOne({where: { id: this.id }});
+    //     if (db_user !== null || socket.request.session.passport.user in temp_users) {
+    //       // console.log(`User ${socket.id} Connected`);
+    //       if(db_user !== null){
+    //         if (db_user.name !== data.name && ![null, undefined].includes(data.name)) db_user.update({ name: data.name });
+    //         this.temp = false;
+    //       } else {
+    //         db_user = temp_users[socket.request.session.passport.user];
+    //         this.temp = true;
+    //       };
+    //       this.name = db_user.name;
+    //       this.data = db_user;
+    //       this.initSockets();
+    //       server.sendUpdate();
+    //     } else {
+    //       this.socket.disconnect(true);
+    //       server.deleteUser(this.id);
+    //     };
+    //   })();
+    // };
+
 
   // User Object
   class user{
-    constructor(socket, data){
-
-      // "Public" properties
-      this.id = socket.request.session.passport.user;
-      this.socket = socket;
-      this.name = null;
-      this.channel = null;
-      this.data = {};
-      this.temp = false;
-
-      // "Private" properties
-      this._status = "online"
-
-      // Getters/ setters
-      this.publicData;
-      this.status;
-
-      // Get user data
-      (async()=>{
-        var db_user = await db.models.User.findOne({where: { id: this.id }});
-        if (db_user !== null || socket.request.session.passport.user in temp_users) {
-          // console.log(`User ${socket.id} Connected`);
-          if(db_user !== null){
-            if (db_user.name !== data.name && ![null, undefined].includes(data.name)) db_user.update({ name: data.name });
-            this.temp = false;
+    constructor(id, {update=false}={}){
+        this.id = id;
+        this.socket = null;
+        this.channel = null;
+        
+        // Give blank values before getting from db
+        this.name = null;
+        this.data = null;
+        this.temp = null;
+        this._status = "offline";
+        this.publicData;
+        this.status;
+        (async()=>{
+          var db_user = await db.models.User.findByPk(id);
+          if (db_user !== null || id in temp_users) {
+            if(db_user !== null){
+              this.temp = false;
+            } else {
+              db_user = temp_users[id];
+              this.temp = true;
+            };
+            this.name = db_user.name;
+            this.data = db_user;
+            if(update){
+              server.sendUpdate();
+            };
           } else {
-            db_user = temp_users[socket.request.session.passport.user];
-            this.temp = true;
+            this.socket.disconnect(true);
+            server.deleteUser(id);
           };
-          this.name = db_user.name;
-          this.data = db_user;
-          this.initSockets();
-          server.sendUpdate();
-        } else {
-          this.socket.disconnect(true);
-          server.deleteUser(this.id);
-        };
-      })();
+        })();
     };
 
     get publicData(){
@@ -51,7 +84,7 @@ function startServer({ db, io, config, secret, port, temp_users }) {
         channel: this.channel,
         status: this.status,
         temp: this.temp,
-        socketID: this.socket.id
+        socketID: (this.socket !== null) ? this.socket.id : null
       }
     };
 
@@ -66,12 +99,13 @@ function startServer({ db, io, config, secret, port, temp_users }) {
           // console.log(`User ${this.id} Disconnected`);
           this._status = "offline";
           this.channel = null;
+          this.socket = null;
           break;
         default:
           console.log("Error: Invalid status");
       }
-      server.sendUpdate();
       if(this.channel !== null) this.leaveChannel();
+      server.sendUpdate();
     };
 
     get status(){
@@ -111,7 +145,7 @@ function startServer({ db, io, config, secret, port, temp_users }) {
       });
     }
 
-    reconnect(socket, data){
+    connect(socket, data){
       this.socket = socket;
       if(this.name !== data.name && ![null, undefined].includes(data.name)) {
         (this.temp === false) ? this.data.update({ name: data.name }) : this.data.name = data.name;
@@ -123,8 +157,7 @@ function startServer({ db, io, config, secret, port, temp_users }) {
 
     async joinChannel(id){
       var channel = await db.models.Channel.findOne({where: {id}});
-      if (channel !== undefined) {
-        // console.log(`User ${this.id} changing to channel ${channel.id}`);
+      if(channel !== undefined && expressFunctions.hasPermission("join",{id: this.id, scope: "channels", subscope: id})) {
         server.mcu.emit("setChannel", {
           user: this.id,
           channel: channel.id
@@ -207,6 +240,7 @@ function startServer({ db, io, config, secret, port, temp_users }) {
       this.peerPort = port;
       this.publicData;
       this.updateChannels();
+      this.getUsers();
     };
 
     get publicData(){
@@ -215,7 +249,6 @@ function startServer({ db, io, config, secret, port, temp_users }) {
         users: {},
         channels: this.channels
       };
-
       for (const [id, temp_user] of Object.entries(this.users)) {
         data.users[id] = temp_user.publicData;
       };
@@ -249,15 +282,22 @@ function startServer({ db, io, config, secret, port, temp_users }) {
       this.sendUpdate("channels");
     }
 
-    addUser(socket, data){
-      this.users[socket.request.session.passport.user] = new user(socket, data);
+    async getUsers(){
+      var allUsers = await db.models.User.findAll();
+      for(const new_user of allUsers){
+        this.addUser(new_user.id, {update: false});
+      };
       this.sendUpdate();
+    }
+
+    addUser(id, opts={}){
+      this.users[id] = new user(id, opts);
     };
 
-    removeUser(id){
-      this.users[id].remove();
+    connectUser(socket, data){
+      this.users[socket.request.session.passport.user].connect(socket, data);
       this.sendUpdate();
-    };
+    }
 
     deleteUser(id){
       delete this.users[id];
@@ -292,15 +332,14 @@ function startServer({ db, io, config, secret, port, temp_users }) {
             // MCU is working, allow connections
             if(server.users[socket.request.session.passport.user] === undefined){
               // Add a new user
-              server.addUser(socket, data);
+              server.addUser(socket.request.session.passport.user, {update: true});
+            }
+            // Set existing user to be online
+            if(server.users[socket.request.session.passport.user].status === "online"){
+              socket.disconnect(true);
             } else {
-              // Set existing user to be online
-              if(server.users[socket.request.session.passport.user].status === "online"){
-                socket.disconnect(true);
-              } else {
-                server.users[socket.request.session.passport.user].reconnect(socket, data);
-              }
-            };
+              server.users[socket.request.session.passport.user].connect(socket, data);
+            }
           } else {
             // Disconnect as MCU is down
             socket.disconnect(true);

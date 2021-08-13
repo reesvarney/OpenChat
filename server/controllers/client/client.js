@@ -8,8 +8,16 @@ module.exports = function ({ config, db, expressFunctions }) {
     var viewData = { config, db, req };
 
     // Customise data according to permissions
-    if(req.user.permissions.permission_edit_roles){
-      viewData["roles"] = await db.models.Role.findAll();
+    if(req.user.permissions.global.edit_roles){
+      viewData["roles"] = await db.models.Role.findAll({
+        include: [{
+          model: db.models.PermissionSet,
+          include: [{
+            model:db.models.PermissionValue,
+            include: db.models.Permission
+          }]
+        }]
+      });
     } else {
       viewData["roles"] = {};
     };

@@ -1,13 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
+const { emitKeypressEvents } = require('readline');
 var {Op} = require('sequelize');
 
 module.exports = function({
   db,
   config,
   expressFunctions,
-  signallingServer
+  signallingServer,
+  authFunctions
 }) {
 
   function saveConf(){
@@ -70,7 +72,7 @@ module.exports = function({
     }
   }
 
-  router.delete("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
+  router.delete("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
     db.models.Channel.destroy({
       where: {
         id: req.params.uuid
@@ -83,7 +85,7 @@ module.exports = function({
     signallingServer.updateChannels();
   });
 
-  router.post("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
+  router.post("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
     var name = req.body.name;
     var description = req.body.description;
 
@@ -96,7 +98,7 @@ module.exports = function({
     });
   });
 
-  router.post("/channel/move/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
+  router.post("/channel/move/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
     var id = req.params.uuid;
     var index = req.body.index;
     (async()=>{
@@ -111,7 +113,7 @@ module.exports = function({
     })()
   });
 
-  router.post("/channel/new", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_channels'), function (req, res) {
+  router.post("/channel/new", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
     var name = req.body.name;
     var type = req.body.type;
     var isError = false;
@@ -135,31 +137,65 @@ module.exports = function({
 
   });
 
-  router.post("/server/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_server'), function (req, res) {
+  router.post("/server/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_server'), function (req, res) {
     config.name = req.body.name;
     saveConf();
     res.redirect('/');
   })
 
-  router.post("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('permission_edit_roles'), function(req,res){
-    (async()=>{
-      var role = await db.models.Role.findByPk(req.params.uuid);
-      if(role === null){
-        res.status(400).send('ERROR: Role does not exist');
-      } else {
-        Object.keys(req.body).forEach((perm)=>{
-          if(!(perm in role.dataValues)){
-            res.status(400).send('ERROR: Invalid Key')
-            return false;
-          }
-        });
-        await role.update(req.body).catch(err =>{
-          res.status(400).send('ERROR: Sequelize error', err)
-          return false;
-        });
-        res.status(200).send('SUCCESS');
+  router.post("/role/create", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
+    var roleNum = await db.models.Role.count();
+    await authFunctions.createRole(`Role #${roleNum}`);
+    res.status(200).send('SUCCESS');
+  });
+
+  router.post("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
+    var role = await db.models.Role.findByPk(req.params.uuid, {
+      include: [
+        {          
+          model: db.models.PermissionSet,
+          include: [{model:db.models.PermissionValue}]
+        },
+        {
+          model: db.models.User
+        }
+      ]
+    });
+    if(role === null){
+      res.status(400).send('ERROR: Role does not exist');
+    } else {
+      // Update permissionValues for role
+      for(const perm of Object.keys(req.body)){
+        var permission = role.PermissionSet.PermissionValues.find(el => perm === el.PermissionId);
+        if(permission !== undefined){
+          await permission.update({
+            value: req.body[perm]
+          });
+        };
+      };
+      res.status(200).send('SUCCESS');
+      for(const user of role.Users){
+        authFunctions.updateUserPerms(user.id);
       }
-    })()
+    };
+  });
+
+  router.delete("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
+    var users = (await db.models.Role.findByPk(req.params.uuid, {
+      include: db.models.User
+    })).Users;
+    db.models.Role.destroy({
+      where: {
+        id: req.params.uuid
+      }
+    }).catch(err =>{
+      res.status(400).send('ERROR: Sequelize error', err)
+      return false;
+    });;
+    for(const user of users){
+      authFunctions.updateUserPerms(user.id);
+    }
+    res.sendStatus(200);
   });
 
   return router;

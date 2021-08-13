@@ -1,19 +1,6 @@
 const { DataTypes, Sequelize } = require("sequelize");
 
 module.exports = {
-  RoleAssignment: {
-    attributes: {
-      id: {
-        type: DataTypes.UUIDV4,
-        defaultValue: Sequelize.UUIDV4,
-        unique: true,
-        primaryKey: true
-      }
-    },
-    relations: [],
-    options: {},
-  },
-
   Message: {
     attributes: {
       id: {
@@ -77,8 +64,13 @@ module.exports = {
         relation: "hasMany",
         model: "Message",
         options: {
-          onDelete: 'CASCADE'
+          onDelete: 'CASCADE',
+          hooks: true
         }
+      },
+      {
+        relation: "belongsTo",
+        model: "Category"
       }
     ],
   },
@@ -109,7 +101,19 @@ module.exports = {
     ]
   },
 
-  //Store permissions here. Some permissions have been added which may not need to be used however it will allow for less migrations to be needed in the future
+  RoleAssignment: {
+    attributes: {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      }
+    },
+    relations: [],
+    options: {},
+  },
+
   Role: {
     attributes: {
       id: {
@@ -123,63 +127,7 @@ module.exports = {
         allowNull: false,
         unique: true,
         defaultValue: "New Role",
-      },
-      isAdmin: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_join: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-      permission_speak: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-      permission_listen: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-      permission_send_message: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-      permission_move: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_ban: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_kick: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_mute: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_deafen: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_delete_message: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_edit_channels: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_edit_server: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      permission_edit_roles: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
+      }
     },
     options: {},
     relations: [
@@ -190,13 +138,115 @@ module.exports = {
           through: "RoleAssignment"
         },
       },
+      {
+        relation: "belongsTo",
+        model: "PermissionSet",
+        options: {
+          onDelete: 'CASCADE',
+          hooks: true
+        }
+      }
     ],
+  },
+
+  Permission: {
+    attributes: {
+      id: {
+        type: DataTypes.STRING,
+        unique: true,
+        primaryKey: true
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false,
+        defaultValue: "Permission"
+      },
+      defaultValue: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: "Permission"
+      },
+    },
+    relations: [
+      {
+        relation: "hasMany",
+        model: "PermissionValue",
+        options: {
+          onDelete: 'CASCADE',
+          hooks: true
+        }
+      }
+    ],
+    options: {
+      createdAt: false,
+      updatedAt: false
+    }
+  },
+
+  PermissionValue: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true,
+      },
+      value: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false
+      }
+    },
+    relations: [
+      {
+        relation: "belongsTo",
+        model: "Permission"
+      },
+      {
+        relation: "belongsTo",
+        model: "PermissionSet"
+      }
+    ],
+    options: {
+      createdAt: false
+    }
+  },
+
+  PermissionSet: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      }
+    },
+    relations: [
+      {
+        relation: "hasMany",
+        model: "PermissionValue",
+        options: {
+          onDelete: 'CASCADE',
+          hooks: true
+        }
+      },
+      {
+        relation: "hasMany",
+        model: "Role"
+      }
+    ],
+    options: {
+      createdAt: false,
+      updatedAt: false
+    }
   },
 
   Pubkey: {
     attributes: {
       id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4,
         unique: true,
         primaryKey: true
@@ -212,6 +262,38 @@ module.exports = {
       {
         relation: "belongsTo",
         model: "User"
+      }
+    ]
+  },
+
+  Category: {
+    attributes: {
+      id: {
+        type: DataTypes.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
+        primaryKey: true
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      position: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: true,
+      }
+    },
+    options: {},
+    relations: [
+      {
+        relation: "hasMany",
+        model: "Channel",
+        options: {
+          onDelete: 'CASCADE',
+          hooks: true
+        }
       }
     ]
   },

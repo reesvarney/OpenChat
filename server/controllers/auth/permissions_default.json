@@ -1,0 +1,66 @@
+{
+  "isAdmin": {
+    "defaultValue": false,
+    "displayName" : "Admin"
+  },
+  "speak": {
+    "defaultValue": true,
+    "displayName" : "Speak"
+  },
+  "listen": {
+    "defaultValue": true,
+    "displayName" : "Listen"
+  },
+  "view_channel": {
+    "defaultValue": true,
+    "displayName" : "View Channels"
+  },
+  "join": {
+    "defaultValue": true,
+    "displayName" : "Join Channels"
+  },
+  "view_messages": {
+    "defaultValue": true,
+    "displayName" : "See Messages"
+  },
+  "send_message": {
+    "defaultValue": true,
+    "displayName" : "Send Messages"
+  },
+  "move": {
+    "defaultValue": false,
+    "displayName" : "Move Users"
+  },
+  "ban": {
+    "defaultValue": false,
+    "displayName" : "Ban Users"
+  },
+  "kick": {
+    "defaultValue": false,
+    "displayName" : "Kick Users"
+  },
+  "mute_users": {
+    "defaultValue": false,
+    "displayName" : "Mute Users"
+  },
+  "deafen_users": {
+    "defaultValue": false,
+    "displayName" : "Deafen Users"
+  },
+  "manage_messages": {
+    "defaultValue": false,
+    "displayName" : "Manage Messages"
+  },
+  "edit_channels": {
+    "defaultValue": false,
+    "displayName" : "Edit Channels"
+  },
+  "edit_server": {
+    "defaultValue": false,
+    "displayName" : "Edit Server"
+  },
+  "edit_roles": {
+    "defaultValue": false,
+    "displayName" : "Edit Roles"
+  }
+}

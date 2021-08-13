@@ -13,7 +13,7 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "electron": "^10.4.2",
-    "electron-builder": "^22.9.1"
+    "electron-builder": "^22.11.9"
   },
   "build": {
     "extraResources": [
@@ -29,7 +29,7 @@
   "dependencies": {
     "electron-titlebar": "0.0.3",
     "electron-updater": "^4.3.5",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "jquery": "^3.5.1",
     "keypair": "^1.0.1",
     "peerjs-client": "^0.3.15"

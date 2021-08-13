@@ -5,13 +5,17 @@ const {dbPromise, addModels} = require('./db/init.js');
 const secret = require('./scripts/secret.js')();
 const port = process.env.PORT || 443; 
 var config = require('./scripts/config.js')();
+var OCCache = {
+  "permissions": {}
+};
 
 //DB Ready
 dbPromise.then((db)=> {
 console.log('Database ✔');
 
 //HELPERS
-var expressFunctions = require('./helpers/expressfunctions.js');
+var expressFunctions = require('./helpers/expressfunctions.js')(OCCache);
+console.log("Helper Functions ✔")
 
 //HTTP SERVER
 var https = require('https');
@@ -38,9 +42,10 @@ var sessionMiddleware = session({
 });
 
 sessionStore.sync();
+console.log('Session Manager ✔');
 
 var app = express();
-
+app.use(express.static("./views/static"));
 app.disable('view cache');
 app.set('view engine', 'ejs');
 app.use(sessionMiddleware);
@@ -57,12 +62,13 @@ try {
     }
   } else {
     options = {
-      key: fs.readFileSync('ssl/server.key', 'utf8'),
-      cert: fs.readFileSync('ssl/server.cert', 'utf8')
+      key: fs.readFileSync('./ssl/server.key', 'utf8'),
+      cert: fs.readFileSync('./ssl/server.cert', 'utf8')
     };
   }
   if("key" in options && "cert" in options && !(options.key == "" || options.cert == "")) startServer();
 } catch (err) {
+  console.log("Generating keypair...")
   //Generate a keypair to be used temporarily
   require("child_process").exec("npm list mkcert || npm i", {cwd: './scripts/create_cert'}, function(error, stdout, stderr) {
     (async()=>{
@@ -73,7 +79,8 @@ try {
 };
 
 //If no cert exists we do not run this code
-function startServer(){
+async function startServer(){
+  console.log("Starting server...")
   var server = https.createServer(options, app);
   server.listen(port, function(){
     console.log("HTTPS Server ✔")
@@ -82,7 +89,7 @@ function startServer(){
   //AUTH
   var temp_users = {};
   var passport = require('passport');
-  require('./controllers/auth/init.js')(passport, db, temp_users);
+  var authFunctions = await require('./controllers/auth/init.js')(passport, db, temp_users, OCCache);
   app.use(passport.initialize());
   app.use(passport.session());
   
@@ -104,7 +111,7 @@ function startServer(){
     sessionMiddleware(socket.request, {}, next);
   });
   
-  var signallingServer = require('./controllers/signalling/signalling.js')({db, io, config, port, secret, temp_users });
+  var signallingServer = require('./controllers/signalling/signalling.js')({db, io, config, port, secret, temp_users, expressFunctions, OCCache });
   
   
   // ROUTING //
@@ -122,7 +129,9 @@ function startServer(){
     expressFunctions,
     addModels,
     port,
-    signallingServer
+    signallingServer,
+    authFunctions,
+    OCCache
   };
   
   var clientController = require('./controllers/client/client.js')(controllerParams);

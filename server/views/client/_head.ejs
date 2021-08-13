@@ -28,7 +28,13 @@
     <script src="./js/sortable.min.js"></script>
     <script src="./js/smartscroll.js"></script>
     <script src="./js/client.js"></script>
-    <% if(req.user.permissions.permission_edit_channels){%>
+    <% if(req.user.permissions.global.edit_channels){%>
         <script src="./js/client-edit_channels.js"></script>
+    <% } %>
+    <% if(req.user.permissions.global.edit_roles){%>
+        <script src="./js/client-edit_roles.js"></script>
+    <% } %>
+    <% if(req.user.permissions.global.edit_server){%>
+        <script src="./js/client-edit_server.js"></script>
     <% } %>
 </head>

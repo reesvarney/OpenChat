@@ -1,5 +1,4 @@
 navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-
 var soundfiles = [
     "mute",
     "unmute",
@@ -165,8 +164,11 @@ var client = window.client = new class{
 
   _populateUsers(d){
     $('.user-list').empty();
+    $('.global-user-list ul').empty();
     this.serverinfo.users = d.users;
+    console.log(d.users)
     for(const [userID, user] of Object.entries(d.users)){
+      $("<li><a></a></li>").text(`${user.name} - ${user.status}`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
       if(user.channel !== null){
         $("<li><a></a></li>").text(user.name).appendTo(`#${user.channel}-users`);
         if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
@@ -546,10 +548,5 @@ $( document ).ready(function() {
     });
   });
   
-  $(".edit_server_btn").on('click', function(){
-    overlay.show('edit_server');
-    $('#edit_server>form input[name="name"]').val(client.serverinfo.name);
-  })
-
   scrollController = new smartScroll($('#message_scroll'));
 });

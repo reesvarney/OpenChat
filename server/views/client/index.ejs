@@ -4,129 +4,7 @@
 
 <body>
   <div id="overlay">
-    <% if(req.user.permissions.permission_edit_channels){%>
-    <div uk-modal id="add_channel">
-      <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
-        <h3 class="uk-card-title">New Channel</h3>
-        <form action="admin/channel/new" method="post">
-          <!-- TODO - Create radios dynamically for each defined channel type -->
-          <div class="uk-margin">
-            <label>Name</label>
-            <input type="text" name="name" class="uk-input" placeholder="Channel Name">
-          </div>
-
-
-          <label>Type</label>
-          <div class="uk-margin">
-            <input type="radio" id="type_select_voice" name="type" class="uk-radio" value="voice">
-            <label for="type_select_voice">Voice</label>
-
-            <input type="radio" id="type_select_text" name="type" value="text" class="uk-radio" checked>
-            <label for="type_select_text">Text</label>
-          </div>
-
-          <button class="uk-button uk-button-secondary uk-margin">Add</button>
-        </form>
-      </div>
-    </div>
-    <% } %>
-
-
-    <% if(req.user.permissions.permission_edit_channels){%>
-    <div uk-modal id="edit_channel">
-      <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
-        <h3 class="uk-card-title">Edit Channel</h3>
-        <form action="admin/channel//edit" method="post" class="uk-form-horizontal">
-          <div class="uk-margin">
-            <label class="uk-form-label">Name</label>
-            <input type="text" name="name" class="uk-input uk-form-width-medium" placeholder="Channel Name">
-          </div>
-        </form>
-        <div class="uk-inline uk-margin " id="edit_channel_actions">
-          <button id="channel_save_btn" class="uk-button uk-button-secondary">Save</button>
-          <button id="channel_delete_btn" class="uk-button uk-button-danger">Delete</button>
-        </div>
-      </div>
-    </div>
-    <% } %>
-
-
-    <% if(req.user.permissions.permission_edit_server || req.user.permissions.permission_edit_roles){%>
-    <div uk-modal id="edit_server">
-      <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
-        <h3 class="uk-card-title">Server Settings</h3>
-        <hr class="uk-divider-small">
-
-        <% if(req.user.permissions.permission_edit_server){%>
-        <form action="admin/server/edit" method="post" class="uk-form-horizontal">
-          <h4>Details</h4>
-          <div class="uk-margin">
-            <label class="uk-form-label">Server Name</label>
-            <input type="text" name="name" class="uk-input uk-form-width-medium" placeholder="" value="<%= config.name %>">
-          </div>
-          <button class="uk-button uk-button-secondary">Save</button>
-        </form>
-        <hr class="uk-divider-icon">
-        <% } %>
-
-        <% if(req.user.permissions.permission_edit_roles && roles !== undefined){%>
-        <div class="uk-margin">
-          <h4>Roles</h4>
-          <ul uk-accordion="multiple: true">
-            <% roles.forEach(role => { %>
-            <% if(role.name !== "owner"){%> 
-            <% var permissions = Object.keys(role.dataValues).filter(function(k) {
-                return k.indexOf('permission') == 0;
-              }).reduce(function(newData, k) {
-                newData[k] = role.dataValues[k];
-                newData['isAdmin'] = role.dataValues['isAdmin'];
-                return newData;
-              }, {}) %>
-              <li>
-                <a class="uk-accordion-title" href="#"><%=role.name%></a>
-                <div class="uk-accordion-content">
-                  <form action="admin/role/<%=role.id%>/edit" method="post" class="uk-form-horizontal role_edit_form">
-                    <% if(role.name !== "default"){ %>
-                      <div class="uk-margin">
-                        <label class="uk-form-label">Role Name</label>
-                        <div class="uk-form-controls">
-                          <input type="text" class="uk-input uk-form-width-medium" name="name" value="<%=role.name%>"></input>
-                        </div>
-                      </div>
-                    <% } %>
-
-                    <label class="uk-legend">Permissions</label>
-                    <div class="uk-margin">
-
-                      <% for( const [name, value] of Object.entries(permissions)){ %>
-                        <div class="uk-margin">
-                          <label class="uk-form-label"><%=name%></label>
-                          <input type="hidden" name="<%=name%>" value="false">
-                          <input class="uk-checkbox" type="checkbox" name="<%=name%>" <% if(value){ %> checked <% } %>
-                            <% if(permissions['isAdmin'] && name !== 'isAdmin'){ %> disabled <%} %> value="true">
-                        </div>
-                      <% }; %>
-
-
-                      <button class="uk-button uk-button-secondary">Save</button>
-                      <% if(role.name !== "default"){ %>
-                        <button class="uk-button uk-button-danger">Delete</button>
-                      <% } %>
-                      </div>
-
-                  </form>
-                </div>
-
-              </li>
-            <% }%>
-            <% }); %>
-          </ul>
-          <!--- ADD THIS WITH INCREASED ROLE MANAGEMENT: <button class="uk-button uk-button-default">New</button> --->
-        </div>
-        <% } %>
-      </div>
-    </div>
-    <% } %>
+    <%- include('_admin_windows', {req, roles}) %>
   </div>
 
   <nav>
@@ -134,7 +12,7 @@
       <img id="oc_image" src="./img/logo.svg">
       <div style="width: 100%; display: flex; justify-content: space-between;">
         <h1 id="server_title"><%= config.name %></h1>
-        <% if(req.user.permissions.permission_edit_server || req.user.permissions.permission_edit_roles){ %>
+        <% if(req.user.permissions.global.edit_server || req.user.permissions.global.edit_roles){ %>
           <a href="#" class="edit_server_btn"><span uk-icon="cog"></span></a>
         <% } %>
       </div>
@@ -142,7 +20,7 @@
     <a id="nav-close"><i class="fas fa-times"></i></a>
     <div id="channel_heading">
       <h4>Channels</h4>
-      <% if(req.user.permissions.permission_edit_channels){ %>
+      <% if(req.user.permissions.global.edit_channels){ %>
         <a href="#" id="add_channel_btn"><span uk-icon="plus-circle"></span></a>
       <% } %>
     </div>
@@ -163,6 +41,7 @@
   </nav>
 
   <main>
+    <div class="channel-content">
     
     <!-- MOVE THIS INTO SEPARATE MESSAGE CONTROLLER -->
     <!-- START -->
@@ -200,17 +79,34 @@
     </div>
 
     
-    <% if(req.user.permissions.permission_send_message){ %>
-    <form id="message_input_area">
-        <textarea rows="2" id="message_box" class="uk-textarea"></textarea>
-        <button id="message_send" class="uk-button uk-button-default" disabled>Send</button>
-    </form>
-    <% } else {%>
-    <div id="message_input_area">
-      <p style="color: grey">You do not have permission to send messages.</p>
-    </div>
+    <% if(req.user.permissions.global.send_message){ %>
+      <form id="message_input_area">
+          <textarea rows="2" id="message_box" class="uk-textarea"></textarea>
+          <button id="message_send" class="uk-button uk-button-default" disabled>Send</button>
+      </form>
+      <% } else {%>
+      <div id="message_input_area">
+        <p style="color: grey">You do not have permission to send messages.</p>
+      </div>
     <%} %>
     <!-- END -->
+    </div>
+
+    <div class="global-user-list">
+      <h3 class="uk-heading-divider">Users</h3>
+      <h5 class="uk-heading-line"><span>Permanent</span></h5>
+      <ul class="perm-users uk-list">
+        
+      </ul>
+
+      <!-- Add a check for the config.allowanon for whether to display this - also maybe hide if no temp users connected -->
+      <h5 class="uk-heading-line"><span>Temporary</span></h5>
+
+      <ul class="temp-users uk-list">
+        
+      </ul>
+    </div>
+
   </main>
 </body>
 

@@ -280,8 +280,18 @@ div.center-self {
   display: none;
 }
 
-/* MESSAGE AREA */
 main {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  padding: 0px;
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* MESSAGE AREA */
+.channel-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -469,6 +479,14 @@ main {
   color: #444444;
 }
 
+/* User Area */
+.global-user-list {
+  min-width: 50px;
+  width: 250px;
+  max-width: 30%;
+  padding: 10px;
+}
+
 @media screen and (max-width: 700px) {
 
   /* MAKE NAV 100% WIDTH, SWIPE BETWEEN NAV/ MESSAGES */
@@ -482,11 +500,11 @@ main {
     overflow-y: auto;
   }
 
-  main {
+  .channel-content {
     min-width: 100vw;
   }
 
-  main>h2 {
+  .channel-content>h2 {
     display: inline-block;
   }
 

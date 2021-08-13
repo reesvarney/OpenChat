@@ -170,7 +170,7 @@ var client = window.client = new class{
     for(const [userID, user] of Object.entries(d.users)){
       $("<li><a></a></li>").text(`${user.name} - ${user.status}`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
       if(user.channel !== null){
-        $("<li><a></a></li>").text(user.name).appendTo(`#${user.channel}-users`);
+        $("<li><div class='user'><a></a></div></li>").text(user.name).appendTo(`#${user.channel}-users`);
         if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
           // Play external join sound
         }

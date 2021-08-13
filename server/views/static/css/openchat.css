@@ -446,6 +446,18 @@ main {
   height: 400px;
 }
 
+.appleMusic-embed {
+  width: 100%;
+  min-width: 80px;
+  height: 250px;
+  border-radius: 12px;
+}
+
+.appleMusic-embed iframe {
+  overflow:hidden;
+  background:transparent;
+}
+
 /* MESSAGE INPUT */
 #message_input_area {
   display: flex;

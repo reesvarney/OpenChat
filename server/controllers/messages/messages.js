@@ -18,8 +18,6 @@ const spamLimit2 = rateLimit({
   windowMs: 60 * 1000,
   max: 30
 });
-const { render } = require("ejs");
-const { User } = require("../../db/models");
 
 function sanitize(str) {
   var document = new JSDOM("<div></div>");
@@ -111,11 +109,22 @@ module.exports = function ({ db, io, expressFunctions }) {
                 },
                 {
                   name: "spotify",
-                  expression: /\.spotify\.com/,
+                  expression: /\.spotify\.com\/([^.]+)/,
                   function: function (str) {
                     return `https://open.spotify.com/embed/${str.split("spotify.com/").pop()}`
                   },
                 },
+                {
+                  name: "appleMusic",
+                  expression: /(?:.+)?music\.apple\.com\/..\/(album|song)\/([^,.;#\\\/]+)\/(\d+)$/,
+                  function: function (str) {
+                    // Bit inefficient but we'll just run the regex on it again so we can use the capture groups
+                    var captureGroups = str.match(/(?:.+)?music\.apple\.com\/..\/(album|song)\/([^,.;#\\\/]+)\/(\d+)$/);
+                    var out = `https://embed.music.apple.com/gb/${captureGroups[1]}/${captureGroups[2]}/${captureGroups[3]}`;
+                    console.log(out);
+                    return out
+                  }
+                }
               ];
 
               for (x = 0; x < links.length; x++) {

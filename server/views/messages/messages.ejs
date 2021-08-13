@@ -36,5 +36,9 @@ var message = data[i];
         <% if("spotify" in message){ %>
             <%- include('_spotify_embed', {id: message.id, url: message.spotify}) %>
         <% } %>
+
+        <% if("appleMusic" in message){ %>
+            <%- include('_appleMusic_embed', {id: message.id, url: message.appleMusic}) %>
+        <% } %>
     </div>
 <% } %>

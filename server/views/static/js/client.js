@@ -20,6 +20,7 @@ var soundfiles = [
 var soundeffects = new Proxy(soundfiles, {
   get(target, filename) {
     var audio = new Audio(`./audio/${filename}.mp3`);
+    audio.volume = 0.05;
     audio.loop = false;
     return audio
   }

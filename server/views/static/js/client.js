@@ -20,7 +20,7 @@ var soundfiles = [
 var soundeffects = new Proxy(soundfiles, {
   get(target, filename) {
     var audio = new Audio(`./audio/${filename}.mp3`);
-    audio.volume = 0.05;
+    audio.volume = 0.2;
     audio.loop = false;
     return audio
   }
@@ -169,9 +169,9 @@ var client = window.client = new class{
     this.serverinfo.users = d.users;
     console.log(d.users)
     for(const [userID, user] of Object.entries(d.users)){
-      $("<li><a></a></li>").text(`${user.name} - ${user.status}`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
+      $(`<li><div class='user'><a>${user.name} - ${user.status}</a></div></li>`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
       if(user.channel !== null){
-        $("<li><div class='user'><a></a></div></li>").text(user.name).appendTo(`#${user.channel}-users`);
+        $(`<li><div class='user'><a>${user.name}</a></div></li>`).appendTo(`#${user.channel}-users`);
         if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
           // Play external join sound
         }
@@ -299,7 +299,10 @@ var client = window.client = new class{
       timeout: 10000,
       success: ((result)=>{
         var channel_el = $(result).appendTo(categoryList);
-        new channelTypes[d.type](channel_el);
+        var new_channel = new channelTypes[d.type](channel_el);
+        if(this.textChannel === null && d.type === "text"){
+          new_channel.setActive();
+        }
       })
     });
   };
@@ -387,20 +390,22 @@ class textChannel extends channel{
   constructor(el){
     super(el);
     this.type = "text";
-    $(this.el).on('click', '.channel', ()=> {
-      if(this.id != client.textChannel){
-        $("#text_channels li").removeClass("active");
-        $(this.el).addClass("active");
-        this.page = 0;
-        client.textChannel = this.id;
-        $("#message_input_area *").each( function( index ){
-          $(this).prop('disabled', false);
-        });
-        this.getMessages({page: this.page});
-        $("#channel_name").text(this.name)
-      }
-    });
+    $(this.el).on('click', '.channel', this.setActive);
   };
+
+  setActive(){
+    if(this.id != client.textChannel){
+      $("#text_channels li").removeClass("active");
+      $(this.el).addClass("active");
+      this.page = 0;
+      client.textChannel = this.id;
+      $("#message_input_area *").each( function( index ){
+        $(this).prop('disabled', false);
+      });
+      this.getMessages({page: this.page});
+      $("#channel_name").text(this.name)
+    }
+  }
 
   getMessages(params){
     $.ajax({
@@ -529,6 +534,27 @@ $( document ).ready(function() {
       $("#message_input_area").submit();
     }
   });
+
+  $(document).on('click', '.user', (evt)=>{
+    var container = $(".interact-menu");
+    var bounds = {
+      x: (evt.clientX > $(".interact-menu").outerWidth()) ? evt.clientX - $(".interact-menu").outerWidth() : evt.clientX,
+      y: Math.min(evt.clientY, $(window).height() - $(".interact-menu").outerHeight())
+    }
+    container.css({top: bounds.y, left: bounds.x}).show();
+    $(document).on('mousedown.closeinteract', (e)=>{
+        if (!container.is(e.target) && container.has(e.target).length === 0) 
+        {
+            container.hide();
+            container.find('.toggle-content').hide();
+            $(document).off('.closeinteract');
+        }
+    });
+  });
+
+  $(".toggle").on('click', (evt)=>{
+    $(evt.target).find('.toggle-content').toggle();
+  })
   
   $("#message_input_area").submit(function(e) {
     e.preventDefault();

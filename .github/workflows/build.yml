@@ -2,6 +2,10 @@ name: Build/Release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to set and release"
+        required: true
   release:
     types: [created]
   

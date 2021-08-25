@@ -121,7 +121,6 @@ module.exports = function ({ db, io, expressFunctions }) {
                     // Bit inefficient but we'll just run the regex on it again so we can use the capture groups
                     var captureGroups = str.match(/(?:.+)?music\.apple\.com\/..\/(album|song)\/([^,.;#\\\/]+)\/(\d+)$/);
                     var out = `https://embed.music.apple.com/gb/${captureGroups[1]}/${captureGroups[2]}/${captureGroups[3]}`;
-                    console.log(out);
                     return out
                   }
                 }

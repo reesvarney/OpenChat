@@ -1,0 +1,32 @@
+  <ul>
+    <% if(req.user.permissions.global.edit_roles && roles !== undefined){ %>
+    <li class="toggle">
+      Roles
+      <div class="toggle-content">
+        <form id="user-interact-roles" method="POST" action="/admin/user/<%= user.id %>/roles/set">
+          <% roles.forEach(role => { %>
+            <% if(!["owner", "all"].includes(role.name)){%>
+              <div>
+                <input type="hidden" name="<%=role.id%>" value="false">
+                <input class="uk-checkbox" type="checkbox" name="<%=role.id%>" <% if(role.value){ %> checked <% } %> value="true">
+                <label class="uk-form-label"><%=role.name%></label>
+              </div>
+            <% } %>
+          <% }); %>
+        </form>
+      </div>
+    </li>
+    <% } %>
+    <li>
+      Mute
+    </li>
+    <li>
+      Deafen
+    </li>
+    <li>
+      Kick
+    </li>
+    <li>
+      Ban
+    </li>
+  </ul>

@@ -184,7 +184,7 @@ module.exports = function({
     var users = (await db.models.Role.findByPk(req.params.uuid, {
       include: db.models.User
     })).Users;
-    db.models.Role.destroy({
+    await db.models.Role.destroy({
       where: {
         id: req.params.uuid
       }
@@ -194,6 +194,34 @@ module.exports = function({
     });;
     for(const user of users){
       authFunctions.updateUserPerms(user.id);
+    }
+    res.sendStatus(200);
+  });
+
+  router.post("/user/:uuid/roles/set", expressFunctions.checkAuth, expressFunctions.hasPermission("edit_roles"), async(req,res)=>{
+    // need to make sure this gets updated for other clients, probs easiest just to get them to re-request the menu to begin with though this will end up closing any kind of dropdowns etc
+    var user = await db.models.User.findByPk(req.params.uuid, {include: db.models.Role});
+    var changes = req.body;
+    if(user !== null){
+      for(const [roleid, rolevalue] of Object.entries(changes)){
+        if(user.Roles.map(a=>a.id).includes(roleid)){
+          if(rolevalue === false){
+            // remove role
+            var oldRole = user.Roles.find(a=>a.id === roleid);
+            if(!["owner", "all"].includes(oldRole.name)){
+              await user.removeRole(oldRole)
+            }
+          }
+        } else {
+          var newRole = await db.models.Role.findByPk(roleid);
+          // add role (if exists)
+          if(newRole !== null){
+            if(!["owner", "all"].includes(newRole.name)){
+              await user.addRole(newRole)
+            }
+          }
+        }
+      }
     }
     res.sendStatus(200);
   });

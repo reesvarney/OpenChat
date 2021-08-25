@@ -3,7 +3,7 @@ var message = data[i];
 %>
     <div id="<%= message.id %>" class="message-card">
         <p>
-            <strong><%= message.sender %></strong>
+            <strong class="user inline" data-userid="<%= message.User.id %>"><%= message.sender %></strong>
                 <i class="date">
                 <script type="text/javascript">
                     var date = new Date("<%= message.date %>");

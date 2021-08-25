@@ -242,18 +242,21 @@ div.center-self {
 /* USER */
 .user{
   cursor: pointer;
+}
+
+.user:not(.inline){
   padding: 10px;
 }
 
-.user:hover{
+.user:not(.inline):hover{
   background-color: rgba(0,0,0, 0.1);
 }
 
-.user a {
+.user:not(.inline) a {
   color: black;
 }
 
-.user a:hover{
+.user:not(.inline) a:hover{
   text-decoration: none;
 }
 

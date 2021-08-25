@@ -169,9 +169,9 @@ var client = window.client = new class{
     this.serverinfo.users = d.users;
     console.log(d.users)
     for(const [userID, user] of Object.entries(d.users)){
-      $(`<li><div class='user'><a>${user.name} - ${user.status}</a></div></li>`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
+      $(`<li><div class='user' data-userid='${userID}'><a>${user.name} - ${user.status}</a></div></li>`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
       if(user.channel !== null){
-        $(`<li><div class='user'><a>${user.name}</a></div></li>`).appendTo(`#${user.channel}-users`);
+        $(`<li><div class='user' data-userid='${userID}'><a>${user.name}</a></div></li>`).appendTo(`#${user.channel}-users`);
         if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
           // Play external join sound
         }
@@ -537,24 +537,55 @@ $( document ).ready(function() {
 
   $(document).on('click', '.user', (evt)=>{
     var container = $(".interact-menu");
-    var bounds = {
-      x: (evt.clientX > $(".interact-menu").outerWidth()) ? evt.clientX - $(".interact-menu").outerWidth() : evt.clientX,
-      y: Math.min(evt.clientY, $(window).height() - $(".interact-menu").outerHeight())
-    }
-    container.css({top: bounds.y, left: bounds.x}).show();
-    $(document).on('mousedown.closeinteract', (e)=>{
-        if (!container.is(e.target) && container.has(e.target).length === 0) 
-        {
-            container.hide();
-            container.find('.toggle-content').hide();
-            $(document).off('.closeinteract');
+    $.ajax({
+      async: true,
+      type: 'GET',
+      url: `/users/${$(evt.currentTarget).data("userid")}/interact`,
+      timeout: 10000,
+      success: ( function( result){
+        container.html(result);
+        var bounds = {
+          x: (evt.clientX > $(".interact-menu").outerWidth()) ? evt.clientX - $(".interact-menu").outerWidth() : evt.clientX,
+          y: Math.min(evt.clientY, $(window).height() - $(".interact-menu").outerHeight())
         }
+        container.css({top: bounds.y, left: bounds.x}).show();
+        $("#user-interact-roles").on('change.rolechange', function(evt){
+          var roledata = {};
+          for(const v of Object.values($(this).serializeArray())){
+            roledata[v.name] = (roledata[v.name] !== true) ? v.value : false
+          };
+          $.ajax({
+            async: true,
+            type: "POST",
+            url: $(this).attr('action'),
+            data: roledata,
+            timeout: 10000,
+            success: (result)=>{
+              console.log('done',result)
+            }
+          })
+        });
+        $(document).on('mousedown.closeinteract', (e)=>{
+            if (!container.is(e.target) && container.has(e.target).length === 0) 
+            {
+                container.hide();
+                container.find('.toggle-content').hide();
+                $(document).off('.closeinteract');
+                $(document).off('.rolechange');
+            }
+        });
+      }),
+      error: function (xhr, ajaxOptions, thrownError) {
+        console.log(xhr, thrownError)
+      }
     });
+
   });
 
-  $(".toggle").on('click', (evt)=>{
-    $(evt.target).find('.toggle-content').toggle();
-  })
+  $(document).on('click', '.toggle', function(evt){
+    if(evt.target != this) return;
+    $(evt.currentTarget).find('.toggle-content').toggle();
+  });
   
   $("#message_input_area").submit(function(e) {
     e.preventDefault();

@@ -26,6 +26,31 @@ module.exports = function ({ config, db, expressFunctions }) {
     res.render("client/index", viewData);
   });
 
+  router.get("/users/:id/interact", expressFunctions.checkAuth, async(req,res)=>{
+    var user = await db.models.User.findByPk(req.params.id);
+    if(user === null){
+      res.sendStatus(400);
+    } else {
+      var roles = null;
+
+      if(req.user.permissions.global.edit_roles){
+        roles = (await db.models.Role.findAll()).map((a)=>{
+          return {
+          name: a.name, 
+          id: a.id, 
+          value: false
+          }
+        });
+        var userRoles = await user.getRoles();
+        for(const role of userRoles){
+          roles[roles.findIndex(b=> b.id === role.id)].value = true;
+        };
+      }
+  
+      res.render("client/_user_interact", {req, user, roles})
+    }
+  });
+
   router.get("/channels/:id", expressFunctions.checkAuth, async(req, res)=>{
     var channel = await db.models.Channel.findByPk(req.params.id);
     if(channel === null){

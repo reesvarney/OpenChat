@@ -1,4 +1,27 @@
+window.roleFunctions = {
+  createRoleChangeListener: ()=>{
+    $("#user-interact-roles").on('change.rolechange', function(evt){
+      var roledata = {};
+      for(const v of Object.values($(this).serializeArray())){
+        roledata[v.name] = (roledata[v.name] !== true && ["true", true].includes(v.value)) ? true : false;
+      };
+      $.ajax({
+        async: true,
+        type: "POST",
+        url: $(this).attr('action'),
+        data: roledata,
+        timeout: 10000,
+        success: (result)=>{
+          console.log('done',result)
+        }
+      })
+    });
+  }
+}
+
 $( document ).ready(()=>{
+
+
   $("#new_role_button").on("click", (event)=>{
     $.ajax({
       async: true,

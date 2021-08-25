@@ -549,29 +549,16 @@ $( document ).ready(function() {
           y: Math.min(evt.clientY, $(window).height() - $(".interact-menu").outerHeight())
         }
         container.css({top: bounds.y, left: bounds.x}).show();
-        $("#user-interact-roles").on('change.rolechange', function(evt){
-          var roledata = {};
-          for(const v of Object.values($(this).serializeArray())){
-            roledata[v.name] = (roledata[v.name] !== true) ? v.value : false
-          };
-          $.ajax({
-            async: true,
-            type: "POST",
-            url: $(this).attr('action'),
-            data: roledata,
-            timeout: 10000,
-            success: (result)=>{
-              console.log('done',result)
-            }
-          })
-        });
+        if(window.roleFunctions !== undefined){
+          window.roleFunctions.createRoleChangeListener();
+        }
         $(document).on('mousedown.closeinteract', (e)=>{
             if (!container.is(e.target) && container.has(e.target).length === 0) 
             {
                 container.hide();
                 container.find('.toggle-content').hide();
                 $(document).off('.closeinteract');
-                $(document).off('.rolechange');
+                $("#user-interact-roles").off('.rolechange');
             }
         });
       }),

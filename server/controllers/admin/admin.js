@@ -205,7 +205,7 @@ module.exports = function({
     if(user !== null){
       for(const [roleid, rolevalue] of Object.entries(changes)){
         if(user.Roles.map(a=>a.id).includes(roleid)){
-          if(rolevalue === false){
+          if([false, "false"].includes(rolevalue)){
             // remove role
             var oldRole = user.Roles.find(a=>a.id === roleid);
             if(!["owner", "all"].includes(oldRole.name)){

@@ -183,7 +183,7 @@ var client = window.client = new class{
     for(const [userID, user] of Object.entries(d.users)){
       $(`<li><div class='user' data-userid='${userID}'><a>${user.name} - ${user.status}</a></div></li>`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
       if(user.channel !== null){
-        $(`<li><div class='user' data-userid='${userID}'><a>${user.name}</a></div></li>`).appendTo(`#${user.channel}-users`);
+        $(`<li><div class='user slim' data-userid='${userID}'><a>${user.name}</a></div></li>`).appendTo(`#${user.channel}-users`);
         if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
           // Play external join sound
         }
@@ -297,6 +297,15 @@ var client = window.client = new class{
           
           if(channels.sort().map((a) => a.name).join(',') !== localChannels.sort().map((a) => a.name).join(',')){
             // Check channel names
+            for(const localChannel of localChannels){
+              var remoteChannel = channels.find(a=> a.id === localChannel.id);
+              if(remoteChannel.name !== localChannel.name){
+                $(localChannel.el).find(".channel").text(remoteChannel.name);
+                if(localChannel.id === this.textChannel){
+                  $("#channel_info #channel_name").text(remoteChannel.name);
+                }
+              }
+            }
           }
         }
       }

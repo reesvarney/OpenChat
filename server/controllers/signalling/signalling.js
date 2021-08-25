@@ -259,6 +259,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     async updateChannels(){
       var channels = {};
       var result = await db.models.Channel.aggregate("type", "DISTINCT", { plain: false });
+
       for(const typeObj of result){
         var type = typeObj.DISTINCT;
         channels[type] = [];

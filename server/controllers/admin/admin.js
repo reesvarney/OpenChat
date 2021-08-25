@@ -94,7 +94,7 @@ module.exports = function({
         name: name
       });
       res.sendStatus(200);
-      signallingServer.sendUpdate();
+      signallingServer.updateChannels();
     });
   });
 

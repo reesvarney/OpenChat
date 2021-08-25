@@ -219,13 +219,13 @@ div.center-self {
 
 .user-list li {
   position: relative;
-  margin-top: 10px;
+  margin-top: 5px;
   box-sizing: border-box;
   padding-left: 20px;
 }
 
 .user-list li:last-of-type {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 
@@ -242,10 +242,15 @@ div.center-self {
 /* USER */
 .user{
   cursor: pointer;
+  border-radius: 5px;
 }
 
 .user:not(.inline){
   padding: 10px;
+}
+
+.user.slim{
+  padding: 3px 10px;
 }
 
 .user:not(.inline):hover{
@@ -528,11 +533,13 @@ main {
 .interact-menu{
   display: none;
   position: fixed;
-  background-color: #f2f2f2;
+  background-color: rgba(255,255,255, 0.6);
   padding: 15px;
   min-width: 10em;
   box-shadow: 0px 0px 5px #aaa;
   z-index: 100;
+  border-radius: 5px;
+  backdrop-filter: blur(10px);
 }
 
 .interact-menu ul {
@@ -545,6 +552,7 @@ main {
   text-decoration: none;
   padding:5px;
   list-style-type: none;
+  border-radius: 5px;
 }
 
 .interact-menu li:not(:last-of-type){
@@ -559,8 +567,21 @@ main {
 /* Custom toggle */
 .toggle>.toggle-content{
   display: none;
-  padding-left: 10px;
   font-size: 0.8em;
+}
+
+/* User interact */
+#user-interact-roles{
+  margin-top:5px;
+  padding: 10px;
+  padding-right: 0px;
+  background-color: rgba(240,240,240, 0.4);
+  border-radius: 5px;
+}
+
+/* User interact */
+#user-interact-roles>div:not(:last-of-type){
+  margin-bottom: 15px;
 }
 
 @media screen and (max-width: 700px) {

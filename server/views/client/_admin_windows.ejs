@@ -70,53 +70,7 @@
   
           <% if(req.user.permissions.global.edit_roles && roles !== undefined){%>
           <div id="edit_roles" class="uk-margin">
-            <h4>Roles</h4>
-            <ul uk-accordion="multiple: true">
-              <% roles.forEach(role => { %>
-              <% if(role.name !== "owner"){%>
-                <li>
-                  <a class="uk-accordion-title" href="#"><%=role.name%></a>
-                  <div class="uk-accordion-content">
-                    <form action="admin/role/<%=role.id%>/edit" method="post" class="uk-form-horizontal role_edit_form">
-                      <% if(role.name !== "all"){ %>
-                        <div class="uk-margin">
-                          <label class="uk-form-label">Role Name</label>
-                          <div class="uk-form-controls">
-                            <input type="text" class="uk-input uk-form-width-medium" name="name" value="<%=role.name%>"></input>
-                          </div>
-                        </div>
-                      <% } %>
-  
-                      <label class="uk-legend">Permissions</label>
-                      <div class="uk-margin">
-  
-                        <% for( const {value, Permission} of role.PermissionSet.PermissionValues){ %>
-                          <div class="uk-margin">
-                            <label class="uk-form-label"><%=Permission.name%></label>
-                            <input type="hidden" name="<%=Permission.id%>" value="false">
-                            <input class="uk-checkbox" type="checkbox" name="<%=Permission.id%>" <% if(value){ %> checked <% } %>
-                              <% var roleIsAdmin = role.PermissionSet.PermissionValues.find(el => el.PermissionId === 'isAdmin') %>
-                              <% if(roleIsAdmin !== undefined && roleIsAdmin.value === true && Permission.name !== 'isAdmin'){ %> disabled <%} %> value="true">
-                          </div>
-                        <% }; %>
-  
-                        <div class="edit_role_actions">
-                          <button class="uk-button uk-button-secondary">Save</button>
-                          <% if(role.name !== "all"){ %>
-                            <button class="uk-button uk-button-danger role_delete_btn">Delete</button>
-                          <% } %>
-                        </div>
-
-                        </div>
-  
-                    </form>
-                  </div>
-  
-                </li>
-              <% }%>
-              <% }); %>
-            </ul>
-            <button class="uk-button uk-button-default" id="new_role_button">New</button>
+            <%- include("_role_settings", {roles}); %>
           </div>
           <% } %>
         </div>

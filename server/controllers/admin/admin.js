@@ -146,6 +146,7 @@ module.exports = function({
   router.post("/role/create", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
     var roleNum = await db.models.Role.count();
     await authFunctions.createRole(`Role #${roleNum}`);
+    signallingServer.updateRoles();
     res.status(200).send('SUCCESS');
   });
 
@@ -165,15 +166,19 @@ module.exports = function({
       res.status(400).send('ERROR: Role does not exist');
     } else {
       // Update permissionValues for role
-      for(const perm of Object.keys(req.body)){
-        var permission = role.PermissionSet.PermissionValues.find(el => perm === el.PermissionId);
+      for(const key of Object.keys(req.body)){
+        var permission = role.PermissionSet.PermissionValues.find(el => key === el.PermissionId);
         if(permission !== undefined){
           await permission.update({
-            value: req.body[perm]
+            value: req.body[key]
           });
+        } else if(key === "name"){
+          role.update({name: req.body[key]})
         };
       };
       res.status(200).send('SUCCESS');
+      signallingServer.updateRoles();
+
       for(const user of role.Users){
         authFunctions.updateUserPerms(user.id);
       }
@@ -196,6 +201,7 @@ module.exports = function({
       authFunctions.updateUserPerms(user.id);
     }
     res.sendStatus(200);
+    signallingServer.updateRoles();
   });
 
   router.post("/user/:uuid/roles/set", expressFunctions.checkAuth, expressFunctions.hasPermission("edit_roles"), async(req,res)=>{

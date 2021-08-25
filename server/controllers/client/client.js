@@ -47,9 +47,23 @@ module.exports = function ({ config, db, expressFunctions }) {
         };
       }
   
-      res.render("client/_user_interact", {req, user, roles})
+      res.render("client/_user_interact", {req, user, roles});
     }
   });
+
+  router.get("/settings/roles", expressFunctions.checkAuth, expressFunctions.hasPermission("edit_roles"), async(req, res)=>{
+    var roles = {};
+    roles = await db.models.Role.findAll({
+      include: [{
+        model: db.models.PermissionSet,
+        include: [{
+          model:db.models.PermissionValue,
+          include: db.models.Permission
+        }]
+      }]
+    });
+    res.render("client/_role_settings", {roles});
+  })
 
   router.get("/channels/:id", expressFunctions.checkAuth, async(req, res)=>{
     var channel = await db.models.Channel.findByPk(req.params.id);

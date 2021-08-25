@@ -155,6 +155,18 @@ var client = window.client = new class{
         };
       });
   
+      this.socket.on("viewUpdate", ({type, data})=>{
+        switch(type){
+          case "roles":
+            if(window.roleFunctions !== undefined){
+              window.roleFunctions.updateRoleSettings();
+            }
+            break
+          case "userInteract":
+            break
+        }
+      });
+
       this.socket.on("newMessage", (d)=>{
         if(d.channel_id == this.textChannel ){
           this.channels[d.channel_id].getMessages({"id": d.message_id});
@@ -574,7 +586,7 @@ $( document ).ready(function() {
     $(evt.currentTarget).find('.toggle-content').toggle();
   });
   
-  $("#message_input_area").submit(function(e) {
+  $("#message_input_area").on('submit', function(e) {
     e.preventDefault();
     var contents = $("#message_box").val();
     $.ajax({

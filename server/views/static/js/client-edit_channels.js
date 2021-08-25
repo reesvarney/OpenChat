@@ -23,25 +23,6 @@ $( document ).ready(()=>{
       });
     })
 
-    $(".role_edit_form").on( 'submit', function (e) {
-      e.preventDefault();
-      var data = {};
-      $(this).serializeArray().forEach((perm)=>{
-        if(!(perm.name in data && data[perm.name] == "true")){ 
-          data[perm.name] = perm.value
-        };
-      });
-      $.ajax({
-        async: true,
-        type: 'POST',
-        url: this.action,
-        data: data,
-        timeout: 10000,
-        success: ((result)=>{
-        })
-      });
-    });
-
     $("#edit_channel form").on( 'submit', function (e) {
       e.preventDefault();
       $.ajax({

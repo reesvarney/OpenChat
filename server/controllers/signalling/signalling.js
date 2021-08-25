@@ -282,6 +282,14 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
       this.sendUpdate("channels");
     }
 
+    async updateRoles(){
+      io.emit("viewUpdate", {type: "roles", data: null});
+    }
+
+    async updateInteracts(id){
+      io.emit("viewUpdate", {type: "interact", data: id});
+    }
+
     async getUsers(){
       var allUsers = await db.models.User.findAll();
       for(const new_user of allUsers){

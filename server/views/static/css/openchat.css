@@ -151,7 +151,7 @@ div.center-self {
 }
 
 .channel-group>ul>li:not(.active):hover {
-  background: #f5f5f5;
+  background: rgba(200,200,200, 0.1);
 }
 
 .channel-name {
@@ -254,7 +254,7 @@ div.center-self {
 }
 
 .user:not(.inline):hover{
-  background-color: rgba(0,0,0, 0.1);
+  background-color: rgba(200,200,200, 0.1);
 }
 
 .user:not(.inline) a {
@@ -561,7 +561,7 @@ main {
 
 
 .interact-menu li:hover {
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(200,200,200,0.1);
 }
 
 /* Custom toggle */

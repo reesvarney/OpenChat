@@ -411,7 +411,7 @@ class textChannel extends channel{
   constructor(el){
     super(el);
     this.type = "text";
-    $(this.el).on('click', '.channel', this.setActive);
+    $(this.el).on('click', '.channel', ()=>{this.setActive()});
   };
 
   setActive(){

@@ -7,11 +7,11 @@ function hash(salt, message) {
 $( document ).ready(function() {
   $('#login-form').submit(function() {
       $('#login-form').hide();
+      $('#logo').hide();
+      $('#loading_spinner').show();
       var pass = $('#password').val();
       var salt = $('#salt').val();
       $('#password').val(hash(salt, pass));
-      $('#logo').hide();
-      $('#loading_spinner').show();
       return true;
   });
 });

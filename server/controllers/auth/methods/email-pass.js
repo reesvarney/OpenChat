@@ -2,9 +2,11 @@ var express = require("express");
 var router = express.Router();
 var crypto = require("crypto");
 var LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require('bcrypt');
+var saltRounds = 10;
 
-function encrypt(pub_key, data) {
-  return crypto.publicEncrypt(pub_key, Buffer.from(data, "utf-8"));
+function preHash(string){
+  return crypto.createHash("sha256").update(string).digest("hex");
 }
 
 module.exports = {
@@ -46,43 +48,46 @@ module.exports = {
     });
 
     router.get('/register', expressFunctions.checkNotAuth, function (req, res) {
+      // Generate and send salt for user to generate the password with, preventing the server from ever seeing it
       var salt = crypto.randomBytes(128).toString('base64');
       req.session.salt = salt;
       res.render('auth/email-pass/register', {
-        salt: salt
+        salt: salt,
+        failed: ("failed" in req.query) ? true : false
       });
     })
 
     router.post('/register', expressFunctions.checkNotAuth, function (req, res) {
       if (req.session.salt == req.body.salt) {
-        var private_salt = crypto.randomBytes(128).toString('base64');
-        var hash = crypto.createHash('sha256');
-        hash.update(req.body.password);
-        hash.update(private_salt);
-        var pass_hashed = hash.digest('hex');
-        db.models.EmailPass.create({
-          email: req.body.email,
-          salt: req.body.salt,
-          private_salt: private_salt,
-          pass_hashed: pass_hashed
-        }).then((authMethod) => {
-          authMethod.createUser({
-            name: req.body.username
-          }).then((user) => {
-            res.redirect(`/auth/email-pass?email=${req.body.email}`)
-          })
+        bcrypt.hash(preHash(req.body.password), saltRounds, function(err, pass_hashed) {
+          db.models.EmailPass.create({
+            email: req.body.email,
+            salt: req.body.salt,
+            pass_hashed: pass_hashed
+          }).catch((err)=>{
+            res.redirect(`/auth/email-pass/register?failed`);
+          }).then((authMethod) => {
+            if(authMethod !== undefined){
+              authMethod.createUser({
+                name: req.body.username
+              }).catch((err)=>{
+                res.redirect(`/auth/email-pass/register?failed`);
+                authMethod.destroy();
+              }).then((user) => {
+                if(user !== undefined){
+                  res.redirect(`/auth/email-pass?email=${req.body.email}`)
+                };
+              })
+            }
+          });
         });
       };
     });
 
     return router;
   },
-  strategy: ({
-    db
-  }) => {
+  strategy: ({db}) => {
     return new LocalStrategy(function (username, password, done) {
-      var hash = crypto.createHash('sha256');
-      hash.update(password);
       db.models.EmailPass.findOne({
         where: {
           email: username,
@@ -90,10 +95,14 @@ module.exports = {
         include: db.models.User
       }).then(function (result) {
         if (result === null) return done(null, false);
-        hash.update(result.dataValues.private_salt);
-        var pass_hashed = hash.digest('hex');
-        if (result.dataValues.pass_hashed != pass_hashed) return done(null, false);
-        return done(null, result.User.dataValues);
+        var prehashed = preHash(password);
+        bcrypt.compare(prehashed, result.pass_hashed, function(err, isCorrect) {
+          if(isCorrect !== true){
+            return done(null, false);
+          } else {
+            return done(null, result.User);
+          }
+        });
       })
     })
   },

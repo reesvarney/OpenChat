@@ -321,10 +321,6 @@ module.exports = {
       salt: {
         type: DataTypes.STRING,
         allowNull: false
-      },
-      private_salt: {
-        type: DataTypes.STRING,
-        allowNull: false
       }
     },
     options: {},

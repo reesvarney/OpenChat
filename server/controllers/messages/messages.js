@@ -252,5 +252,7 @@ module.exports = function ({ db, io, expressFunctions }) {
 
   });
 
+  router.delete("/message/:uuid", expressFunctions.checkAuth)
+
   return router;
 };

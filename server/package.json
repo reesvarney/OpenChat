@@ -16,6 +16,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "anchorme": "^2.1.2",
+    "bcrypt": "^5.0.1",
     "connect-session-sequelize": "^7.0.1",
     "cookie-parser": "^1.4.5",
     "crypto": "^1.0.1",

@@ -20,7 +20,7 @@ var soundfiles = [
 var soundeffects = new Proxy(soundfiles, {
   get(target, filename) {
     var audio = new Audio(`./audio/${filename}.mp3`);
-    audio.volume = 0.2;
+    audio.volume = localStorage.getItem('sfx_volume') || 0.2;
     audio.loop = false;
     return audio
   }
@@ -136,6 +136,13 @@ var client = window.client = new class{
       //openchat related errors
       this.socket.on("ocerror", (d)=>{
         console.log("OPENCHAT ERROR: " + d);
+      });
+
+      this.socket.on("removeMessage", (msgID)=>{
+        var msg = $(`#${msgID}`);
+        if(msg.length){
+          msg.remove();
+        };
       });
   
       //Change in users
@@ -334,9 +341,9 @@ var client = window.client = new class{
       if(this.isStandalone && "outputDevice" in bridge){
         this.audioOut.setSinkId(bridge.outputDevice);
       }
-
-      // CALL CONTROLS
+      this.audioOut.volume = localStorage.getItem('call_volume') || 1;
       if(!this.isStandalone){
+        // CALL CONTROLS
         $("#disconnect_button").on('click',()=>{
           this.call.end();
         });
@@ -348,7 +355,35 @@ var client = window.client = new class{
         $("#mute_audio").on('click',()=>{
             this.muteAudio(!this.audioOut.muted);
         });
+
+        // User Settings
+        $("#user_settings form").on("submit", (e)=>{
+          e.preventDefault();
+          this.socket.emit("updateInfo", {
+            name: $(e.currentTarget).find("input[name=name]").val()
+          });
+        })
+      } else {
+        $("#user_settings_button").hide();
       }
+
+      $("#sfx_volume").val(localStorage.getItem('sfx_volume') || 0.5);
+      $("#sfx_volume").on('input', (e)=>{
+        var vol = $(e.target).val();
+        var i;
+        for(i = 0; i < soundfiles.length; i++){
+          soundeffects[soundfiles[i]].volume = vol;
+        };
+        localStorage.setItem("sfx_volume", vol);
+      });
+
+      $("#call_volume").val(this.audioOut.volume);
+      $("#call_volume").on('input', (e)=>{
+        var vol = $(e.target).val();
+        this.audioOut.volume = vol;
+        localStorage.setItem("call_volume", vol);
+      });
+
     });
   }
 
@@ -432,7 +467,7 @@ class textChannel extends channel{
     $.ajax({
       async: true,
       type: 'GET',
-      url: `/messages/${this.id}`,
+      url: `/messages/channel/${this.id}`,
       data: params,
       timeout: 10000,
       success: ((result)=>{
@@ -488,7 +523,10 @@ $( document ).ready(function() {
         }
       } else {
         this.dark = (localStorage.dark === "true") ? true : false;
-        this.setDark(this.dark)
+        this.setDark(this.dark);
+        if(this.dark){
+          $("#toggleDark").prop( "checked", true );
+        }
       }
     }
   
@@ -525,6 +563,21 @@ $( document ).ready(function() {
   $("#toggleDark").on('click', function(){
     client.darkMode.setDark('toggle');
   });
+
+  $("#user_settings_button").on('click', function(){
+    overlay.show("user_settings")
+  });
+
+  $(document).on('click', '.msg_delete', function(){
+    console.log($(this).closest(".message-card"))
+    var msgID = $(this).closest(".message-card").attr("id");
+    console.log(`/message/${msgID}`)
+    $.ajax({
+      async: true,
+      type: 'DELETE',
+      url: `/messages/message/${msgID}`
+    });
+  })
 
   $("#nav-toggle").on('click',function(){
     $("nav").show();
@@ -601,7 +654,7 @@ $( document ).ready(function() {
     $.ajax({
       async: true,
       type: 'POST',
-      url: `/messages/${client.textChannel}`,
+      url: `/messages/channel/${client.textChannel}`,
       data: {contents: contents},
       timeout: 10000,
       success: ( function( result){

@@ -2,7 +2,7 @@
 var message = data[i];
 %>
     <div id="<%= message.id %>" class="message-card">
-        <p>
+        <div "msg-meta">
             <strong class="user inline" data-userid="<%= message.User.id %>"><%= message.sender %></strong>
                 <i class="date">
                 <script type="text/javascript">
@@ -17,8 +17,12 @@ var message = data[i];
                     $("#<%= message.id %> .date")[0].innerHTML = dispDate;
                 </script>
                 </i>
-            <br>
-            <%- message.content %>
+                <% if(message.User.id === req.user.id || req.user.permissions.channels[message.ChannelId].manage_messages){%>
+                    <a class="msg_delete">Delete</a>
+            <%}%>
+        </div>
+        <p class="msg-content">
+        <%- message.content %>
         </p>
         
         <% if("ogp" in message){ %>

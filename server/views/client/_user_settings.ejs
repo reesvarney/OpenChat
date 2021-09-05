@@ -1,0 +1,31 @@
+<div uk-modal id="user_settings">
+  <div class="uk-modal-dialog uk-modal-body" uk-overflow-auto>
+    <h3 class="uk-card-title">Client Settings</h3>        
+    <h4>Profile</h4>
+    <form action="settings" method="post">
+      <div class="uk-margin">
+        <label class="uk-form-label">Display Name</label>
+        <input type="text" name="name" class="uk-input uk-form-width-medium" placeholder="" value="<%= req.user.name %>">
+      </div>
+
+      <button class="uk-button uk-button-secondary uk-button-small">Save</button>
+    </form>
+    <hr class="uk-divider-icon">
+    <h4>View</h4>
+    <div class="uk-margin">
+      <label class="uk-form-label">Dark Mode</label>
+      <input class="uk-checkbox" type="checkbox" id="toggleDark">
+    </div>
+    <hr class="uk-divider-icon">
+    <h4>Audio</h4>
+    <div class="uk-margin">
+      <label class="uk-form-label">Call Volume</label>
+      <input type="range" min="0" max="1" class="uk-range" value="1" step="0.01" id="call_volume">
+    </div>
+
+    <div class="uk-margin">
+      <label class="uk-form-label">SFX Volume</label>
+      <input type="range" min="0" max="1" class="uk-range" value="1" step="0.01" id="sfx_volume">
+    </div>
+  </div>
+</div>

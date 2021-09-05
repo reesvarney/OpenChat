@@ -21,7 +21,7 @@ window.roleFunctions = {
     $.ajax({
       async: true,
       type: "GET",
-      url: "/settings/roles",
+      url: "/admin/role/all",
       timeout: 10000,
       success: (result)=>{
         var current = $("#edit_roles .uk-open");

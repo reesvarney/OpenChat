@@ -126,7 +126,8 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
           } else {
             temp_users[this.id].name = data.name;
           }
-          server.sendUpdate();
+          this.name = data.name;
+          server.sendUpdate("users");
         });
       });
 
@@ -241,6 +242,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
       this.publicData;
       this.updateChannels();
       this.getUsers();
+      this.io = io;
     };
 
     get publicData(){

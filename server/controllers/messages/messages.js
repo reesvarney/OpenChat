@@ -26,11 +26,11 @@ function sanitize(str) {
     .innerHTML;
 }
 
-module.exports = function ({ db, io, expressFunctions }) {
+module.exports = function ({ db, io, expressFunctions, signallingServer }) {
   var ogpCache = {};
   var messageCache = {};
 
-  router.get("/:channel", expressFunctions.checkAuth, (req, res) => {
+  router.get("/channel/:channel", expressFunctions.checkAuth, (req, res) => {
     if (req.query.page == undefined) {
       req.query.page = 0;
     }
@@ -217,6 +217,7 @@ module.exports = function ({ db, io, expressFunctions }) {
           .then(function () {
             res.render("messages/messages", {
               data: messages,
+              req
             });
           })
           .catch((e) => {
@@ -226,7 +227,7 @@ module.exports = function ({ db, io, expressFunctions }) {
     });
   });
 
-  router.post("/:channel", autoLimit, spamLimit, spamLimit2, expressFunctions.checkAuth, expressFunctions.hasPermission("send_message"), (req, res) => {
+  router.post("/channel/:channel", autoLimit, spamLimit, spamLimit2, expressFunctions.checkAuth, expressFunctions.hasPermission("send_message"), (req, res) => {
     var error = false;
     if(req.user !== undefined){
       db.models.Message.create({
@@ -252,7 +253,20 @@ module.exports = function ({ db, io, expressFunctions }) {
 
   });
 
-  router.delete("/message/:uuid", expressFunctions.checkAuth)
+  router.delete("/message/:uuid", expressFunctions.checkAuth, async(req, res)=>{
+    var message = await db.models.Message.findByPk(req.params.uuid);
+    if(message !== null){
+      if(message.UserId === req.user.id || req.user.permissions.channels[message.ChannelId].manage_messages){
+        await message.destroy();
+        res.sendStatus(200);
+        signallingServer.io.emit("removeMessage", req.params.uuid);
+      } else {
+        res.sendStatus(403);
+      }
+    } else {
+      res.sendStatus(404);
+    }
+  });
 
   return router;
 };

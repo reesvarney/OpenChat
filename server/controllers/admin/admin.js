@@ -185,6 +185,20 @@ module.exports = function({
     };
   });
 
+  router.get("/role/all", expressFunctions.checkAuth, expressFunctions.hasPermission("edit_roles"), async(req, res)=>{
+    var roles = {};
+    roles = await db.models.Role.findAll({
+      include: [{
+        model: db.models.PermissionSet,
+        include: [{
+          model:db.models.PermissionValue,
+          include: db.models.Permission
+        }]
+      }]
+    });
+    res.render("client/_role_settings", {roles});
+  });
+
   router.delete("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
     var users = (await db.models.Role.findByPk(req.params.uuid, {
       include: db.models.User

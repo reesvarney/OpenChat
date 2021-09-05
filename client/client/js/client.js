@@ -218,9 +218,14 @@ $(window).on('load', function (e) {
 
   $("#user_form").on( 'submit', function (e) {
     e.preventDefault();
+
     $(this).serializeArray().forEach((pref)=>{
-      if(name.length !== 0){userPrefs[pref.name] = pref.value;}
+      // I think this was due to maybe having some hidden values before? I'll leave just in case
+      if(pref.name.length !== 0){
+        userPrefs[pref.name] = pref.value;
+      }
     });
+
     $("#user_form .device-select select").each((i, el)=>{
       userPrefs[el.id] = $(el).val();
     });

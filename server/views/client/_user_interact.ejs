@@ -1,5 +1,5 @@
   <ul>
-    <% if(req.user.permissions.global.edit_roles && roles !== undefined){ %>
+    <% if(req.user.permissions.global.edit_roles && roles !== undefined && roles.filter(a=>!["owner", "all"].includes(a.name)).length > 0){ %>
     <li class="toggle">
       Roles
       <div class="toggle-content">
@@ -17,16 +17,44 @@
       </div>
     </li>
     <% } %>
+
+    <% if(req.user.permissions.global.mute_users){%>
+      <li class="disabled">
+        Server Mute
+      </li>
+    <%}%>
+
+    <% if(req.user.permissions.global.deafen_users){%>
     <li class="disabled">
-      Mute
+      Server Deafen
     </li>
-    <li class="disabled">
-      Deafen
-    </li>
+    <%}%>
+
+    <% if(req.user.permissions.global.kick){%>
     <li class="disabled">
       Kick
     </li>
+    <%}%>
+
+    <% if(req.user.permissions.global.ban){%>
     <li class="disabled">
       Ban
+    </li>
+    <%}%>
+
+    <li class="disabled">
+      Volume
+    </li>
+
+    <li class="disabled">
+      Local Mute
+    </li>
+
+    <li class="disabled">
+      Local Deafen
+    </li>
+    
+    <li class="disabled">
+      Block
     </li>
   </ul>

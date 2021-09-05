@@ -109,6 +109,7 @@ global.pub_key = keys.public.toString('utf8');
 ipcMain.on("decrypt", (event, data) => {
   var buffer = Buffer.from(data.data, 'utf-8');
   console.log(keys.private.toString('utf8'), buffer);
+  
   var decoded = crypto.privateDecrypt(keys.private.toString('utf8'), buffer);
   event.returnValue = JSON.stringify(decoded);
 });

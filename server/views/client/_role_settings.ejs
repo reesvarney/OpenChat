@@ -29,9 +29,9 @@
             <% }; %>
 
             <div class="edit_role_actions">
-              <button class="uk-button uk-button-secondary">Save</button>
+              <button class="uk-button uk-button-secondary uk-button-small">Save</button>
               <% if(role.name !== "all"){ %>
-                <button class="uk-button uk-button-danger role_delete_btn">Delete</button>
+                <button class="uk-button uk-button-danger uk-button-small role_delete_btn">Delete</button>
               <% } %>
             </div>
 
@@ -44,4 +44,4 @@
   <% }%>
   <% }); %>
 </ul>
-<button class="uk-button uk-button-default" id="new_role_button">New</button>
+<button class="uk-button uk-button-default uk-button-small" id="new_role_button">New</button>

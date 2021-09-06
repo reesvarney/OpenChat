@@ -86,6 +86,16 @@ async function startServer(){
     console.log("HTTPS Server ✔")
   });
   
+  // SASS MIDDLEWARE
+  var sassMiddleware = require('node-sass-middleware')
+  app.use( '*/css',
+    sassMiddleware({
+      src: './views/static/sass',
+      dest: './views/static/css',
+      debug: false,
+    })
+  );
+
   //AUTH
   var temp_users = {};
   var passport = require('passport');

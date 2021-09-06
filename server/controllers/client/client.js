@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 module.exports = function ({ config, db, expressFunctions }) {
-  router.use(express.static("./views/static"));
+  router.use(express.static("./views/dist"));
 
   router.get("/", expressFunctions.checkAuth, async(req, res)=>{
     var viewData = { config, db, req };

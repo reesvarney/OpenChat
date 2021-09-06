@@ -45,7 +45,7 @@ sessionStore.sync();
 console.log('Session Manager ✔');
 
 var app = express();
-app.use(express.static("./views/dist"));
+app.use(express.static("./views/assets/dist"));
 app.disable('view cache');
 app.set('view engine', 'ejs');
 app.use(sessionMiddleware);
@@ -90,8 +90,8 @@ async function startServer(){
   var sassMiddleware = require('node-sass-middleware')
   app.use( '*/css',
     sassMiddleware({
-      src: './views/static/scss',
-      dest: './views/static/css',
+      src: './views/assets/src/scss',
+      dest: './views/assets/dist/css',
       debug: false,
     })
   );

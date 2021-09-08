@@ -45,12 +45,11 @@ sessionStore.sync();
 console.log('Session Manager ✔');
 
 var app = express();
-app.use(express.static("./views/assets/dist"));
 app.disable('view cache');
 app.set('view engine', 'ejs');
 app.use(sessionMiddleware);
 app.use(cookieParser);
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var options = {};
 
@@ -95,6 +94,7 @@ async function startServer(){
       debug: false,
     })
   );
+  app.use(express.static("./views/assets/dist"));
 
   //AUTH
   var temp_users = {};

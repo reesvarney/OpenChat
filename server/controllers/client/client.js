@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
-module.exports = function ({ config, db, expressFunctions }) {
+module.exports = function ({ config, db, expressFunctions, temp_users }) {
   router.use(express.static("./views/assets/dist"));
 
   router.get("/", expressFunctions.checkAuth, async(req, res)=>{
@@ -27,13 +27,17 @@ module.exports = function ({ config, db, expressFunctions }) {
   });
 
   router.get("/users/:id/interact", expressFunctions.checkAuth, async(req,res)=>{
-    var user = await db.models.User.findByPk(req.params.id);
+    if(req.params.id in temp_users){
+      user = temp_users[req.params.id]
+    } else {
+      user = await db.models.User.findByPk(req.params.id);
+    }
     if(user === null){
       res.sendStatus(400);
     } else {
       var roles = null;
 
-      if(req.user.permissions.global.edit_roles){
+      if(user.temp === false && req.user.permissions.global.edit_roles){
         roles = (await db.models.Role.findAll()).map((a)=>{
           return {
           name: a.name, 
@@ -57,7 +61,7 @@ module.exports = function ({ config, db, expressFunctions }) {
       res.status(400).send("Channel does not exist");
     } else {
       var viewData = { req, data: channel};
-      res.render(`client/_${channel.type}_channel`, viewData);
+      res.render(`client/_channel`, viewData);
     }
   });
 

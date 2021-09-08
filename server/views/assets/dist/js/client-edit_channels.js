@@ -1,12 +1,12 @@
 $( document ).ready(()=>{
-    $("#add_channel_btn").click(function () {
+    $(".add_channel_btn").click(function () {
       overlay.show("add_channel");
     });
 
     $("#channels").on('click', '.edit_channel_btn',function(){
       overlay.show('edit_channel');
-      $('#edit_channel form').attr('action', `admin/channel/edit/${$(this).parent().find('.channel')[0].id}`)
-      $('#edit_channel form input[name="name"]').val($(this).parent().find('.channel')[0].innerText)
+      $('#edit_channel form').attr('action', `admin/channel/edit/${$(this).parent().find('.channel-name')[0].id}`)
+      $('#edit_channel form input[name="name"]').val($(this).parent().find('.channel-name')[0].innerText)
     })
 
     $("#edit_channel_actions>#channel_delete_btn").on('click', function(){

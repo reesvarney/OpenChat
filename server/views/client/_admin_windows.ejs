@@ -63,6 +63,18 @@
               <input class="uk-checkbox" type="checkbox" name="allowAnon" <% if(config.allowAnon){ %> checked <% } %> value="true">
             </div>
 
+            <div class="uk-margin">
+              <div class="combined-time" name="anonTimeout">
+                <label class="uk-form-label">Anonymous user timeout</label>
+                <input name="days" min="0" type="number" value="<%= config.anonTimeout.days %>">
+                <span>Days</span>
+                <input name="hours" max="24" min="0" type="number" value="<%= config.anonTimeout.hours %>">
+                <span>Hours</span> 
+                <input name="minutes" max="60" min="0" type="number" value="<%= config.anonTimeout.minutes %>">
+                <span>Minutes</span> 
+              </div>
+            </div>
+
             <button class="uk-button uk-button-secondary uk-button-small">Save</button>
           </form>
           <hr class="uk-divider-icon">

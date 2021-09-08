@@ -84,9 +84,10 @@ module.exports = {
         primaryKey: true,
       },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         allowNull: false,
         defaultValue: "New User",
+
       }
     },
     options: {},
@@ -123,7 +124,7 @@ module.exports = {
         primaryKey: true,
       },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         allowNull: false,
         unique: true,
         defaultValue: "New Role",

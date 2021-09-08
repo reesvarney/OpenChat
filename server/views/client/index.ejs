@@ -4,45 +4,45 @@
 
 <body>
   <div id="overlay">
-    <%- include('_admin_windows', {req, roles}) %>
+    <%- include('_admin_windows', {req, roles, config}) %>
     <%- include('_user_settings', {req}) %>
   </div>
 
   <nav>
     <div class="brand">
-      <img id="oc_image" src="./img/logo.svg">
-      <div style="width: 100%; display: flex; justify-content: space-between;">
-        <h1 id="server_title"><%= config.name %></h1>
+      <img class="brand-image" src="./img/logo.svg">
+      <div id="server_title">
+        <h1><%= config.name %></h1>
         <% if(req.user.permissions.global.edit_server || req.user.permissions.global.edit_roles){ %>
-          <a href="#" class="edit_server_btn"><span uk-icon="cog"></span></a>
+          <a href="#" class="edit_server_btn">
+            <i class="fas fa-cog"></i>
+          </a>
         <% } %>
       </div>
     </div>
     <a id="nav-close"><i class="fas fa-times"></i></a>
-    <div id="channel_heading">
+    <div id="channels_heading">
       <h4>Channels</h4>
       <% if(req.user.permissions.global.edit_channels){ %>
-        <a href="#" id="add_channel_btn"><span uk-icon="plus-circle"></span></a>
+        <a href="#" class="add_channel_btn">
+          <i class="far fa-plus-square"></i>
+        </a>
       <% } %>
     </div>
     <div id="channels">
-
-
     </div>
-    <div class="uk-card uk-card-default">
-      <div id="control_area">
-        <a id="mute_microphone" class="control-button"><i class="fas fa-microphone fa-lg"></i></a>
-        <a id="mute_audio" class="control-button"><i class="fas fa-volume-up fa-lg"></i></a>
-        <a id="disconnect_button" class="control-button" style="display: none;"><i class="fas fa-phone-slash fa-lg"></i></a>
-        <a id="logout_button" class="control-button" href="/auth/logout" style="color: black;" title="Sign Out"><i class="fas fa-sign-out-alt fa-lg"></i></a>
-        <a id="user_settings_button" class="control-button"><i class="fas fa-user-cog" title="User Settings"></i></a>
-      </div>
+    <div id="control_area" class="uk-card uk-card-default">
+      <a id="mute_microphone"><i class="fas fa-microphone fa-lg"></i></a>
+      <a id="mute_audio"><i class="fas fa-volume-up fa-lg"></i></a>
+      <a id="disconnect_button" style="display: none;"><i class="fas fa-phone-slash fa-lg"></i></a>
+      <a id="logout_button" href="/auth/logout" style="color: black;" title="Sign Out"><i class="fas fa-sign-out-alt fa-lg"></i></a>
+      <a id="user_settings_button"><i class="fas fa-user-cog" title="User Settings"></i></a>
     </div>
 
   </nav>
 
   <main>
-    <div class="channel-content">
+    <div id="channel-content">
     
     <!-- MOVE THIS INTO SEPARATE MESSAGE CONTROLLER -->
     <!-- START -->
@@ -51,11 +51,11 @@
         <a  style="font-size: 2em;"><i class="fas fa-bars"></i></a>
       </div>
       <div>
-        <p id="channel_name"  class="uk-heading-small uk-text-lighter"></p>
-        <p id="channel_description"></p>
+        <p class="current_channel_name"  class="uk-heading-small uk-text-lighter"></p>
+        <p class="current_channel_desc"></p>
       </div>
     </div>
-    <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: scroll;" id="message_scroll">
+    <div style="display: flex; flex-direction: column; flex-grow: 1; overflow-y: auto;" id="message_scroll">
       <div id="load_messages" style="width: 100%; text-align: center; margin-top: auto; display: none;">
         <a href="#">Load More</a>
       </div>
@@ -82,8 +82,7 @@
     
     <% if(req.user.permissions.global.send_message){ %>
       <form id="message_input_area">
-          <textarea rows="2" id="message_box" class="uk-textarea"></textarea>
-          <button id="message_send" class="uk-button uk-button-default" disabled>Send</button>
+          <textarea rows="2" id="message_box" class="uk-textarea" placeholder="Send a message"></textarea>
       </form>
       <% } else {%>
       <div id="message_input_area">
@@ -93,7 +92,7 @@
     <!-- END -->
     </div>
 
-    <div class="global-user-list">
+    <div id="global_user_list">
       <h3 class="uk-heading-divider">Users</h3>
       <h5 class="uk-heading-line"><span>Permanent</span></h5>
       <ul class="perm-users uk-list">

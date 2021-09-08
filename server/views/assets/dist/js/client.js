@@ -60,7 +60,7 @@ class call{
       };
       $("#disconnect_button").show();
       $('#voice_channels li').removeClass("active");
-      $('#voice_channels #' + client.voiceChannel.negotiating).parent().parent().addClass("active");
+      $('#voice_channels #' + client.voiceChannel.negotiating).closest("li").addClass("active");
       client.audioOut.srcObject = remoteStream;
       client.voiceChannel.current = client.voiceChannel.negotiating;
       client.voiceChannel.negotiating = null;
@@ -184,11 +184,11 @@ var client = window.client = new class{
 
   _populateUsers(d){
     $('.user-list').empty();
-    $('.global-user-list ul').empty();
+    $('#global_user_list ul').empty();
     this.serverinfo.users = d.users;
     console.log(d.users)
     for(const [userID, user] of Object.entries(d.users)){
-      $(`<li><div class='user' data-userid='${userID}'><a>${user.name} - ${user.status}</a></div></li>`).appendTo(`.global-user-list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
+      $(`<li><div class='user' data-userid='${userID}'><a>${user.name} - ${user.status}</a></div></li>`).appendTo(`#global_user_list ul${(user.temp) ? ".temp-users" : ".perm-users"}`);
       if(user.channel !== null){
         $(`<li><div class='user slim' data-userid='${userID}'><a>${user.name}</a></div></li>`).appendTo(`#${user.channel}-users`);
         if(user.socketID !== this.socket.id && user.channel === this.voiceChannel.current){
@@ -209,7 +209,6 @@ var client = window.client = new class{
   _createCategory(channel_type){
     var category = $(`<div class="channel-group"><h4>${channel_type.toUpperCase()}</h4></div>`).appendTo('#channels');
     var categoryList = $(`<ul id="${channel_type}_channels" group-type="${channel_type}"></ul>`).appendTo(category);
-
     // Create sortable - this needs to be put into edit_channels file
     var type = categoryList.attr('group-type');
     if(categoryList.children.length > 0){
@@ -307,9 +306,9 @@ var client = window.client = new class{
             for(const localChannel of localChannels){
               var remoteChannel = channels.find(a=> a.id === localChannel.id);
               if(remoteChannel.name !== localChannel.name){
-                $(localChannel.el).find(".channel").text(remoteChannel.name);
+                $(localChannel.el).find(".channel-name").text(remoteChannel.name);
                 if(localChannel.id === this.textChannel){
-                  $("#channel_info #channel_name").text(remoteChannel.name);
+                  $(".current_channel_name").text(remoteChannel.name);
                 }
               }
             }
@@ -427,7 +426,7 @@ class voiceChannel extends channel{
   constructor(el){
     super(el);
     this.type = "voice";
-    $(this.el).on('click', '.channel', ()=> {
+    $(this.el).on('click', '.channel-name', ()=> {
       this.joinChannel()
     });
   }
@@ -446,7 +445,7 @@ class textChannel extends channel{
   constructor(el){
     super(el);
     this.type = "text";
-    $(this.el).on('click', '.channel', ()=>{this.setActive()});
+    $(this.el).on('click', '.channel-name', ()=>{this.setActive()});
   };
 
   setActive(){
@@ -459,7 +458,7 @@ class textChannel extends channel{
         $(this).prop('disabled', false);
       });
       this.getMessages({page: this.page});
-      $("#channel_name").text(this.name)
+      $(".current_channel_name").text(this.name)
     }
   }
 
@@ -609,7 +608,8 @@ $( document ).ready(function() {
     }
   });
 
-  $(document).on('click', '.user', (evt)=>{
+  $(document).on('contextmenu', '.user', (evt)=>{
+    evt.preventDefault();
     var container = $(".interact-menu");
     $.ajax({
       async: true,
@@ -666,6 +666,6 @@ $( document ).ready(function() {
       }
     });
   });
-  
+
   scrollController = new smartScroll($('#message_scroll'));
 });

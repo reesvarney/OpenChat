@@ -1,5 +1,5 @@
   <ul>
-    <% if(req.user.permissions.global.edit_roles && roles !== undefined && roles.filter(a=>!["owner", "all"].includes(a.name)).length > 0){ %>
+    <% if(req.user.permissions.global.edit_roles && user.temp === false && roles !== undefined && roles.filter(a=>!["owner", "all"].includes(a.name)).length > 0){ %>
     <li class="toggle">
       Roles
       <div class="toggle-content">

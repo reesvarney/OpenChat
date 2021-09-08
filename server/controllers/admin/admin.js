@@ -139,6 +139,8 @@ module.exports = function({
 
   router.post("/server/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_server'), function (req, res) {
     config.name = req.body.name;
+    config.anonTimeout = req.body.anonTimeout;
+    config.allowAnon = req.body.allowAnon;
     saveConf();
     res.redirect('/');
   })

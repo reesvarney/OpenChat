@@ -8,18 +8,20 @@ module.exports = function (controllerParams) {
   fs.readdir(path.join(__dirname, './methods'), (err, files) => {
     files.forEach((file) => {
       var method = require(path.join(__dirname, './methods', file));
-      controllerParams.passport.use(method.name, method.strategy(controllerParams));
-      if ("models" in method) {
-        controllerParams.addModels(method.models);
-      };
-      if (!method.hidden) authMethods.push({
-        path: method.name,
-        name: method.displayName,
-        icon: method.icon
-      });
-      var methodRouter = method.router(method.name, controllerParams);
-      methodRouter.use(express.static("./views/assets/dist"));
-      router.use(`/${method.name}`, methodRouter);
+      if(!(method.name === "anon" && controllerParams.config.allowAnon == "false")){
+        controllerParams.passport.use(method.name, method.strategy(controllerParams));
+        if ("models" in method) {
+          controllerParams.addModels(method.models);
+        };
+        if (!method.hidden) authMethods.push({
+          path: method.name,
+          name: method.displayName,
+          icon: method.icon
+        });
+        var methodRouter = method.router(method.name, controllerParams);
+        methodRouter.use(express.static("./views/assets/dist"));
+        router.use(`/${method.name}`, methodRouter);
+      }
     });
   });
 

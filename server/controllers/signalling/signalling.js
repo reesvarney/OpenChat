@@ -1,6 +1,3 @@
-//WHEN CLIENT CONNECTS TO THE SIGNALLING SERVER
-const { v4: uuidv4 } = require('uuid');
-
 function startServer({ db, io, config, secret, port, temp_users, expressFunctions }) {
 
     // constructor(socket, data){
@@ -42,19 +39,20 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     //   })();
     // };
 
-
   // User Object
   class user{
     constructor(id, {update=false}={}){
         this.id = id;
         this.socket = null;
         this.channel = null;
-        
+        this.request = null;
+
         // Give blank values before getting from db
         this.name = null;
         this.data = null;
         this.temp = null;
         this._status = "offline";
+        this.expires = null;
         this.publicData;
         this.status;
         (async()=>{
@@ -120,7 +118,8 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
           where: { id: this.id },
         }).then((db_user) => {
           if (db_user !== null) {
-            if (db_user.dataValues.name !== data.name) {
+            // todo: change the length check to just use validation provided by sequelize
+            if (db_user.dataValues.name !== data.name && data.name.length <= 32) {
               db_user.update({ name: data.name });
             }
           } else {
@@ -142,16 +141,27 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
 
       this.socket.on("disconnect", (reason)=>{
         // console.log("Disconnect:", reason)
+        // This might not work if the user needs to be connected in order to update or might be read only from the socket object
+        if(this.temp === true){
+          var time = (((((config.anonTimeout.days || 0) * 24) + (config.anonTimeout.hours || 0)) * 60) + (config.anonTimeout.minutes || 0)) * 60000;
+          server.awaitingRemoval[this.id] = new Date().getTime() + time;
+        }
         this.status = "offline";
       });
     }
 
     connect(socket, data){
       this.socket = socket;
+      this.request = socket.request;
       if(this.name !== data.name && ![null, undefined].includes(data.name)) {
         (this.temp === false) ? this.data.update({ name: data.name }) : this.data.name = data.name;
         this.name = data.name;
       };
+      if(this.temp === true){
+        if(this.id in server.awaitingRemoval){
+          delete server.awaitingRemoval[this.id];
+        }
+      }
       this.initSockets();
       this.status = "online";
     }
@@ -237,12 +247,14 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     constructor(){
       this.name = config.name;
       this.users = {};
+      this.awaitingRemoval = {};
       this.mcu = new mcu();
       this.peerPort = port;
       this.publicData;
       this.updateChannels();
       this.getUsers();
       this.io = io;
+      setInterval((function(){this.flushTemp()}).bind(this), 60 * 1000);
     };
 
     get publicData(){
@@ -305,6 +317,15 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
       this.users[id] = new user(id, opts);
     };
 
+    async flushTemp(){
+      for(const [k,v] of Object.entries(this.awaitingRemoval)){
+        if(v < new Date().getTime()){
+          this.users[k].request.session.destroy();
+          this.deleteUser(k);
+        }
+      }
+    }
+
     connectUser(socket, data){
       this.users[socket.request.session.passport.user].connect(socket, data);
       this.sendUpdate();
@@ -312,6 +333,9 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
 
     deleteUser(id){
       delete this.users[id];
+      if(id in this.awaitingRemoval){
+        delete this.awaitingRemoval[id];
+      };
       this.sendUpdate();
     }
 
@@ -347,7 +371,11 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
             }
             // Set existing user to be online
             if(server.users[socket.request.session.passport.user].status === "online"){
-              socket.disconnect(true);
+              // if user already connected
+              // should change this to support multiple connections per user
+              server.users[socket.request.session.passport.user].socket.disconnect(true);
+              server.users[socket.request.session.passport.user].status = "offline";
+              server.users[socket.request.session.passport.user].connect(socket, data);
             } else {
               server.users[socket.request.session.passport.user].connect(socket, data);
             }

@@ -608,7 +608,7 @@ $( document ).ready(function() {
     }
   });
 
-  $(document).on('contextmenu', '.user', (evt)=>{
+  $(document).on('contextmenu taphold', '.user', (evt)=>{
     evt.preventDefault();
     var container = $(".interact-menu");
     $.ajax({

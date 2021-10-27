@@ -174,8 +174,8 @@ div.center-self {
 }
 
 .modal {
-    border-radius: 3%;
-    background: var(--bg-darker-5);
+    border-radius: 7px;
+    background: var(--bg);
     position: absolute;
     left: 50%;
     top: 50%;
@@ -183,7 +183,6 @@ div.center-self {
     min-width: 50vw;
     max-width: 80vw;
     transform: translate(-50%, -50%);
-    border-radius: 20px;
     padding: 20px;
 }
 
@@ -248,13 +247,12 @@ form input[type="checkbox"] {
 }
 
 button {
-    color: var(--accent-contrast);
+    color: #ffffff;
     border-color: var(--accent-contrast);
-    background-color: var(--bg-darker-5);
+    background-color: var(--accent-contrast);
     border-style: solid;
-    border-radius: 10px;
     font-size: 20px;
-    padding: 10px;
+    padding: 5px 10px;
     font-weight: 600;
     cursor: pointer;
 }

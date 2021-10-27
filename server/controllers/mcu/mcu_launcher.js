@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
-var browser;
-var page;
+let browser;
+let page;
 
 async function startMCU({isHeadless, port}) {
     try {

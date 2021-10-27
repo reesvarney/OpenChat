@@ -31,7 +31,7 @@
     </div>
     <div id="channels">
     </div>
-    <div id="control_area" class="uk-card uk-card-default">
+    <div id="control_area">
       <a id="mute_microphone"><i class="fas fa-microphone fa-lg"></i></a>
       <a id="mute_audio"><i class="fas fa-volume-up fa-lg"></i></a>
       <a id="disconnect_button" style="display: none;"><i class="fas fa-phone-slash fa-lg"></i></a>
@@ -51,7 +51,7 @@
         <a  style="font-size: 2em;"><i class="fas fa-bars"></i></a>
       </div>
       <div>
-        <p class="current_channel_name"  class="uk-heading-small uk-text-lighter"></p>
+        <p class="current_channel_name"></p>
         <p class="current_channel_desc"></p>
       </div>
     </div>
@@ -82,7 +82,7 @@
     
     <% if(req.user.permissions.global.send_message){ %>
       <form id="message_input_area">
-          <textarea rows="2" id="message_box" class="uk-textarea" placeholder="Send a message"></textarea>
+          <textarea rows="2" id="message_box" placeholder="Send a message"></textarea>
       </form>
       <% } else {%>
       <div id="message_input_area">

@@ -1,14 +1,14 @@
 <% for(i = 0; i < data.length; i++){ 
-var message = data[i];
+let message = data[i];
 %>
     <div id="<%= message.id %>" class="message-card">
         <div "msg-meta">
             <strong class="user inline" data-userid="<%= message.User.id %>"><%= message.sender %></strong>
                 <i class="date">
                 <script type="text/javascript">
-                    var date = new Date("<%= message.date %>");
-                    var now = new Date();
-                    var dispDate;
+                    let date = new Date("<%= message.date %>");
+                    let now = new Date();
+                    let dispDate;
                     if(Math.floor(Math.abs(now - date) / (1000 * 60 * 60 * 24)) == 0){
                         dispDate = date.toLocaleTimeString();
                     } else {

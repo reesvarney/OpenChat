@@ -229,17 +229,22 @@ $(window).on('load', function (e) {
     $("#user_form .device-select select").each((i, el)=>{
       userPrefs[el.id] = $(el).val();
     });
+
     $("#user_form input[type='checkbox']").each((i, el)=>{
       userPrefs[el.id] = $(el)[0].checked;
     })
+
     ipcRenderer.send("setPrefs", userPrefs);
+
     Object.values(servers).forEach((server) => {
       server.socket.emit("updateInfo", {
         name: userPrefs.displayName
       });
       if(server.wv !== undefined){server.wv[0].send("client_event", {event: "setDark", data: userPrefs.darkMode})};
     });
+
     setDark(userPrefs.darkMode)
+
     overlay.hide();
   });
   
@@ -273,4 +278,5 @@ $(window).on('load', function (e) {
     if("output" in selected){$('#user_form #audioOutput').val(selected.output)};
     if("source" in selected){$('#user_form #audioSource').val(selected.source)};
   });
+
 });

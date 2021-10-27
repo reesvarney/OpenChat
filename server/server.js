@@ -4,8 +4,8 @@ const fs = require('fs');
 const {dbPromise, addModels} = require('./db/init.js');
 const secret = require('./scripts/secret.js')();
 const port = process.env.PORT || 443; 
-var config = require('./scripts/config.js')();
-var OCCache = {
+let config = require('./scripts/config.js')();
+let OCCache = {
   "permissions": {}
 };
 
@@ -14,24 +14,24 @@ dbPromise.then((db)=> {
 console.log('Database ✔');
 
 //HELPERS
-var expressFunctions = require('./helpers/expressfunctions.js')(OCCache);
+let expressFunctions = require('./helpers/expressfunctions.js')(OCCache);
 console.log("Helper Functions ✔")
 
 //HTTP SERVER
-var https = require('https');
+let https = require('https');
 const express = require('express');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser')();
-var session = require('express-session');
-var SequelizeStore = require("connect-session-sequelize")(session.Store);
+let bodyParser = require('body-parser');
+let cookieParser = require('cookie-parser')();
+let session = require('express-session');
+let SequelizeStore = require("connect-session-sequelize")(session.Store);
 
-var sessionStore = new SequelizeStore({
+let sessionStore = new SequelizeStore({
   db: db,
   checkExpirationInterval: 5 * 60 * 1000, 
   expiration: 24 * 60 * 60 * 1000
 });
 
-var sessionMiddleware = session({
+let sessionMiddleware = session({
   name: 'middleware',
   secure: true,
   secret: secret,
@@ -44,14 +44,14 @@ var sessionMiddleware = session({
 sessionStore.sync();
 console.log('Session Manager ✔');
 
-var app = express();
+let app = express();
 app.disable('view cache');
 app.set('view engine', 'ejs');
 app.use(sessionMiddleware);
 app.use(cookieParser);
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var options = {};
+let options = {};
 
 try {
   if (process.env.sslkey && process.env.sslcert){
@@ -80,13 +80,13 @@ try {
 //If no cert exists we do not run this code
 async function startServer(){
   console.log("Starting server...")
-  var server = https.createServer(options, app);
+  let server = https.createServer(options, app);
   server.listen(port, function(){
     console.log("HTTPS Server ✔")
   });
   
   // SASS MIDDLEWARE
-  var sassMiddleware = require('node-sass-middleware')
+  let sassMiddleware = require('node-sass-middleware')
   app.use( '*/css',
     sassMiddleware({
       src: './views/assets/src/scss',
@@ -97,9 +97,9 @@ async function startServer(){
   app.use(express.static("./views/assets/dist"));
 
   //AUTH
-  var temp_users = {};
-  var passport = require('passport');
-  var authFunctions = await require('./controllers/auth/init.js')(passport, db, temp_users, OCCache);
+  let temp_users = {};
+  let passport = require('passport');
+  let authFunctions = await require('./controllers/auth/init.js')(passport, db, temp_users, OCCache);
   app.use(passport.initialize());
   app.use(passport.session());
   
@@ -112,7 +112,7 @@ async function startServer(){
   app.use('/rtc', peerServer);
   
   //SIGNALLING
-  var io = require('socket.io')(server, {
+  let io = require('socket.io')(server, {
     pingTimeout: 0, // Removed timeout, it seemed to be causing issues
     pingInterval: 15000
   });
@@ -121,7 +121,7 @@ async function startServer(){
     sessionMiddleware(socket.request, {}, next);
   });
   
-  var signallingServer = require('./controllers/signalling/signalling.js')({db, io, config, port, secret, temp_users, expressFunctions, OCCache });
+  let signallingServer = require('./controllers/signalling/signalling.js')({db, io, config, port, secret, temp_users, expressFunctions, OCCache });
   
   
   // ROUTING //
@@ -129,7 +129,7 @@ async function startServer(){
   /**
    * These are the variables that can be accessed by any controllers/ extensions.
    */
-  var controllerParams = {
+  let controllerParams = {
     db,
     io,
     passport,
@@ -144,11 +144,11 @@ async function startServer(){
     OCCache
   };
   
-  var clientController = require('./controllers/client/client.js')(controllerParams);
-  var mcuController = require('./controllers/mcu/mcu.js')(controllerParams);
-  var messageController = require('./controllers/messages/messages.js')(controllerParams);
-  var authController = require('./controllers/auth/auth.js')(controllerParams);
-  var adminController = require('./controllers/admin/admin.js')(controllerParams);
+  let clientController = require('./controllers/client/client.js')(controllerParams);
+  let mcuController = require('./controllers/mcu/mcu.js')(controllerParams);
+  let messageController = require('./controllers/messages/messages.js')(controllerParams);
+  let authController = require('./controllers/auth/auth.js')(controllerParams);
+  let adminController = require('./controllers/admin/admin.js')(controllerParams);
   
   app.use('/auth', authController);
   app.use('/admin', adminController);
@@ -161,8 +161,8 @@ async function startServer(){
   
   // MCU CLIENT //
   // Configure params for starting the MCU here
-  var mcu_params = {port: port};
+  let mcu_params = {port: port};
   mcu_params.isHeadless = process.argv.includes("showmcu") ? false : true;
-  require('./controllers/mcu/mcu_launcher.js')(mcu_params);
+  await require('./controllers/mcu/mcu_launcher.js')(mcu_params);
 };
 })

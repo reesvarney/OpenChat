@@ -1,8 +1,8 @@
-var crypto = require('crypto');
-var fs = require('fs');
+let crypto = require('crypto');
+let fs = require('fs');
 
 module.exports = ()=>{
-  var secret;
+  let secret;
   if (fs.existsSync('./secret.txt')) {
     secret =  fs.readFileSync('./secret.txt', 'utf8');
     return secret;

@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
+let express = require('express');
+let router = express.Router();
+let fs = require('fs');
 const { emitKeypressEvents } = require('readline');
-var {Op} = require('sequelize');
+let {Op} = require('sequelize');
 
 module.exports = function({
   db,
@@ -19,18 +19,18 @@ module.exports = function({
   // TODO: EXTEND THE RECORD PROTOTPYE
   async function insertBefore({model, id, index, params}){
     if(![undefined, null].includes(db.models[model].rawAttributes.position)){
-      var item = await db.models[model].findByPk(id);
-      var records = await db.models[model].findAll({ where: ("where" in params) ? params.where : {}});
+      let item = await db.models[model].findByPk(id);
+      let records = await db.models[model].findAll({ where: ("where" in params) ? params.where : {}});
 
       if(index > records.length || index < 0 || index == item.position){
         return {success: false, error: "Invalid index"};
       }
 
-      var newPos = index;
-      var oldPos = item.position;
+      let newPos = index;
+      let oldPos = item.position;
 
       if(oldPos > newPos){
-        var where = {
+        let where = {
           id: {
             [Op.ne]: item.id
           },
@@ -47,7 +47,7 @@ module.exports = function({
           where: where
         });
       } else if(oldPos < newPos){
-        var where = {
+        let where = {
           id: {
             [Op.ne]: item.id
           },
@@ -65,7 +65,7 @@ module.exports = function({
         });
       }
 
-      var result = await item.update({
+      let result = await item.update({
         position: newPos
       });
       return {success: true, record: result};
@@ -86,8 +86,8 @@ module.exports = function({
   });
 
   router.post("/channel/edit/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
-    var name = req.body.name;
-    var description = req.body.description;
+    let name = req.body.name;
+    let description = req.body.description;
 
     db.models.Channel.findByPk(req.params.uuid).then((channel) => {
       channel.update({
@@ -99,11 +99,11 @@ module.exports = function({
   });
 
   router.post("/channel/move/:uuid", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
-    var id = req.params.uuid;
-    var index = req.body.index;
+    let id = req.params.uuid;
+    let index = req.body.index;
     (async()=>{
-      var channel = await db.models.Channel.findByPk(id);
-      var query = await insertBefore({model: "Channel", id: id, index: index, params: {where: {type: channel.type}}})
+      let channel = await db.models.Channel.findByPk(id);
+      let query = await insertBefore({model: "Channel", id: id, index: index, params: {where: {type: channel.type}}})
       if(query.success){
         res.status(200).send('success')
         signallingServer.updateChannels();
@@ -114,12 +114,12 @@ module.exports = function({
   });
 
   router.post("/channel/new", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_channels'), function (req, res) {
-    var name = req.body.name;
-    var type = req.body.type;
-    var isError = false;
+    let name = req.body.name;
+    let type = req.body.type;
+    let isError = false;
     (async()=>{
-      var positionMax = await db.models.Channel.max('position', {where: {type: req.body.type}});
-      var position = (typeof positionMax !== 'number' || isNaN(positionMax)) ? 0 : positionMax + 1;
+      let positionMax = await db.models.Channel.max('position', {where: {type: req.body.type}});
+      let position = (typeof positionMax !== 'number' || isNaN(positionMax)) ? 0 : positionMax + 1;
       await db.models.Channel.create({
         name: name,
         type: type,
@@ -146,14 +146,14 @@ module.exports = function({
   })
 
   router.post("/role/create", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
-    var roleNum = await db.models.Role.count();
+    let roleNum = await db.models.Role.count();
     await authFunctions.createRole(`Role #${roleNum}`);
     signallingServer.updateRoles();
     res.status(200).send('SUCCESS');
   });
 
   router.post("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
-    var role = await db.models.Role.findByPk(req.params.uuid, {
+    let role = await db.models.Role.findByPk(req.params.uuid, {
       include: [
         {          
           model: db.models.PermissionSet,
@@ -169,7 +169,7 @@ module.exports = function({
     } else {
       // Update permissionValues for role
       for(const key of Object.keys(req.body)){
-        var permission = role.PermissionSet.PermissionValues.find(el => key === el.PermissionId);
+        let permission = role.PermissionSet.PermissionValues.find(el => key === el.PermissionId);
         if(permission !== undefined){
           await permission.update({
             value: req.body[key]
@@ -188,7 +188,7 @@ module.exports = function({
   });
 
   router.get("/role/all", expressFunctions.checkAuth, expressFunctions.hasPermission("edit_roles"), async(req, res)=>{
-    var roles = {};
+    let roles = {};
     roles = await db.models.Role.findAll({
       include: [{
         model: db.models.PermissionSet,
@@ -202,7 +202,7 @@ module.exports = function({
   });
 
   router.delete("/role/:uuid/edit", expressFunctions.checkAuth, expressFunctions.hasPermission('edit_roles'), async(req,res)=>{
-    var users = (await db.models.Role.findByPk(req.params.uuid, {
+    let users = (await db.models.Role.findByPk(req.params.uuid, {
       include: db.models.User
     })).Users;
     await db.models.Role.destroy({
@@ -222,20 +222,20 @@ module.exports = function({
 
   router.post("/user/:uuid/roles/set", expressFunctions.checkAuth, expressFunctions.hasPermission("edit_roles"), async(req,res)=>{
     // need to make sure this gets updated for other clients, probs easiest just to get them to re-request the menu to begin with though this will end up closing any kind of dropdowns etc
-    var user = await db.models.User.findByPk(req.params.uuid, {include: db.models.Role});
-    var changes = req.body;
+    let user = await db.models.User.findByPk(req.params.uuid, {include: db.models.Role});
+    let changes = req.body;
     if(user !== null){
       for(const [roleid, rolevalue] of Object.entries(changes)){
         if(user.Roles.map(a=>a.id).includes(roleid)){
           if([false, "false"].includes(rolevalue)){
             // remove role
-            var oldRole = user.Roles.find(a=>a.id === roleid);
+            let oldRole = user.Roles.find(a=>a.id === roleid);
             if(!["owner", "all"].includes(oldRole.name)){
               await user.removeRole(oldRole)
             }
           }
         } else {
-          var newRole = await db.models.Role.findByPk(roleid);
+          let newRole = await db.models.Role.findByPk(roleid);
           // add role (if exists)
           if(newRole !== null){
             if(!["owner", "all"].includes(newRole.name)){

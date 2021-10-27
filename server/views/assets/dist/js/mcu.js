@@ -1,6 +1,6 @@
 
   // SOCKET LISTENERS
-  var mcu = new class{
+  let mcu = new class{
     constructor(){
       this.users = {};
       this.channels = {};
@@ -26,7 +26,7 @@
         });
 
         this.peer.on("call", (call)=>{
-          var result = Object.assign({}, ...Object.entries(this.users).map(([a,b]) => ({ [b.socket_id]: a })));
+          let result = Object.assign({}, ...Object.entries(this.users).map(([a,b]) => ({ [b.socket_id]: a })));
           if(call.peer in result){
             this.users[result[call.peer]].setCall(call);
           } else {
@@ -107,7 +107,7 @@
     
         // Remove any channels that have been deleted
         for(const vc in this.channels){
-          var found = false;
+          let found = false;
           for(const serverChannel of data.channels.voice){
             if(vc === serverChannel.id){
               found = true;
@@ -204,7 +204,7 @@
     constructor({id}){
       this.id = id;
       // Keeping this here just in case the audio element is needed
-      var audio = document.createElement("AUDIO");
+      let audio = document.createElement("AUDIO");
       audio.controls = true;
       audio.autoplay = true;
       audio.muted = true;
@@ -212,7 +212,7 @@
     }
   
     getUsers(){
-      var connectedUsers = [];
+      let connectedUsers = [];
       for(const user of Object.values(mcu.users)){
         if(user.channel === this.id){
           connectedUsers.push(user.id);
@@ -222,7 +222,7 @@
     }
   
     updateStreams(){
-      var connectedUsers = this.getUsers();
+      let connectedUsers = this.getUsers();
   
       // Iterate through each connected user
       connectedUsers.forEach(currentID => {
@@ -237,7 +237,7 @@
   
           // Duplicate the user array minus the current user, check that the user's call exists
           // TODO: Should also do checks for user constraints in here as well
-          var peers_filtered = connectedUsers.filter((value, index, arr)=>{
+          let peers_filtered = connectedUsers.filter((value, index, arr)=>{
             return (value !== currentID && mcu.users[value].call !== null);
           });
   
@@ -245,7 +245,7 @@
             // If more than one other user, combine streams
   
             // Array to contain any streams that need to be combined by the stream mixer
-            var inStreams = [];
+            let inStreams = [];
   
             // Add remote stream to inStreams
             for (i = 0; i < peers_filtered.length; i++) {
@@ -256,8 +256,8 @@
             mcu.users[currentID]["mixer"] = new MultiStreamsMixer(inStreams);
     
             // Get the mixed streams/ tracks
-            var mix_stream = mcu.users[currentid]["mixer"].getMixedStream();
-            var mix_track = mix_stream.getAudioTracks()[0];
+            let mix_stream = mcu.users[currentid]["mixer"].getMixedStream();
+            let mix_track = mix_stream.getAudioTracks()[0];
   
             // I can't remember what this did to be honest
             // I'll test it without for now
@@ -270,7 +270,7 @@
             // Else just forward the incoming streams
   
             // Get peer stream
-            var currentStream = mcu.users[peers_filtered[0]]["call"]["peerConnection"].getRemoteStreams()[0];
+            let currentStream = mcu.users[peers_filtered[0]]["call"]["peerConnection"].getRemoteStreams()[0];
             
             // See above ^13
             this.audioOut.srcObject = currentStream;

@@ -6,12 +6,12 @@ $( document ).ready(()=>{
 
   $("form[action='admin/server/edit']").on("submit", (evt)=>{
     evt.preventDefault();
-    var newData = {};
-    var combinedTime = $(evt.currentTarget).find(".combined-time");
-    var disabled = [];
+    let newData = {};
+    let combinedTime = $(evt.currentTarget).find(".combined-time");
+    let disabled = [];
     $(combinedTime).each((index, el)=>{
-      var inputs = $(el).find("input");
-      var combinedObj = {};
+      let inputs = $(el).find("input");
+      let combinedObj = {};
       for(const input of inputs){
         combinedObj[$(input).attr("name")] = $(input).val() || 0;
         $(input).prop("disabled", true);
@@ -19,7 +19,7 @@ $( document ).ready(()=>{
       }
       newData[$(el).attr("name")] = combinedObj;
     });
-    var formData = $(evt.currentTarget).serializeArray();
+    let formData = $(evt.currentTarget).serializeArray();
     for(const input of disabled){
       $(input).prop("disabled", false);
     }

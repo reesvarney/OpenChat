@@ -1,9 +1,9 @@
-var express = require("express");
-var router = express.Router();
-var crypto = require("crypto");
-var LocalStrategy = require("passport-local").Strategy;
+let express = require("express");
+let router = express.Router();
+let crypto = require("crypto");
+let LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require('bcrypt');
-var saltRounds = 10;
+let saltRounds = 10;
 
 function preHash(string){
   return crypto.createHash("sha256").update(string).digest("hex");
@@ -26,7 +26,7 @@ module.exports = {
             email: req.query.email
           }
         }).then(function (result) {
-          var salt = (result === null) ? crypto.randomBytes(128).toString('base64') : result.salt;
+          let salt = (result === null) ? crypto.randomBytes(128).toString('base64') : result.salt;
           res.render('auth/email-pass/login', {
             salt: salt,
             email: req.query.email,
@@ -49,7 +49,7 @@ module.exports = {
 
     router.get('/register', expressFunctions.checkNotAuth, function (req, res) {
       // Generate and send salt for user to generate the password with, preventing the server from ever seeing it
-      var salt = crypto.randomBytes(128).toString('base64');
+      let salt = crypto.randomBytes(128).toString('base64');
       req.session.salt = salt;
       res.render('auth/email-pass/register', {
         salt: salt,
@@ -95,7 +95,7 @@ module.exports = {
         include: db.models.User
       }).then(function (result) {
         if (result === null) return done(null, false);
-        var prehashed = preHash(password);
+        let prehashed = preHash(password);
         bcrypt.compare(prehashed, result.pass_hashed, function(err, isCorrect) {
           if(isCorrect !== true){
             return done(null, false);

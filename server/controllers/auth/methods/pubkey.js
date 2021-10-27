@@ -1,7 +1,7 @@
-var express = require("express");
-var router = express.Router();
-var crypto = require("crypto");
-var LocalStrategy = require("passport-local").Strategy;
+let express = require("express");
+let router = express.Router();
+let crypto = require("crypto");
+let LocalStrategy = require("passport-local").Strategy;
 
 function encrypt(pub_key, data) {
     return crypto.publicEncrypt(pub_key, Buffer.from(data, "utf-8"));
@@ -12,10 +12,10 @@ module.exports = {
   hidden: true,
   router: (name, {expressFunctions, passport})=>{
     router.get("/", expressFunctions.checkNotAuth, function (req, res) {
-      var pub_key = req.query.public_key;
+      let pub_key = req.query.public_key;
       req.session.authData = crypto.randomBytes(64);
       req.session.publicKey = pub_key;
-      var enc_data = encrypt(pub_key, req.session.authData);
+      let enc_data = encrypt(pub_key, req.session.authData);
       res.send({ encoded_data: enc_data });
     });
   
@@ -38,8 +38,8 @@ module.exports = {
             Buffer.from(req.session.authData.data)
           )
         ) {
-          var key_raw = req.session.publicKey;
-          var publicKey = key_raw.replace(/(?:\r\n|\r|\n)/g, "");
+          let key_raw = req.session.publicKey;
+          let publicKey = key_raw.replace(/(?:\r\n|\r|\n)/g, "");
           db.models.Pubkey.findOrCreate({
             where: {
               pub_key: publicKey,

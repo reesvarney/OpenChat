@@ -7,7 +7,7 @@ class smartScroll{
 
     //returns whether user is near bottom of element
     doesScroll(range){
-        var source = (this.scrolling) ? this.scrollDestination : $(this.element).scrollTop();
+        let source = (this.scrolling) ? this.scrollDestination : $(this.element).scrollTop();
         if(($(this.element).prop('scrollHeight') - (source + $(this.element).height())) < range + 100 ) {
             return true;
         } else {

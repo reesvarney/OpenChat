@@ -18,7 +18,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
 
     //   // Get user data
     //   (async()=>{
-    //     var db_user = await db.models.User.findOne({where: { id: this.id }});
+    //     let db_user = await db.models.User.findOne({where: { id: this.id }});
     //     if (db_user !== null || socket.request.session.passport.user in temp_users) {
     //       // console.log(`User ${socket.id} Connected`);
     //       if(db_user !== null){
@@ -56,7 +56,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
         this.publicData;
         this.status;
         (async()=>{
-          var db_user = await db.models.User.findByPk(id);
+          let db_user = await db.models.User.findByPk(id);
           if (db_user !== null || id in temp_users) {
             if(db_user !== null){
               this.temp = false;
@@ -87,7 +87,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     };
 
     set status(status){
-      var status = status.toLowerCase();
+      status = status.toLowerCase();
       switch (status){
         case "online":
           this._status = "online";
@@ -143,7 +143,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
         // console.log("Disconnect:", reason)
         // This might not work if the user needs to be connected in order to update or might be read only from the socket object
         if(this.temp === true){
-          var time = (((((config.anonTimeout.days || 0) * 24) + (config.anonTimeout.hours || 0)) * 60) + (config.anonTimeout.minutes || 0)) * 60000;
+          let time = (((((config.anonTimeout.days || 0) * 24) + (config.anonTimeout.hours || 0)) * 60) + (config.anonTimeout.minutes || 0)) * 60000;
           server.awaitingRemoval[this.id] = new Date().getTime() + time;
         }
         this.status = "offline";
@@ -167,7 +167,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     }
 
     async joinChannel(id){
-      var channel = await db.models.Channel.findOne({where: {id}});
+      let channel = await db.models.Channel.findOne({where: {id}});
       if(channel !== undefined && expressFunctions.hasPermission("join",{id: this.id, scope: "channels", subscope: id})) {
         server.mcu.emit("setChannel", {
           user: this.id,
@@ -243,7 +243,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
   }
 
   // Server Object
-  var server = new class{
+  let server = new class{
     constructor(){
       this.name = config.name;
       this.users = {};
@@ -258,7 +258,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     };
 
     get publicData(){
-      var data = {
+      let data = {
         name: this.name,
         users: {},
         channels: this.channels
@@ -271,14 +271,14 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     };
 
     async updateChannels(){
-      var channels = {};
-      var result = await db.models.Channel.aggregate("type", "DISTINCT", { plain: false });
+      let channels = {};
+      let result = await db.models.Channel.aggregate("type", "DISTINCT", { plain: false });
 
       for(const typeObj of result){
-        var type = typeObj.DISTINCT;
+        let type = typeObj.DISTINCT;
         channels[type] = [];
 
-        var typeChannels = await db.models.Channel.findAll({
+        let typeChannels = await db.models.Channel.findAll({
           where: {
             type: type,
           },
@@ -306,7 +306,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     }
 
     async getUsers(){
-      var allUsers = await db.models.User.findAll();
+      let allUsers = await db.models.User.findAll();
       for(const new_user of allUsers){
         this.addUser(new_user.id, {update: false});
       };
@@ -340,8 +340,8 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
     }
 
     sendUpdate(props){
-      var publicData = this.publicData;
-      var data = {};
+      let publicData = this.publicData;
+      let data = {};
 
       if(props === undefined || props === "all"){
         data.updateData = Object.keys(publicData);
@@ -387,6 +387,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
         if (data.secret == secret) {
           // MCU has connected with the correct secret token
           console.log("MCU Client ✔");
+          console.log("Ready for clients");
           server.mcu.connect(socket);
         } else {
           // There has been an error or somebody has connected trying to impersonate the MCU

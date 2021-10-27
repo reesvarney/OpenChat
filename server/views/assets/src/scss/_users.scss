@@ -1,0 +1,33 @@
+.user{
+  cursor: pointer;
+  border-radius: 5px;
+  
+  &:not(.inline){
+    padding: 10px;
+    background-color: #ffffff;
+
+    &:hover{
+      background-color: rgba(200, 200, 200, 0.1);
+    }
+
+    a {
+      color: black;
+
+      &:hover{
+        text-decoration: none;
+      }
+    }
+  }
+  
+  &.slim{
+    padding: 3px 10px;
+  }
+}
+
+#global_user_list{
+  background-color: #f9f9f9;
+  min-width: 50px;
+  width: 250px;
+  max-width: 30%;
+  padding: 10px;
+}

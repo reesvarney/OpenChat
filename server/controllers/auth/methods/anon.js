@@ -1,6 +1,6 @@
-var express = require("express");
-var router = express.Router();
-var LocalStrategy = require("passport-local").Strategy;
+let express = require("express");
+let router = express.Router();
+let LocalStrategy = require("passport-local").Strategy;
 const { v4: uuidv4 } = require("uuid");
 function validateName(username){
   if (username !== undefined && username.length >= 2 && username.length <= 32) {
@@ -35,8 +35,8 @@ module.exports = {
       passReqToCallback: true,
     },
     function (req, username, password, done) {
-      var userID = `t::-${uuidv4()}`;
-      var data = {
+      let userID = `t::-${uuidv4()}`;
+      let data = {
         id: userID,
         name: username,
       };

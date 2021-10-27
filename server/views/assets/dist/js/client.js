@@ -1,5 +1,5 @@
 navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-var soundfiles = [
+let soundfiles = [
     "mute",
     "unmute",
     "connect",
@@ -17,9 +17,9 @@ var soundfiles = [
     },
 };
 
-var soundeffects = new Proxy(soundfiles, {
+let soundeffects = new Proxy(soundfiles, {
   get(target, filename) {
-    var audio = new Audio(`./audio/${filename}.mp3`);
+    let audio = new Audio(`./audio/${filename}.mp3`);
     audio.volume = localStorage.getItem('sfx_volume') || 0.2;
     audio.loop = false;
     return audio
@@ -33,10 +33,10 @@ class call{
     } else {
       this.constraints = {
         audio: {
-            sampleRate: 64000,
+            sampleRate: 41000,
             volume: 1.0,
-            noiseSuppression: false,
-            echoCancellation: false,
+            noiseSuppression: true,
+            echoCancellation: true,
             autoGainControl: true
         },
         video: false
@@ -79,7 +79,7 @@ class call{
 
 }
 
-var client = window.client = new class{
+let client = window.client = new class{
   constructor(){
     this.isStandalone = window.standalone || false;
     this.socket = null;
@@ -139,7 +139,7 @@ var client = window.client = new class{
       });
 
       this.socket.on("removeMessage", (msgID)=>{
-        var msg = $(`#${msgID}`);
+        let msg = $(`#${msgID}`);
         if(msg.length){
           msg.remove();
         };
@@ -207,10 +207,10 @@ var client = window.client = new class{
   }
 
   _createCategory(channel_type){
-    var category = $(`<div class="channel-group"><h4>${channel_type.toUpperCase()}</h4></div>`).appendTo('#channels');
-    var categoryList = $(`<ul id="${channel_type}_channels" group-type="${channel_type}"></ul>`).appendTo(category);
+    let category = $(`<div class="channel-group"><h4>${channel_type.toUpperCase()}</h4></div>`).appendTo('#channels');
+    let categoryList = $(`<ul id="${channel_type}_channels" group-type="${channel_type}"></ul>`).appendTo(category);
     // Create sortable - this needs to be put into edit_channels file
-    var type = categoryList.attr('group-type');
+    let type = categoryList.attr('group-type');
     if(categoryList.children.length > 0){
       new Sortable($(categoryList)[0], {
         animation: 150,
@@ -239,7 +239,7 @@ var client = window.client = new class{
       // Use to remove any channel categories that don't exist remotely
       for(const channel_type of Object.keys(this.serverinfo.channels)){
         if(d.channels[channel_type] === undefined){
-          var localChannels = Object.values(this.channels).filter(({type}) => type === channel_type);
+          let localChannels = Object.values(this.channels).filter(({type}) => type === channel_type);
           for(const temp_channel of localChannels){
             $(temp_channel.el).remove();
             delete this.channels[temp_channel.id];
@@ -251,7 +251,7 @@ var client = window.client = new class{
       }
 
       for(const [channel_type, channels] of Object.entries(d.channels)){        
-        var localChannels = Object.values(this.channels).filter(({type}) => type === channel_type);
+        let localChannels = Object.values(this.channels).filter(({type}) => type === channel_type);
 
         if(Object.keys(this.channels).length === 0 || localChannels.length === 0 ){
           // No channels exist for this category, create it
@@ -260,7 +260,7 @@ var client = window.client = new class{
           if($(`#${channel_type}_channels`) !== null){ $(`#${channel_type}_channels`).parent(".channel-group").remove()}
 
           // Create category elements
-          var {categoryList} = this._createCategory(channel_type);
+          let {categoryList} = this._createCategory(channel_type);
 
           // create the type if it doesn't exist
           if(this.serverinfo.channels[channel_type] === undefined){
@@ -277,8 +277,8 @@ var client = window.client = new class{
         } else {
           if(channels.length !== localChannels.length){
             // Need to add or remove channels from this category
-            var localIds = localChannels.map(a => a.id);
-            var remoteIds = channels.map(a => a.id);
+            let localIds = localChannels.map(a => a.id);
+            let remoteIds = channels.map(a => a.id);
 
             for(const localId of localIds){
               if(!remoteIds.includes(localId)){
@@ -289,8 +289,8 @@ var client = window.client = new class{
 
             for( const remoteId of remoteIds){
               if(!localIds.includes(remoteId)){
-                var toAdd = channels.find(a => {return a.id === remoteId});
-                var categoryList = $(`#${toAdd.type}_channels`);
+                let toAdd = channels.find(a => {return a.id === remoteId});
+                let categoryList = $(`#${toAdd.type}_channels`);
                 this.addChannel(toAdd, categoryList);
               };
             }; 
@@ -304,7 +304,7 @@ var client = window.client = new class{
           if(channels.sort().map((a) => a.name).join(',') !== localChannels.sort().map((a) => a.name).join(',')){
             // Check channel names
             for(const localChannel of localChannels){
-              var remoteChannel = channels.find(a=> a.id === localChannel.id);
+              let remoteChannel = channels.find(a=> a.id === localChannel.id);
               if(remoteChannel.name !== localChannel.name){
                 $(localChannel.el).find(".channel-name").text(remoteChannel.name);
                 if(localChannel.id === this.textChannel){
@@ -325,8 +325,8 @@ var client = window.client = new class{
       url: `/channels/${d.id}`,
       timeout: 10000,
       success: ((result)=>{
-        var channel_el = $(result).appendTo(categoryList);
-        var new_channel = new channelTypes[d.type](channel_el);
+        let channel_el = $(result).appendTo(categoryList);
+        let new_channel = new channelTypes[d.type](channel_el);
         if(this.textChannel === null && d.type === "text"){
           new_channel.setActive();
         }
@@ -368,8 +368,8 @@ var client = window.client = new class{
 
       $("#sfx_volume").val(localStorage.getItem('sfx_volume') || 0.5);
       $("#sfx_volume").on('input', (e)=>{
-        var vol = $(e.target).val();
-        var i;
+        let vol = $(e.target).val();
+        let i;
         for(i = 0; i < soundfiles.length; i++){
           soundeffects[soundfiles[i]].volume = vol;
         };
@@ -378,7 +378,7 @@ var client = window.client = new class{
 
       $("#call_volume").val(this.audioOut.volume);
       $("#call_volume").on('input', (e)=>{
-        var vol = $(e.target).val();
+        let vol = $(e.target).val();
         this.audioOut.volume = vol;
         localStorage.setItem("call_volume", vol);
       });
@@ -504,7 +504,7 @@ class textChannel extends channel{
   };
 }
 
-var channelTypes = {
+let channelTypes = {
   voice: voiceChannel,
   text: textChannel
 }
@@ -530,7 +530,7 @@ $( document ).ready(function() {
     }
   
     loadDarkScript(val){
-      var script = document.createElement('script');
+      let script = document.createElement('script');
       script.src = './js/darkreader.js';
       this.darkScript = document.head.appendChild(script);
       this.darkScript.onload = ()=>{
@@ -569,7 +569,7 @@ $( document ).ready(function() {
 
   $(document).on('click', '.msg_delete', function(){
     console.log($(this).closest(".message-card"))
-    var msgID = $(this).closest(".message-card").attr("id");
+    let msgID = $(this).closest(".message-card").attr("id");
     console.log(`/message/${msgID}`)
     $.ajax({
       async: true,
@@ -596,7 +596,7 @@ $( document ).ready(function() {
   })
 
   $("#load_messages a").on('click',function(){
-    var channel = client.channels[client.textChannel];
+    let channel = client.channels[client.textChannel];
     channel.page += 1;
     channel.getMessages({"page": channel.page})
   });
@@ -610,7 +610,7 @@ $( document ).ready(function() {
 
   $(document).on('contextmenu taphold', '.user', (evt)=>{
     evt.preventDefault();
-    var container = $(".interact-menu");
+    let container = $(".interact-menu");
     $.ajax({
       async: true,
       type: 'GET',
@@ -618,7 +618,7 @@ $( document ).ready(function() {
       timeout: 10000,
       success: ( function( result){
         container.html(result);
-        var bounds = {
+        let bounds = {
           x: (evt.clientX > $(".interact-menu").outerWidth()) ? evt.clientX - $(".interact-menu").outerWidth() : evt.clientX,
           y: Math.min(evt.clientY, $(window).height() - $(".interact-menu").outerHeight())
         }
@@ -650,7 +650,7 @@ $( document ).ready(function() {
   
   $("#message_input_area").on('submit', function(e) {
     e.preventDefault();
-    var contents = $("#message_box").val();
+    let contents = $("#message_box").val();
     $.ajax({
       async: true,
       type: 'POST',

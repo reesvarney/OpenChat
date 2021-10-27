@@ -1,10 +1,10 @@
 const ogs = require("open-graph-scraper");
-var express = require("express");
-var router = express.Router();
-var anchorme = require("anchorme").default;
+let express = require("express");
+let router = express.Router();
+let anchorme = require("anchorme").default;
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-var moment = require("moment");
+let moment = require("moment");
 const rateLimit = require("express-rate-limit");
 const autoLimit = rateLimit({
   windowMs: 1 * 1000,
@@ -20,22 +20,22 @@ const spamLimit2 = rateLimit({
 });
 
 function sanitize(str) {
-  var document = new JSDOM("<div></div>");
+  let document = new JSDOM("<div></div>");
   document.window.document.querySelector("div").textContent = str;
   return document.window.document.documentElement.querySelector("div")
     .innerHTML;
 }
 
 module.exports = function ({ db, io, expressFunctions, signallingServer }) {
-  var ogpCache = {};
-  var messageCache = {};
+  let ogpCache = {};
+  let messageCache = {};
 
   router.get("/channel/:channel", expressFunctions.checkAuth, (req, res) => {
     if (req.query.page == undefined) {
       req.query.page = 0;
     }
 
-    var query;
+    let query;
 
     if (req.query.id != undefined) {
       query = {
@@ -63,9 +63,9 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
       } else {
         function getMessageData(i) {
           return new Promise((resolve) => {
-            var currentMessage = messages[i].dataValues;
+            let currentMessage = messages[i].dataValues;
             //Just in case message has no user for whatever reason, 
-            var content_clean = sanitize(currentMessage.content);
+            let content_clean = sanitize(currentMessage.content);
             if(currentMessage.User === null){
               currentMessage.sender = "Anonymous";
             } else {
@@ -82,14 +82,14 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
               },
             });
 
-            var links = anchorme.list(content_clean);
+            let links = anchorme.list(content_clean);
 
             currentMessage.date = moment(currentMessage.createdAt);
 
             if (links.length != 0) {
-              var linkHandled = false;
+              let linkHandled = false;
 
-              var regEx = [
+              let regEx = [
                 {
                   name: "yt",
                   expression: /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/gim,
@@ -119,8 +119,8 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
                   expression: /(?:.+)?music\.apple\.com\/..\/(album|song)\/([^,.;#\\\/]+)\/(\d+)$/,
                   function: function (str) {
                     // Bit inefficient but we'll just run the regex on it again so we can use the capture groups
-                    var captureGroups = str.match(/(?:.+)?music\.apple\.com\/..\/(album|song)\/([^,.;#\\\/]+)\/(\d+)$/);
-                    var out = `https://embed.music.apple.com/gb/${captureGroups[1]}/${captureGroups[2]}/${captureGroups[3]}`;
+                    let captureGroups = str.match(/(?:.+)?music\.apple\.com\/..\/(album|song)\/([^,.;#\\\/]+)\/(\d+)$/);
+                    let out = `https://embed.music.apple.com/gb/${captureGroups[1]}/${captureGroups[2]}/${captureGroups[3]}`;
                     return out
                   }
                 }
@@ -128,7 +128,7 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
 
               for (x = 0; x < links.length; x++) {
                 for (z = 0; z < regEx.length; z++) {
-                  var currentRegEx = regEx[z];
+                  let currentRegEx = regEx[z];
                   if (currentRegEx.expression.test(links[x].string)) {
                     currentMessage[currentRegEx.name] = currentRegEx.function(
                       links[x].string
@@ -142,7 +142,7 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
               }
 
               if (!linkHandled) {
-                var firstLink = links[0].string;
+                let firstLink = links[0].string;
                 if (firstLink in ogpCache) {
                   currentMessage["ogp"] = ogpCache[firstLink];
                   messages[i] = currentMessage;
@@ -156,7 +156,7 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
                     },
                     (error, ogpResult, response) => {
                       if ("ogTitle" in ogpResult) {
-                        var ogpData = {};
+                        let ogpData = {};
 
                         ogpData.imageSRC = "";
                         if (
@@ -200,7 +200,7 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
           });
         }
 
-        var messageStatuses = [];
+        let messageStatuses = [];
         for (i = 0; i < messages.length; i++) {
           if (messages[i].dataValues.id in messageCache) {
             Object.assign(messageCache[messages[i].dataValues.id], {
@@ -228,7 +228,7 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
   });
 
   router.post("/channel/:channel", autoLimit, spamLimit, spamLimit2, expressFunctions.checkAuth, expressFunctions.hasPermission("send_message"), (req, res) => {
-    var error = false;
+    let error = false;
     if(req.user !== undefined){
       db.models.Message.create({
         ChannelId: req.params.channel,
@@ -254,7 +254,7 @@ module.exports = function ({ db, io, expressFunctions, signallingServer }) {
   });
 
   router.delete("/message/:uuid", expressFunctions.checkAuth, async(req, res)=>{
-    var message = await db.models.Message.findByPk(req.params.uuid);
+    let message = await db.models.Message.findByPk(req.params.uuid);
     if(message !== null){
       if(message.UserId === req.user.id || req.user.permissions.channels[message.ChannelId].manage_messages){
         await message.destroy();

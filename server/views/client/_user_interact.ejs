@@ -1,6 +1,12 @@
   <ul>
+    <li class="interact-info">
+      User ID:
+      <br>
+      <%= user.id %>
+    </li>
+    <% //console.log(roles.filter(a=>!["owner", "all"].includes(a.name)).length )%>
     <% if(req.user.permissions.global.edit_roles && user.temp === false && roles !== undefined && roles.filter(a=>!["owner", "all"].includes(a.name)).length > 0){ %>
-    <li class="toggle">
+    <li class="toggle feature-new">
       Roles
       <div class="toggle-content">
         <form id="user-interact-roles" method="POST" action="/admin/user/<%= user.id %>/roles/set">
@@ -19,42 +25,42 @@
     <% } %>
 
     <% if(req.user.permissions.global.mute_users){%>
-      <li class="disabled">
+      <li class="disabled feature-soon">
         Server Mute
       </li>
     <%}%>
 
     <% if(req.user.permissions.global.deafen_users){%>
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Server Deafen
     </li>
     <%}%>
 
     <% if(req.user.permissions.global.kick){%>
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Kick
     </li>
     <%}%>
 
     <% if(req.user.permissions.global.ban){%>
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Ban
     </li>
     <%}%>
 
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Volume
     </li>
 
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Local Mute
     </li>
 
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Local Deafen
     </li>
     
-    <li class="disabled">
+    <li class="disabled feature-soon">
       Block
     </li>
   </ul>

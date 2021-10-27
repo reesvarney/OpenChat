@@ -29,7 +29,7 @@ const relations = {
 
 function addModels(model_data){
   for (const [name, model] of Object.entries(model_data)) {
-    var tmodel = sequelize.define(name, model.attributes, model.options);
+    sequelize.define(name, model.attributes, model.options);
   };
   
   for (const [name, model] of Object.entries(model_data)) {

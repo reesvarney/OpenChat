@@ -1,13 +1,13 @@
-var express = require("express");
-var router = express.Router();
+let express = require("express");
+let router = express.Router();
 const fs = require('fs');
 const path = require('path');
-var authMethods = [];
+let authMethods = [];
 
 module.exports = function (controllerParams) {
   fs.readdir(path.join(__dirname, './methods'), (err, files) => {
     files.forEach((file) => {
-      var method = require(path.join(__dirname, './methods', file));
+      let method = require(path.join(__dirname, './methods', file));
       if(!(method.name === "anon" && controllerParams.config.allowAnon == "false")){
         controllerParams.passport.use(method.name, method.strategy(controllerParams));
         if ("models" in method) {
@@ -18,7 +18,7 @@ module.exports = function (controllerParams) {
           name: method.displayName,
           icon: method.icon
         });
-        var methodRouter = method.router(method.name, controllerParams);
+        let methodRouter = method.router(method.name, controllerParams);
         methodRouter.use(express.static("./views/assets/dist"));
         router.use(`/${method.name}`, methodRouter);
       }

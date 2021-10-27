@@ -1,6 +1,6 @@
-var path = require('path');
-var express = require('express');
-var router = express.Router();
+let path = require('path');
+let express = require('express');
+let router = express.Router();
 
 
 module.exports = function({secret}){

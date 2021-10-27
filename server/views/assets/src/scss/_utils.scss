@@ -1,0 +1,25 @@
+.feature-new {
+  position: relative;
+  &:after{
+    content: "New";
+    color: #119911;
+    position: absolute;
+    top: 0px;
+    right: 8px;
+    padding-right: 5px;
+    font-size: 12px;
+  }
+}
+
+.feature-soon {
+  position: relative;
+  &:after{
+    content: "Soon";
+    color: #a33030;
+    position: absolute;
+    top: 0px;
+    right: 8px;
+    padding-right: 5px;
+    font-size: 12px;
+  }
+}

@@ -1,7 +1,7 @@
-var fs = require('fs');
+let fs = require('fs');
 
 module.exports = ()=>{
-  var config;
+  let config;
   try{
     config =  require('../config.json');
   } catch(err){

@@ -1,7 +1,7 @@
 async function initialize(passport, db, temp_users, OCCache) {
-  var setup_mode = false;
-  var defaultPerms = require('./permissions_default.json');
-  var permissions = {};
+  let setup_mode = false;
+  let defaultPerms = require('./permissions_default.json');
+  let permissions = {};
 
   // Create permissions based off of the json
   for(const [id, {defaultValue, displayName}] of Object.entries(defaultPerms)){
@@ -17,7 +17,7 @@ async function initialize(passport, db, temp_users, OCCache) {
   };
 
   // Checks for the default role
-  var defaultRole = await db.models.Role.findOne({
+  let defaultRole = await db.models.Role.findOne({
     where: {
       name: "all"
     },
@@ -30,7 +30,7 @@ async function initialize(passport, db, temp_users, OCCache) {
   }
 
   // Checks for the owner role
-  var ownerRole = await db.models.Role.findOne({
+  let ownerRole = await db.models.Role.findOne({
     where: {
       name: "owner"
     },
@@ -58,10 +58,10 @@ async function initialize(passport, db, temp_users, OCCache) {
 
   // Creates permissions with default values
   async function createPermissionSet(){
-    var newSet = await db.models.PermissionSet.create();
+    let newSet = await db.models.PermissionSet.create();
     for(const [id, permission] of Object.entries(permissions)){
       try{
-        var newVal = await db.models.PermissionValue.create({
+        let newVal = await db.models.PermissionValue.create({
           PermissionId: id,
           value: permission[0].defaultValue
         });
@@ -76,13 +76,13 @@ async function initialize(passport, db, temp_users, OCCache) {
   // Creates a role and gives it the default values for each permission
   async function createRole(name){
     try{
-      var role = await db.models.Role.create({
+      let role = await db.models.Role.create({
         name: name
       });
     } catch(err){
       console.log(err)
     }
-    var newSet = await createPermissionSet();
+    let newSet = await createPermissionSet();
     await role.setPermissionSet(newSet);
 
     _role = await db.models.Role.findByPk(role.id, {
@@ -98,12 +98,12 @@ async function initialize(passport, db, temp_users, OCCache) {
 
   // Updates the permissions property of the user to match database values
   async function updateUserPerms(userid){
-    var user = {};
+    let user = {};
     if(userid.startsWith("t::")){
       user = temp_users[userid];
       user["Roles"] = [defaultRole];
     } else {
-      var result = await db.models.User.findOne({
+      let result = await db.models.User.findOne({
         where: {
           id: userid,
         },
@@ -129,7 +129,7 @@ async function initialize(passport, db, temp_users, OCCache) {
       user = result;
     }
     
-    var permissions = {"global" : {},"categories": {}, "channels": {}};
+    let permissions = {"global" : {},"categories": {}, "channels": {}};
 
     if(user.Roles.length === 0){
       // User does not have any roles, give them the default role
@@ -140,7 +140,7 @@ async function initialize(passport, db, temp_users, OCCache) {
     } else {
       // User has at least 1 role, runs for each
       for(const role of user.Roles){
-        var test = role.PermissionSet.PermissionValues.filter(({PermissionId, value})=> PermissionId === "isAdmin" && value === true);
+        let test = role.PermissionSet.PermissionValues.filter(({PermissionId, value})=> PermissionId === "isAdmin" && value === true);
         if(test.length > 0) {
           // Role includes admin permission, make all of these true
           for (const key of Object.keys(defaultPerms)) {
@@ -161,13 +161,13 @@ async function initialize(passport, db, temp_users, OCCache) {
     // This means when checking if a user can do something we can simply just check user.permissions.channels[currentchannel]
     // Will also need to find a way for a user to have individual perms for channels/ categories rather than just roles
 
-    var categories = await db.models.Category.findAll();
+    let categories = await db.models.Category.findAll();
     for(const {id} of categories){
       // temp, will need to check category permission assignments
       permissions["categories"][id] = permissions["global"];
     };
 
-    var channels = await db.models.Channel.findAll();
+    let channels = await db.models.Channel.findAll();
     for(const {id} of channels){
       // temp, will need to check channel permission assignments
       permissions["channels"][id] = permissions["global"];

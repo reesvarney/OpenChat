@@ -10,7 +10,7 @@ $( document ).ready(()=>{
     })
 
     $("#edit_channel_actions>#channel_delete_btn").on('click', function(){
-      var action = $('#edit_channel form').attr('action');
+      let action = $('#edit_channel form').attr('action');
       $.ajax({
         async: true,
         type: 'DELETE',

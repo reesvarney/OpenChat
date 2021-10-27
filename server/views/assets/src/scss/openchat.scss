@@ -1,3 +1,8 @@
+@import "_users.scss";
+@import "_channels.scss";
+@import "_messages.scss";
+@import "_utils.scss";
+
 html {
   height: 100vh;
   width: 100vw;
@@ -74,127 +79,6 @@ html {
         }        
       }
 
-      #channels_heading {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        .add_channel_btn {
-          color: #bbbbbb;
-        }
-      }
-
-      #channels {
-        padding: 5px;
-        padding-left: 10px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        overflow-y: auto;
-        overflow-x: hidden;
-
-        .channel-group{
-          justify-self: flex-start;
-
-          h4{
-            font-weight: 500;
-            margin-top: 5px;
-            color: darkgrey;
-          }
-
-          &>ul{
-            padding-left: 10px;
-
-            &>li {
-              display: flex;
-              flex-direction: column;
-              text-decoration: none;
-              list-style: none;
-              background: #ffffff;
-              border-radius: 3px;
-
-              &.active {
-                box-shadow: 0px 0px 6px 1px rgba(22, 66, 199, 0.52);
-
-                .channel{
-                  .channel-name { 
-                    &:hover {
-                      cursor: default;
-                    }
-                  }
-                }
-                
-              }
-
-              &:not(.active):hover {
-                background: rgba(200,200,200, 0.1);
-              }
-
-              .channel {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-
-                .edit_channel_btn {
-                  align-self: center;
-                  height: 100%;
-                  padding: 0px 5px;
-                  margin-right: 5px;
-
-                  &:hover{
-                    text-decoration: none;
-                  }
-
-                  &>* {
-                    display: block;
-                    align-self: center;
-                    position: relative;
-                    color: #a1a1a1;
-                  }
-                }
-
-                .channel-name {
-                  display: inline-block;
-                  height: 100%;
-                  box-sizing: border-box;
-                  padding: 10px;
-                  position: relative;
-                  flex-grow: 2;
-                  color: black;
-                  // font-size: 28px;
-                  margin: 0px;
-
-                  &:hover {
-                    cursor: pointer;
-                    color: black;
-                    text-decoration: none;
-                  }
-                }
-              }
-              
-              .user-list {
-                position: relative;
-                list-style: none;
-                height: auto;
-                padding: 0px;
-                padding-right: 15px;
-
-                li {
-                  position: relative;
-                  margin-top: 5px;
-                  box-sizing: border-box;
-                  padding-left: 20px;
-
-                  &:last-of-type {
-                    margin-bottom: 15px;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
       #control_area {
         display: flex;
         flex-direction: row;
@@ -241,47 +125,6 @@ html {
           }
         }
       }
-
-      #global_user_list{
-        background-color: #f9f9f9;
-        min-width: 50px;
-        width: 250px;
-        max-width: 30%;
-        padding: 10px;
-
-        .user {
-          background-color: #ffffff;
-
-          &:hover{
-            background-color: rgba(200,200,200, 0.1);
-          }
-        }
-      }
-    }
-
-    .user{
-      cursor: pointer;
-      border-radius: 5px;
-      
-      &:not(.inline){
-        padding: 10px;
-
-        &:hover{
-          background-color: rgba(200,200,200, 0.1);
-        }
-
-        a {
-          color: black;
-
-          &:hover{
-            text-decoration: none;
-          }
-        }
-      }
-      
-      &.slim{
-        padding: 3px 10px;
-      }
     }
   }
 
@@ -301,11 +144,14 @@ html {
       margin: 0px;
 
       li {
-        cursor: pointer;
         text-decoration: none;
         padding:5px;
         list-style-type: none;
         border-radius: 5px;
+
+        &:not(.interact-info){
+          cursor: pointer;
+        }
 
         &.disabled {
           cursor: default;
@@ -409,196 +255,6 @@ main {
   position: relative;
 }
 
-
-#channel_info {
-  padding: 10px;
-  padding-left: 20px;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  background-color: rgba(255,255,255, 0.9);
-}
-
-/* #channel_info::after {
-  content: '';
-  width: 100%;
-  height: 1px;
-  left: 0;
-  bottom: 0px;
-  background: linear-gradient(to right, hsla(0, 0%, 0%, 0.1) 0%, hsla(0, 0%, 0%, 0.1) 33%, hsla(0, 0%, 0%, 0) 90%);
-  box-shadow: 0px 7px 14px rgba(0, 0, 0, 0.2);
-  position: absolute;
-} */
-
-#message_scroll {
-  position: relative;
-}
-
-#messages {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-start;
-  margin: 0px;
-  box-sizing: content-box;
-  min-height: 100%;
-}
-
-.message-card {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  padding-left: 30px;
-  padding-right: 40px;
-  word-wrap: break-word;
-}
-
-.message-card:hover {
-  background: #fafafa;
-}
-
-.message-card .msg-meta{
-  width: 100%;
-}
-
-.msg_delete {
-  display: inline-block;
-  margin-left: auto;
-}
-
-.ogp-card {
-  display: flex;
-  flex-direction: row;
-  margin-left: 20px;
-  margin-top: 10px;
-  background: #f6f6f6;
-  padding: 20px;
-  align-items: flex-start;
-  width: auto;
-  max-width: 800px;
-}
-
-.ogp-card img {
-  max-height: 50px;
-  margin-right: 30px;
-}
-
-.ogp-card p {
-  margin: 0px;
-}
-
-#no_messages {
-  width: 100%;
-  height: 200px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  a {
-    font-size: 36px;
-    font-weight: 600;
-    color: darkgrey;
-    cursor: default;
-  
-    &:hover{
-      text-decoration: none;
-    }
-  }
-}
-
-#load_messages {
-  width: 100%;
-  text-align: center;
-  margin-top: auto;
-  padding-top: 30px;
-  margin-bottom: 20px;
-}
-
-#load_messages a {
-  text-decoration: none;
-  border: #ebe9e9;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 20px;
-  padding: 10px;
-  color: darkgrey;
-}
-
-#load_messages a:focus:hover {
-  background-color: #f6f6f6;
-}
-
-#new_message>.content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.yt-container {
-  width: 100%;
-  height: 100%;
-  max-width: 520px;
-  max-height: 292.5px;
-}
-
-.yt-player {
-  position: relative;
-  padding-bottom: 56.25%;
-  /* 16:9 */
-  height: 0;
-
-  box-sizing: border-box;
-}
-
-.yt-player iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-
-.spotify-embed {
-  width: 100%;
-  background: #282828;
-  min-width: 80px;
-  height: 400px;
-}
-
-.appleMusic-embed {
-  width: 100%;
-  min-width: 80px;
-  height: 250px;
-  border-radius: 12px;
-}
-
-.appleMusic-embed iframe {
-  overflow:hidden;
-  background:transparent;
-}
-
-/* MESSAGE INPUT */
-#message_input_area {
-  display: flex;
-  flex-direction: row;
-  border-radius: 0px;
-  /* box-shadow: 0px -7px 14px #ededed; */
-  width: 100%;
-  margin: 0;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-#message_box {
-  flex-grow: 1;
-  width: 100%;
-  width: 100%;
-  box-sizing: border-box;
-  resize: none;
-  overflow-y: auto;
-  border-radius: 8px;
-  background-color: rgba(0,0,0,0.01);
-}
-
 /* detect sub 700 wide displays */
 #nav-toggle,
 #nav-close {
@@ -621,6 +277,10 @@ main {
     width: 100vw;
     height: 100vh;
     overflow-y: auto;
+  }
+
+  #global_user_list {
+    display: none;
   }
 
   .channel-content {

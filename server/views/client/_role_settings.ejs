@@ -23,7 +23,7 @@
                 <label class="uk-form-label"><%=Permission.name%></label>
                 <input type="hidden" name="<%=Permission.id%>" value="false">
                 <input class="uk-checkbox" type="checkbox" name="<%=Permission.id%>" <% if(value){ %> checked <% } %>
-                  <% var roleIsAdmin = role.PermissionSet.PermissionValues.find(el => el.PermissionId === 'isAdmin') %>
+                  <% let roleIsAdmin = role.PermissionSet.PermissionValues.find(el => el.PermissionId === 'isAdmin') %>
                   <% if(roleIsAdmin !== undefined && roleIsAdmin.value === true && Permission.id !== 'isAdmin'){ %> disabled <%} %> value="true">
               </div>
             <% }; %>

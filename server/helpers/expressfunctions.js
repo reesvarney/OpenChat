@@ -18,7 +18,7 @@ module.exports = (OCCache)=>{
       if(id === null){
         return function(req, res, next){
           if (req.isAuthenticated()){
-            var permission;
+            let permission;
             if(subscope !== null){
               permission = req.user.permissions[scope][subscope][perm];
             } else {

@@ -1,7 +1,7 @@
 window.roleFunctions = {
   createRoleChangeListener: ()=>{
     $("#user-interact-roles").on('change.rolechange', function(evt){
-      var roledata = {};
+      let roledata = {};
       for(const v of Object.values($(this).serializeArray())){
         roledata[v.name] = (roledata[v.name] !== true && ["true", true].includes(v.value)) ? true : false;
       };
@@ -24,8 +24,8 @@ window.roleFunctions = {
       url: "/admin/role/all",
       timeout: 10000,
       success: (result)=>{
-        var current = $("#edit_roles .uk-open");
-        var open = [];
+        let current = $("#edit_roles .uk-open");
+        let open = [];
         if(current.length > 0){
           open.push(current.find(".role_edit_form").attr("action"));
         }
@@ -42,8 +42,8 @@ window.roleFunctions = {
 $( document ).ready(()=>{
   $(document).on('submit', ".role_edit_form", function (e) {
     e.preventDefault();
-    var data = {};
-    var disabledfields = $(this).find('[disabled]');
+    let data = {};
+    let disabledfields = $(this).find('[disabled]');
     disabledfields.prop('disabled', false);
     $(this).serializeArray().forEach((perm)=>{
       if(!(perm.name in data && data[perm.name] == "true")){ 
@@ -73,7 +73,7 @@ $( document ).ready(()=>{
   });
 
   $(".edit_role_actions>.role_delete_btn").on('click', function(){
-    var action = $(this).parents('form:first').attr('action');
+    let action = $(this).parents('form:first').attr('action');
     $.ajax({
       async: true,
       type: 'DELETE',

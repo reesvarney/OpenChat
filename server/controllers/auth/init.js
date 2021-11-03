@@ -76,7 +76,7 @@ async function initialize(passport, db, temp_users, OCCache) {
   // Creates a role and gives it the default values for each permission
   async function createRole(name){
     try{
-      let role = await db.models.Role.create({
+      var role = await db.models.Role.create({
         name: name
       });
     } catch(err){

@@ -401,8 +401,10 @@ html {
           padding-right: 0px;
           background-color: rgba(240, 240, 240, 0.4);
           border-radius: 5px; }
-          html .interact-menu ul li #user-interact-roles > div:not(:last-of-type) {
+          html .interact-menu ul li #user-interact-roles div:not(:last-of-type) {
             margin-bottom: 15px; }
+          html .interact-menu ul li #user-interact-roles div label {
+            padding-left: 10px; }
   html .toggle > .toggle-content {
     display: none;
     font-size: 0.8em; }

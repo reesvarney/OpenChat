@@ -173,8 +173,14 @@ html {
           background-color: rgba(240,240,240, 0.4);
           border-radius: 5px;
 
-          &>div:not(:last-of-type){
-            margin-bottom: 15px;
+          div{
+            &:not(:last-of-type){
+              margin-bottom: 15px;
+            }
+  
+            label {
+              padding-left: 10px;
+            }
           }
         }
       }

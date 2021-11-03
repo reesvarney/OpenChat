@@ -8,6 +8,7 @@ require('electron-titlebar')
 
 var templates = {}
 var servers = {};
+let currentServerInteract = null;
 
 class server {
   constructor(url){
@@ -140,6 +141,23 @@ class server {
         this.authenticate();
       }
     });
+
+    this.thumbnail.el.on("contextmenu", ()=>{
+      // Create menu to delete
+      let position  = this.thumbnail.el.position();
+      let container = $("#server_contextmenu");
+      currentServerInteract = this.url.href;
+      container.show();
+      container.css({top: position.top, left: position.left});
+      $(document).on('mousedown.closeinteract', (e)=>{
+        if (!container.is(e.target) && container.has(e.target).length === 0) 
+        {
+            container.hide();
+            container.find('.toggle-content').hide();
+            $(document).off('.closeinteract');
+        }
+      });
+    });
   };
 
   removeWebView(){
@@ -186,6 +204,20 @@ $(window).on('load', function (e) {
     if (e.target !== this) return;
     overlay.hide();
   });
+
+  $("#delete_server").on("click", function(){
+    let serverIndex = userPrefs.servers.map(a=> (new URL(a)).href).indexOf(currentServerInteract);
+    console.log(serverIndex)
+    if(serverIndex !== -1){
+      userPrefs.servers.splice(serverIndex, 1);
+      ipcRenderer.send("setPrefs", userPrefs);
+      servers[currentServerInteract].removeWebView();
+      $(`[oc_url="${currentServerInteract}"]`).remove();
+      delete servers[currentServerInteract];
+      console.log("Deleted")
+      $("#server_contextmenu").hide();
+    };
+  })
 
   $("#modal_close").on( 'click', function () {
     overlay.hide();

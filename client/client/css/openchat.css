@@ -310,3 +310,15 @@ button:hover:focus{
 .dark #electron-titlebar img{
     filter: invert(1);
 }
+
+#server_contextmenu{
+    display: none;
+    position: fixed;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#server_contextmenu a{
+    cursor: pointer;
+}

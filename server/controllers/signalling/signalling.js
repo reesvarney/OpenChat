@@ -135,6 +135,10 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
         this.joinChannel(id);
       });
 
+      this.socket.on("RTCNegotiation", (msg)=>{
+        server.mcu.socket.emit("RTCNegotiation", msg);
+      });
+
       this.socket.on("leaveChannel", ()=>{
         this.leaveChannel();
       });

@@ -109,6 +109,10 @@ async function startServer(){
     ssl: options
   });
   
+  peerServer.on('connection', (client)=>{
+    console.log(client);
+  });
+
   app.use('/rtc', peerServer);
   
   //SIGNALLING

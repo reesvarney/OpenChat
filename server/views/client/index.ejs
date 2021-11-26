@@ -100,8 +100,9 @@
       </ul>
 
       <!-- Add a check for the config.allowanon for whether to display this - also maybe hide if no temp users connected -->
-      <h5 class="uk-heading-line"><span>Temporary</span></h5>
-
+      <% if(config.allowAnon){ %>
+        <h5 class="uk-heading-line"><span>Temporary</span></h5>
+      <% } %>
       <ul class="temp-users uk-list">
         
       </ul>

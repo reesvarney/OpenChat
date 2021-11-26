@@ -1,6 +1,6 @@
 
   // SOCKET LISTENERS
-  let mcu = new class{
+  const mcu = new class{
     constructor(){
       this.users = {};
       this.channels = {};
@@ -259,8 +259,7 @@
             let mix_stream = mcu.users[currentid]["mixer"].getMixedStream();
             let mix_track = mix_stream.getAudioTracks()[0];
   
-            // I can't remember what this did to be honest
-            // I'll test it without for now
+            // seems that it needs to be played through/ loaded into an audio element to work? not too sure but i think it needs this to work
             this.audioOut.srcObject = instreams[0];
   
             // Set the output track to the mixed audio

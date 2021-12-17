@@ -55,6 +55,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
         this.expires = null;
         this.publicData;
         this.status;
+
         (async()=>{
           let db_user = await db.models.User.findByPk(id);
           if (db_user !== null || id in temp_users) {
@@ -74,6 +75,8 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
             server.deleteUser(id);
           };
         })();
+
+        this.iceCandidate = null;
     };
 
     get publicData(){
@@ -136,6 +139,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
       });
 
       this.socket.on("RTCNegotiation", (msg)=>{
+        msg.sender = this.socket.id;
         server.mcu.socket.emit("RTCNegotiation", msg);
       });
 
@@ -194,6 +198,7 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
       this.status = "offline";
       this.id = null;
       this.socket = null;
+      this.iceCandidate = null;
     }
 
     initSockets(){
@@ -230,6 +235,10 @@ function startServer({ db, io, config, secret, port, temp_users, expressFunction
         console.log("MCU LOST CONNECTION");
         this.socket.disconnect(); //Just to make sure its completely disconnected
       });
+
+      this.socket.on("RTCNegotiation",({type, data})=>{
+
+      })
     }
 
     connect(socket){

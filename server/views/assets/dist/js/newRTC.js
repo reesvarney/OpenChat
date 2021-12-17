@@ -23,10 +23,10 @@ class OCRTCBase{
             this._onAnswer(data);
           } else {
             console.log("Invalid SDP Type");
-          }
+          };
         case "candidate":
           this._onCandidate(data);
-      }
+      };
     });
 
     this.peerConnection.ontrack = (event)=>{
@@ -34,12 +34,8 @@ class OCRTCBase{
     };
 
     this.peerConnection.onnegotiationneeded = async()=>{
-      try {
-        await this.peerConnection.setLocalDescription(await this.peerConnection.createOffer());
-        this.socket.emit("RTCNegotiation", {type:"desc", data: this.peerConnection.localDescription});
-      } catch (err) {
-        console.error(err);
-      }
+      await this.peerConnection.setLocalDescription(await this.peerConnection.createOffer());
+      this.socket.emit("RTCNegotiation", {type:"desc", data: this.peerConnection.localDescription});
     }
   };
 
